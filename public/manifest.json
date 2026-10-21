@@ -1,0 +1,27 @@
+{
+  "name": "pioftina.gr",
+  "short_name": "pioftina",
+  "description": "Έξυπνος Προγραμματισμός Γευμάτων & Τιμές Supermarket",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

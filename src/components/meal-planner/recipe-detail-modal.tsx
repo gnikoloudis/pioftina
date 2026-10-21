@@ -28,8 +28,10 @@ import {
   Check,
   ExternalLink,
   Link as LinkIcon,
+  Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AddIngredientModal, AddIngredientResult } from "@/components/admin/add-ingredient-modal";
 
 interface RecipeDetailModalProps {
   recipe: Recipe | null;
@@ -39,6 +41,7 @@ interface RecipeDetailModalProps {
   onUpdateCategory?: (recipeId: string, category: RecipeCategory) => void;
   onUpdateReferenceUrl?: (recipeId: string, referenceUrl: string) => void;
   onEditInStudio?: (recipeId: string) => void;
+  onAddIngredient?: (recipeId: string, ingredient: Ingredient) => void;
 }
 
 export function RecipeDetailModal({
@@ -49,9 +52,11 @@ export function RecipeDetailModal({
   onUpdateCategory,
   onUpdateReferenceUrl,
   onEditInStudio,
+  onAddIngredient,
 }: RecipeDetailModalProps) {
   const [activeTab, setActiveTab] = useState<"ingredients" | "curation">("ingredients");
   const [curatingIngredient, setCuratingIngredient] = useState<Ingredient | null>(null);
+  const [isAddIngredientOpen, setIsAddIngredientOpen] = useState(false);
   const [justUpdatedCategory, setJustUpdatedCategory] = useState(false);
   const [isEditingRefUrl, setIsEditingRefUrl] = useState(false);
   const [refUrlInput, setRefUrlInput] = useState(recipe?.referenceUrl || "");
@@ -272,9 +277,22 @@ export function RecipeDetailModal({
                 </p>
 
                 <div>
-                  <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-3">
-                    Απαιτούμενα Υλικά ({recipe.ingredients.length})
-                  </h3>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">
+                      Απαιτούμενα Υλικά ({recipe.ingredients.length})
+                    </h3>
+                    {onAddIngredient && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsAddIngredientOpen(true)}
+                        className="h-7 text-xs gap-1.5 rounded-xl border-primary/30 text-primary hover:bg-primary/10"
+                      >
+                        <Plus className="size-3.5" />
+                        Προσθήκη Υλικού
+                      </Button>
+                    )}
+                  </div>
                   <div className="divide-y divide-border border border-border rounded-xl overflow-hidden bg-card">
                     {recipe.ingredients.map((ing) => {
                       const aisle = AISLE_CATEGORIES[ing.category];
@@ -467,6 +485,29 @@ export function RecipeDetailModal({
             if (onCurateProduct) {
               onCurateProduct(recipe.id, curatingIngredient.id, selectedProduct);
             }
+          }}
+        />
+      )}
+
+      {/* Add Ingredient Modal */}
+      {isAddIngredientOpen && (
+        <AddIngredientModal
+          isOpen={isAddIngredientOpen}
+          onClose={() => setIsAddIngredientOpen(false)}
+          recipeTitle={recipe.title}
+          onAddIngredient={(result) => {
+            if (!onAddIngredient) return;
+            const newIng: Ingredient = {
+              id: `ing-${Date.now()}-${recipe.ingredients.length}`,
+              name: result.name,
+              amount: result.amount,
+              unit: result.unit,
+              category: result.category,
+              posokaneiQuery: result.posokaneiQuery,
+              curatedProduct: result.product,
+              isCurated: !!result.product,
+            };
+            onAddIngredient(recipe.id, newIng);
           }}
         />
       )}

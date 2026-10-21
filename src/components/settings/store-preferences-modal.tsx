@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { UserPreferences } from "@/types/meal-planner";
 import { MOCK_RETAILERS } from "@/lib/posokanei/mock-data";
+import { Retailer } from "@/lib/posokanei/types";
 import { SupermarketBadge } from "@/components/supermarket-badge";
 import { X, Check, Settings2, Users, ShoppingCart, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,28 @@ export function StorePreferencesModal({
   const [prioritizeBulk, setPrioritizeBulk] = useState<boolean>(
     preferences.prioritizeBulk
   );
+  const [retailersList, setRetailersList] = useState<Retailer[]>(MOCK_RETAILERS);
+
+  // Sync internal state whenever modal opens or preferences update
+  useEffect(() => {
+    if (isOpen) {
+      setPreferredStores(preferences.preferredSupermarkets);
+      setHouseholdSize(preferences.householdSize);
+      setPrioritizeBulk(preferences.prioritizeBulk);
+    }
+  }, [isOpen, preferences]);
+
+  // Load latest active retailers from Posokanei API with fallback to MOCK_RETAILERS
+  useEffect(() => {
+    fetch("/api/posokanei/retailers")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && Array.isArray(data.retailers) && data.retailers.length > 0) {
+          setRetailersList(data.retailers);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   if (!isOpen) return null;
 
@@ -110,7 +133,7 @@ export function StorePreferencesModal({
             </p>
 
             <div className="grid grid-cols-2 gap-2 pt-1">
-              {MOCK_RETAILERS.map((retailer) => {
+              {retailersList.map((retailer) => {
                 const isSelected = preferredStores.includes(retailer.id);
                 return (
                   <button

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import {
   MealSlot,
   Recipe,
+  Ingredient,
   MealType,
   CourseType,
   DAYS_GREEK,
@@ -41,6 +42,7 @@ interface WeeklyCalendarProps {
   onUpdateServings?: (slotId: string, servings: number) => void;
   onUpdateReferenceUrl?: (recipeId: string, referenceUrl: string) => void;
   onEditRecipeInStudio?: (recipeId: string) => void;
+  onAddIngredient?: (recipeId: string, ingredient: Ingredient) => void;
 }
 
 function getCourseBadge(recipe: Recipe, courseType?: CourseType) {
@@ -89,6 +91,7 @@ export function WeeklyCalendar({
   onUpdateServings,
   onUpdateReferenceUrl,
   onEditRecipeInStudio,
+  onAddIngredient,
 }: WeeklyCalendarProps) {
   const [pickerTarget, setPickerTarget] = useState<{
     day: number;
@@ -470,6 +473,7 @@ export function WeeklyCalendar({
           onClose={() => setPreviewRecipe(null)}
           onUpdateReferenceUrl={onUpdateReferenceUrl}
           onEditInStudio={onEditRecipeInStudio}
+          onAddIngredient={onAddIngredient}
         />
       )}
     </div>

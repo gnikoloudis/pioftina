@@ -46,7 +46,7 @@ function parseFraction(raw: string): number | null {
 /**
  * Detects category from ingredient keywords
  */
-function detectCategory(name: string): AisleCategory {
+export function detectCategory(name: string): AisleCategory {
   const n = name.toLowerCase();
 
   // Dairy

@@ -72,6 +72,48 @@ const STORE_STYLES: Record<
     border: "border-orange-300 dark:border-orange-800",
     label: "Market In",
   },
+  halkiadakis: {
+    bg: "bg-red-50 dark:bg-red-950/40",
+    text: "text-red-700 dark:text-red-300 font-semibold",
+    border: "border-red-300 dark:border-red-800",
+    label: "Χαλκιαδάκης",
+  },
+  chalkiadakis: {
+    bg: "bg-red-50 dark:bg-red-950/40",
+    text: "text-red-700 dark:text-red-300 font-semibold",
+    border: "border-red-300 dark:border-red-800",
+    label: "Χαλκιαδάκης",
+  },
+  xalkiadakis: {
+    bg: "bg-red-50 dark:bg-red-950/40",
+    text: "text-red-700 dark:text-red-300 font-semibold",
+    border: "border-red-300 dark:border-red-800",
+    label: "Χαλκιαδάκης",
+  },
+  "χαλκιαδακης": {
+    bg: "bg-red-50 dark:bg-red-950/40",
+    text: "text-red-700 dark:text-red-300 font-semibold",
+    border: "border-red-300 dark:border-red-800",
+    label: "Χαλκιαδάκης",
+  },
+  "χαλκιαδάκης": {
+    bg: "bg-red-50 dark:bg-red-950/40",
+    text: "text-red-700 dark:text-red-300 font-semibold",
+    border: "border-red-300 dark:border-red-800",
+    label: "Χαλκιαδάκης",
+  },
+  bazaar: {
+    bg: "bg-amber-50 dark:bg-amber-950/40",
+    text: "text-amber-800 dark:text-amber-300 font-semibold",
+    border: "border-amber-300 dark:border-amber-800",
+    label: "Bazaar",
+  },
+  synka: {
+    bg: "bg-emerald-50 dark:bg-emerald-950/40",
+    text: "text-emerald-800 dark:text-emerald-300 font-semibold",
+    border: "border-emerald-300 dark:border-emerald-800",
+    label: "ΣΥΝ.ΚΑ",
+  },
 };
 
 export function SupermarketBadge({
@@ -89,12 +131,21 @@ export function SupermarketBadge({
   };
 
   let displayLabel = retailerName || store.label;
+  const lowerLabel = displayLabel.toLowerCase();
   if (
-    displayLabel.toLowerCase() === "market_in" ||
-    displayLabel.toLowerCase() === "market-in" ||
-    displayLabel.toLowerCase() === "marketin"
+    lowerLabel === "market_in" ||
+    lowerLabel === "market-in" ||
+    lowerLabel === "marketin"
   ) {
     displayLabel = "Market In";
+  } else if (
+    lowerLabel === "halkiadakis" ||
+    lowerLabel === "chalkiadakis" ||
+    lowerLabel === "xalkiadakis" ||
+    lowerLabel === "χαλκιαδακης" ||
+    lowerLabel === "χαλκιαδάκης"
+  ) {
+    displayLabel = "Χαλκιαδάκης";
   }
 
   const sizeClasses = {

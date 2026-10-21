@@ -48,6 +48,7 @@ export default function Home() {
     curateGroceryIngredient,
     resetIngredientCuration,
     updateCustomRecipe,
+    addIngredientToRecipe,
     toggleItemExcluded,
     restoreAllExcludedItems,
     updateRecipeCategory,
@@ -112,9 +113,14 @@ export default function Home() {
               </span>
               <span className="text-border">|</span>
               <div className="flex items-center gap-1">
-                {preferences.preferredSupermarkets.slice(0, 3).map((st) => (
+                {preferences.preferredSupermarkets.slice(0, 4).map((st) => (
                   <SupermarketBadge key={st} retailerId={st} size="sm" />
                 ))}
+                {preferences.preferredSupermarkets.length > 4 && (
+                  <span className="text-[10px] font-semibold text-muted-foreground px-1">
+                    +{preferences.preferredSupermarkets.length - 4}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -295,6 +301,7 @@ export default function Home() {
               onUpdateServings={updateSlotServings}
               onUpdateReferenceUrl={updateRecipeReferenceUrl}
               onEditRecipeInStudio={handleEditRecipeInStudio}
+              onAddIngredient={addIngredientToRecipe}
             />
           )}
 
@@ -328,6 +335,7 @@ export default function Home() {
               onUpdateCategory={updateRecipeCategory}
               onUpdateReferenceUrl={updateRecipeReferenceUrl}
               onEditRecipeInStudio={handleEditRecipeInStudio}
+              onAddIngredient={addIngredientToRecipe}
             />
           )}
 

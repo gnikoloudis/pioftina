@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import {
   Recipe,
+  Ingredient,
   RecipeCategory,
   RECIPE_CATEGORIES,
   getRecipeCategoryMeta,
@@ -34,6 +35,7 @@ interface RecipeListViewProps {
   onUpdateCategory?: (recipeId: string, category: RecipeCategory) => void;
   onUpdateReferenceUrl?: (recipeId: string, referenceUrl: string) => void;
   onEditRecipeInStudio?: (recipeId: string) => void;
+  onAddIngredient?: (recipeId: string, ingredient: Ingredient) => void;
 }
 
 export function RecipeListView({
@@ -44,6 +46,7 @@ export function RecipeListView({
   onUpdateCategory,
   onUpdateReferenceUrl,
   onEditRecipeInStudio,
+  onAddIngredient,
 }: RecipeListViewProps) {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -53,6 +56,11 @@ export function RecipeListView({
     { id: "all", label: "Όλες οι συνταγές" },
     ...RECIPE_CATEGORIES.map((c) => ({ id: c.id, label: c.label })),
   ];
+
+  const getCategoryCount = (categoryId: string) => {
+    if (categoryId === "all") return recipes.length;
+    return recipes.filter((r) => r.category === categoryId).length;
+  };
 
   const filtered = recipes.filter((r) => {
     const matchesSearch =
@@ -101,20 +109,33 @@ export function RecipeListView({
           )}
         </div>
 
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap transition-colors ${
-                selectedCategory === cat.id
-                  ? "bg-primary text-primary-foreground shadow-xs"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          {categories.map((cat) => {
+            const count = getCategoryCount(cat.id);
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl transition-all shadow-2xs ${
+                  isSelected
+                    ? "bg-primary text-primary-foreground shadow-xs scale-[1.02]"
+                    : "bg-muted/70 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50"
+                }`}
+              >
+                <span>{cat.label}</span>
+                <span
+                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                    isSelected
+                      ? "bg-white/25 text-white"
+                      : "bg-muted-foreground/15 text-muted-foreground"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -256,6 +277,7 @@ export function RecipeListView({
           onUpdateCategory={onUpdateCategory}
           onUpdateReferenceUrl={onUpdateReferenceUrl}
           onEditInStudio={onEditRecipeInStudio}
+          onAddIngredient={onAddIngredient}
         />
       )}
     </div>

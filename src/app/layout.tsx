@@ -18,6 +18,16 @@ export const metadata: Metadata = {
   title: "pioftina.gr — Έξυπνος Προγραμματισμός Γευμάτων & Τιμές Supermarket",
   description:
     "Προγραμματίστε τα γεύματα της εβδομάδας, βελτιστοποιήστε τα μεγέθη συσκευασιών (bulk shopping) και βρείτε τις φθηνότερες τιμές στα ελληνικά supermarkets μέσω του posokanei.gov.gr.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

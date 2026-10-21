@@ -1,5 +1,1231 @@
 [
   {
+    "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249",
+    "title": "Κοτόπουλο παστιτσάδα με σπετσερικό",
+    "description": "Κοτόπουλο παστιτσάδα από την Κέρκυρα, μερακλίδικη, με το χοντρό της μακαρόνι  και φυσικά το απαραίτητο μείγμα μπαχαρικών το σπετσερικό, μια συνταγή για παστιτσάδα άχαστη!",
+    "servings": 6,
+    "prepTimeMinutes": 20,
+    "cookTimeMinutes": 40,
+    "imageUrl": "https://funkycook.gr/wp-content/uploads/2023/02/Κοτόπουλο-παστιτσάδα-με-σπετσερικό.jpg",
+    "category": "traditional",
+    "isCurated": true,
+    "referenceUrl": "https://funkycook.gr/kotopoulo-pastitsada-me-spetseriko/",
+    "instructions": [
+      "Στο μπλέντερ ή σε γουδί βάζουμε τα δαφνόφυλλα, τους μαραθόσπορους και τα κονιορτοποιούμε.",
+      "Κατόπιν τα ανακατεύουμε πολύ καλά με τα υπόλοιπα μπαχαρικά.",
+      "Σε πλασοτέ κατσαρόλα ζεσταίνουμε το μισό από το ελαιόλαδο, θωρακίζουμε το κοτόπουλο μέχρι να πάρει χρώμα, από όλες τις πλευρές.",
+      "Προσθέτουμε τα κρεμμύδια, σοτάρουμε για 3-4’ και «σβήνουμε» με το ξύδι, μόλις εξατμιστεί χαμηλώνουμε την ένταση της φωτιάς.",
+      "Περιχύνουμε με το κρασί, τοποθετούμε το καπάκι και μαγειρεύουμε μέχρι να μελώσουν τα κρεμμύδια, περίπου 20’.",
+      "Προσθέτουμε τον τοματοπελτέ διαλυμένο στο ζεστό νερό, τη ζάχαρη, το υπόλοιπο ελαιόλαδο, 1 κ.σ. από το σπετσερικό, αλάτι και πιπέρι.",
+      "Συνεχίζουμε το μαγείρεμα σε χαμηλή φωτιά για περίπου 45-50’, μέχρι να δέσει η σάλτσα.",
+      "Βράζουμε τα μακαρόνια και μόλις είναι έτοιμα τα στραγγίζουμε.",
+      "Ζεσταίνουμε το βούτυρο και ρίχνουμε τα μακαρόνια στην κατσαρόλα, αποσύρουμε προσθέτουμε 4-5 κ.σ. σάλτσα από το κοτόπουλο και πασπαλίζουμε με το κεφαλοτύρι.",
+      "Σερβίρουμε την παστιτσάδα ζεστή, με μπόλικη σάλτσα και κεφαλοτύρι."
+    ],
+    "ingredients": [
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-0",
+        "name": "κοτόπουλο (κομμένο σε μερίδες)",
+        "amount": 1,
+        "unit": "τεμ",
+        "category": "meat",
+        "posokaneiQuery": "κοτόπουλο μπούτια",
+        "curatedProductId": "chicken-breast-mimikos-700g",
+        "curatedProduct": {
+          "id": "chicken-breast-mimikos-700g",
+          "name": "ΜΙΜΙΚΟΣ Φιλέτο Στήθος Κοτόπουλο 700g",
+          "brand": "ΜΙΜΙΚΟΣ",
+          "category": "Κρεοπωλείο",
+          "category_ids": [
+            "cat-meat",
+            "cat-poultry"
+          ],
+          "unit": "kg",
+          "unit_quantity": 0.7,
+          "has_image": true,
+          "image_url": null,
+          "private_label": false,
+          "price_drop": false,
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false,
+          "retailers": [
+            "sklavenitis",
+            "ab_vasilopoulos",
+            "masoutis"
+          ],
+          "price_stats": {
+            "min_price": 6.95,
+            "max_price": 7.6,
+            "avg_price": 7.25,
+            "min_unit_price": 9.93,
+            "retailer_count": 3
+          },
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "Μιμίκος Φιλέτο 700g",
+              "price": 6.95,
+              "price_normalized": 9.93,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-17T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "ab_vasilopoulos",
+              "retailer_display_name": "ΑΒ Βασιλόπουλος",
+              "retailer_name": "Μιμίκος Φιλέτο 700g",
+              "price": 7.2,
+              "price_normalized": 10.28,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-17T00:00:00",
+              "country": "GR"
+            }
+          ]
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-1",
+        "name": "μεγάλα  κρεμμύδια (τριμμένα ή πολύ ψιλοκομμένα)",
+        "amount": 3,
+        "unit": "τεμ",
+        "category": "dairy",
+        "posokaneiQuery": "κρεμμύδια",
+        "curatedProductId": "onions-bag-1kg",
+        "curatedProduct": {
+          "id": "onions-bag-1kg",
+          "name": "Κρεμμύδια Ξερά Κίτρινα σε Δίχτυ 1kg",
+          "brand": "Μαναβική Supermarket",
+          "category": "Μαναβική & Οπωροπωλείο",
+          "category_ids": [
+            "cat-produce"
+          ],
+          "unit": "kg",
+          "unit_quantity": 1,
+          "has_image": true,
+          "image_url": null,
+          "private_label": true,
+          "price_drop": false,
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false,
+          "retailers": [
+            "sklavenitis",
+            "ab_vasilopoulos",
+            "lidl",
+            "mymarket"
+          ],
+          "price_stats": {
+            "min_price": 0.85,
+            "max_price": 1.1,
+            "avg_price": 0.95,
+            "min_unit_price": 0.85,
+            "retailer_count": 4
+          },
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "Κρεμμύδια 1kg",
+              "price": 0.85,
+              "price_normalized": 0.85,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-18T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "ab_vasilopoulos",
+              "retailer_display_name": "ΑΒ Βασιλόπουλος",
+              "retailer_name": "Κρεμμύδια 1kg",
+              "price": 0.92,
+              "price_normalized": 0.92,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-18T00:00:00",
+              "country": "GR"
+            }
+          ]
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-2",
+        "name": "κόκκινο ημίγλυκο κρασί",
+        "amount": 150,
+        "unit": "ml",
+        "category": "pantry",
+        "posokaneiQuery": "κόκκινο κρασί",
+        "curatedProductId": "715908733c6b46eb9be3cbfe3eefe72e",
+        "curatedProduct": {
+          "id": "715908733c6b46eb9be3cbfe3eefe72e",
+          "name": "ΟΙΝΟΠΟΙΙΑ ΤΡΙΠΟΔΑΚΗ Κόκκινο Κρασί 1,5lt",
+          "brand": "ΟΙΝΟΠΟΙΙΑ ΤΡΙΠΟΔΑΚΗ",
+          "images": [],
+          "category": "Ερυθρά Κρασιά",
+          "category_ids": [
+            "7f677200338b447cb4d469622588b749",
+            "b2a17c2ad4235ea8574d60276396bfcb",
+            "b2a17c2ad4235ea8574d60276395d5d4",
+            "b2a17c2ad4235ea8574d60276395e234"
+          ],
+          "subcategory": "Κρασί",
+          "description": null,
+          "image_url": "https://api.posokanei.gov.gr/images/product/715908733c6b46eb9be3cbfe3eefe72e?v=6a58d3acb23b9f8014b5d43d",
+          "has_image": true,
+          "updated_at": "2026-10-21T09:15:04.156000",
+          "image_version": "6a58d3acb23b9f8014b5d43d",
+          "unit": "L",
+          "unit_quantity": 1.5,
+          "private_label": false,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 3.98,
+            "max_price": 4.89,
+            "avg_price": 4.29,
+            "retailer_count": 3,
+            "min_unit_price": 2.65,
+            "last_computed": null
+          },
+          "retailers": [
+            "galaxias"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "galaxias",
+              "retailer_display_name": "Γαλαξίας",
+              "retailer_name": "",
+              "price": 3.98,
+              "price_normalized": 2.65,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "mymarket",
+              "retailer_display_name": "My Market",
+              "retailer_name": "",
+              "price": 3.99,
+              "price_normalized": 2.66,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "synka",
+              "retailer_display_name": "Synka",
+              "retailer_name": "",
+              "price": 4.89,
+              "price_normalized": 3.26,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-3",
+        "name": "ξύδι από κόκκινο κρασί (καλή ποιότητας)",
+        "amount": 45,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "κόκκινο κρασί",
+        "curatedProductId": "ec9d3dcbc2284e7bb18d89e259c63040",
+        "curatedProduct": {
+          "id": "ec9d3dcbc2284e7bb18d89e259c63040",
+          "name": "ΠΑΝ Ξίδι Από Κόκκινο Κρασί Χωρίς Γλουτένη 350ml",
+          "brand": "ΠΑΝ",
+          "images": [],
+          "category": "Ξύδι",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "6adcb51c-615f-4bfb-8e78-b3aa89cd73a7",
+            "da927f79e044451f8555415a7e5387ad",
+            "b2a17c2ad4235ea8574d6027636ce8fa"
+          ],
+          "subcategory": "Ξύδι, Χυμοί Μαγειρικής",
+          "description": "Με το διαυγές, χρυσό-κεχριμπαρένιο χρώμα του, την ελκυστική μύτη, όπου μαζί με τα φρέσκα αρώματα του ξιδιού περνούν νότες ξερής σταφίδας, και τη λεπτή γεύση του, το γνήσιο λευκό ξίδι ΠΑΝ αποτελεί έναν εξαιρετικό πρεσβευτή της κατηγορίας του.",
+          "image_url": "https://api.posokanei.gov.gr/images/product/ec9d3dcbc2284e7bb18d89e259c63040?v=69dd3ef0ee13ba2de98f9394",
+          "has_image": true,
+          "updated_at": "2026-10-21T10:11:47.920000",
+          "image_version": "69dd3ef0ee13ba2de98f9394",
+          "unit": "L",
+          "unit_quantity": 0.35,
+          "private_label": false,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 0.77,
+            "max_price": 0.9,
+            "avg_price": 0.83,
+            "retailer_count": 5,
+            "min_unit_price": 2.2,
+            "last_computed": null
+          },
+          "retailers": [
+            "ab_vasilopoulos",
+            "halkiadakis",
+            "masoutis",
+            "sklavenitis"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "masoutis",
+              "retailer_display_name": "Μασούτης",
+              "retailer_name": "",
+              "price": 0.77,
+              "price_normalized": 2.2,
+              "is_discount": true,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "bazaar",
+              "retailer_display_name": "Bazaar",
+              "retailer_name": "",
+              "price": 0.8,
+              "price_normalized": 2.29,
+              "is_discount": true,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "ab_vasilopoulos",
+              "retailer_display_name": "ΑΒ Βασιλόπουλος",
+              "retailer_name": "",
+              "price": 0.81,
+              "price_normalized": 2.31,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "halkiadakis",
+              "retailer_display_name": "Χαλκιαδάκης",
+              "retailer_name": "",
+              "price": 0.89,
+              "price_normalized": 2.54,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "",
+              "price": 0.9,
+              "price_normalized": 2.57,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-4",
+        "name": "ελαιόλαδο",
+        "amount": 80,
+        "unit": "ml",
+        "category": "pantry",
+        "posokaneiQuery": "ελαιόλαδο",
+        "curatedProductId": "olive-oil-horio-1lt",
+        "curatedProduct": {
+          "id": "olive-oil-horio-1lt",
+          "name": "ΧΩΡΙΟ Εξαιρετικό Παρθένο Ελαιόλαδο Κορωνέικη Ποικιλία 1L",
+          "brand": "ΧΩΡΙΟ",
+          "category": "Έλαια & Σάλτσες",
+          "category_ids": [
+            "cat-oil"
+          ],
+          "unit": "L",
+          "unit_quantity": 1,
+          "has_image": true,
+          "image_url": null,
+          "private_label": false,
+          "price_drop": false,
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false,
+          "retailers": [
+            "sklavenitis",
+            "ab_vasilopoulos",
+            "mymarket",
+            "galaxias"
+          ],
+          "price_stats": {
+            "min_price": 9.8,
+            "max_price": 11.5,
+            "avg_price": 10.6,
+            "min_unit_price": 9.8,
+            "retailer_count": 4
+          },
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "Χωριό Ελαιόλαδο 1L",
+              "price": 9.8,
+              "price_normalized": 9.8,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-17T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "ab_vasilopoulos",
+              "retailer_display_name": "ΑΒ Βασιλόπουλος",
+              "retailer_name": "Χωριό Ελαιόλαδο 1L",
+              "price": 10.2,
+              "price_normalized": 10.2,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-17T00:00:00",
+              "country": "GR"
+            }
+          ]
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-5",
+        "name": "τοματοπελτέ (ή 300 γρ. ψιλοκομμένα τοματάκια κονκασέ)",
+        "amount": 30,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "τοματοπελ",
+        "curatedProductId": "fc0f7a5b3a5e48d8bfe69defd9d50e72",
+        "curatedProduct": {
+          "id": "fc0f7a5b3a5e48d8bfe69defd9d50e72",
+          "name": "PUMMARO πελτές τοματοπολτός 130gr",
+          "brand": "Pummaro",
+          "images": [],
+          "category": "Πολτός Ντομάτας",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "b2a17c2ad4235ea8574d6027636cd0a1",
+            "ec45767e-0ce1-4e0c-872e-1174503c08df",
+            "b2a17c2ad4235ea8574d6027638fe887"
+          ],
+          "subcategory": "Προϊόντα τομάτας",
+          "description": "Pummaro Πελτές από 100% Ελληνικές τομάτες για ακόμη περισσότερη γεύση και κατακόκκινο χρώμα τομάτας στα φαγητά σας.",
+          "image_url": "https://api.posokanei.gov.gr/images/product/fc0f7a5b3a5e48d8bfe69defd9d50e72?v=6a69c980ce7de5df71300a35",
+          "has_image": true,
+          "updated_at": "2026-10-21T15:53:31.919000",
+          "image_version": "6a69c980ce7de5df71300a35",
+          "unit": "kg",
+          "unit_quantity": 0.13,
+          "private_label": false,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 0.87,
+            "max_price": 1.54,
+            "avg_price": 1.19,
+            "retailer_count": 4,
+            "min_unit_price": 6.69,
+            "last_computed": null
+          },
+          "retailers": [
+            "halkiadakis",
+            "masoutis"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "halkiadakis",
+              "retailer_display_name": "Χαλκιαδάκης",
+              "retailer_name": "",
+              "price": 0.87,
+              "price_normalized": 6.69,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "",
+              "price": 1.18,
+              "price_normalized": 9.08,
+              "is_discount": true,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "masoutis",
+              "retailer_display_name": "Μασούτης",
+              "retailer_name": "",
+              "price": 1.19,
+              "price_normalized": 9.15,
+              "is_discount": true,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "ab_vasilopoulos",
+              "retailer_display_name": "ΑΒ Βασιλόπουλος",
+              "retailer_name": "",
+              "price": 1.54,
+              "price_normalized": 11.85,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-6",
+        "name": "Ζάχαρη",
+        "amount": 5,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "ζάχαρη",
+        "curatedProductId": "9b9c0e100c494c509e33fd3b7b99fc95",
+        "curatedProduct": {
+          "id": "9b9c0e100c494c509e33fd3b7b99fc95",
+          "name": "DIAMANT Ζάχαρη Λευκή Κρυσταλλική 1kg",
+          "brand": "DIAMANT ",
+          "images": [],
+          "category": "Λευκή Ζάχαρη",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "b2a17c2ad4235ea8574d602763828316",
+            "b2a17c2ad4235ea8574d60276382b4e2"
+          ],
+          "subcategory": "Ζάχαρη",
+          "description": "Για περισσότερα από 140 χρόνια παράγουμε υψηλής ποιότητας λευκή κρυσταλλική ζάχαρη από ζαχαρότευτλα. Η λευκή κρυσταλλική μας ζάχαρη είναι ιδανική για κάθε κουζίνα.",
+          "image_url": "https://api.posokanei.gov.gr/images/product/9b9c0e100c494c509e33fd3b7b99fc95?v=69f8542adc4b02f7b48583b1",
+          "has_image": true,
+          "updated_at": "2026-10-21T09:18:06.014000",
+          "image_version": "69f8542adc4b02f7b48583b1",
+          "unit": "kg",
+          "unit_quantity": 1,
+          "private_label": false,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 0.68,
+            "max_price": 0.71,
+            "avg_price": 0.69,
+            "retailer_count": 3,
+            "min_unit_price": 0.68,
+            "last_computed": null
+          },
+          "retailers": [
+            "halkiadakis",
+            "masoutis",
+            "sklavenitis"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "galaxias",
+              "retailer_display_name": "Γαλαξίας",
+              "retailer_name": "",
+              "price": 0.68,
+              "price_normalized": 0.68,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "halkiadakis",
+              "retailer_display_name": "Χαλκιαδάκης",
+              "retailer_name": "",
+              "price": 0.68,
+              "price_normalized": 0.68,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "masoutis",
+              "retailer_display_name": "Μασούτης",
+              "retailer_name": "",
+              "price": 0.71,
+              "price_normalized": 0.71,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-7",
+        "name": "Μαύρο πιπέρι",
+        "amount": 5,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "μαύρο πιπέρι",
+        "curatedProductId": "edcdf13b3b854936b3fd6d617f09d7e6",
+        "curatedProduct": {
+          "id": "edcdf13b3b854936b3fd6d617f09d7e6",
+          "name": "Ήλιος Πιπέρι Μαύρο Τριμμένο 40 gr",
+          "brand": "Ήλιος",
+          "images": [],
+          "category": "Μαύρο Πιπέρι ",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "b2a17c2ad4235ea8574d6027636ccfea",
+            "b2a17c2ad4235ea8574d6027638e4a63",
+            "a647c5b091d74d439221095e1b01a235"
+          ],
+          "subcategory": "Πιπέρι",
+          "description": "Το γνωστότερο από τα μπαχαρικά, προέρχεται από το φυτό πέπερι. Έχει ιδιαίτερα καυστική γεύση και σχεδόν σε όλες τις συνταγές είναι απαραίτητη η προσθήκη του. Αρωματίζει και δίνει νόστιμη γεύση στα φαγητά.",
+          "image_url": "https://api.posokanei.gov.gr/images/product/edcdf13b3b854936b3fd6d617f09d7e6",
+          "has_image": true,
+          "updated_at": "2026-10-21T10:12:13.015000",
+          "image_version": null,
+          "unit": "kg",
+          "unit_quantity": 0.04,
+          "private_label": false,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 1.8,
+            "max_price": 2.95,
+            "avg_price": 2.4,
+            "retailer_count": 6,
+            "min_unit_price": 45,
+            "last_computed": null
+          },
+          "retailers": [
+            "halkiadakis"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "",
+              "price": 1.8,
+              "price_normalized": 45,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "ab_vasilopoulos",
+              "retailer_display_name": "ΑΒ Βασιλόπουλος",
+              "retailer_name": "",
+              "price": 1.89,
+              "price_normalized": 47.25,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "halkiadakis",
+              "retailer_display_name": "Χαλκιαδάκης",
+              "retailer_name": "",
+              "price": 2.05,
+              "price_normalized": 51.25,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "galaxias",
+              "retailer_display_name": "Γαλαξίας",
+              "retailer_name": "",
+              "price": 2.75,
+              "price_normalized": 68.75,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "synka",
+              "retailer_display_name": "Synka",
+              "retailer_name": "",
+              "price": 2.95,
+              "price_normalized": 73.75,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "bazaar",
+              "retailer_display_name": "Bazaar",
+              "retailer_name": "",
+              "price": 2.95,
+              "price_normalized": 73.75,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-8",
+        "name": "Αλάτι",
+        "amount": 5,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "αλάτι",
+        "isCurated": false
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-9",
+        "name": "κόκκινο γλυκό πιπέρι",
+        "amount": 5,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "κόκκινο γλυκό πιπέρι",
+        "curatedProductId": "499464eb0d1b4fa78b7cad6851db3f7f",
+        "curatedProduct": {
+          "id": "499464eb0d1b4fa78b7cad6851db3f7f",
+          "name": "ΣΚΛΑΒΕΝΙΤΗΣ Πάπρικα Γλυκιά 50g",
+          "brand": "ΣΚΛΑΒΕΝΙΤΗΣ",
+          "images": [],
+          "category": "Πάπρικα",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "b2a17c2ad4235ea8574d6027636ccfea",
+            "b2a17c2ad4235ea8574d6027638e3736"
+          ],
+          "subcategory": "Μπαχαρικά / Καρυκεύματα",
+          "description": null,
+          "image_url": "https://api.posokanei.gov.gr/images/product/499464eb0d1b4fa78b7cad6851db3f7f?v=6a3e4f7bfa2c39a9c257f0cf",
+          "has_image": true,
+          "updated_at": "2026-10-21T04:34:50.239000",
+          "image_version": "6a3e4f7bfa2c39a9c257f0cf",
+          "unit": "kg",
+          "unit_quantity": 0.05,
+          "private_label": true,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 0.6,
+            "max_price": 0.6,
+            "avg_price": 0.6,
+            "retailer_count": 1,
+            "min_unit_price": 12,
+            "last_computed": null
+          },
+          "retailers": [
+            "sklavenitis"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "",
+              "price": 0.6,
+              "price_normalized": 12,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-10",
+        "name": "κ.γ. καγιέν",
+        "amount": 3,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "κ γ καγιέν",
+        "isCurated": false
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-11",
+        "name": "κ.γ. κανέλα (τριμμένη)",
+        "amount": 3,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "κ γ κανέλα τριμμένη",
+        "isCurated": false
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-12",
+        "name": "κ.γ. μπαχάρι (τριμμένο)",
+        "amount": 3,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "κ γ μπαχάρι τριμμένο",
+        "curatedProductId": "d585dc0be9fa4755b79038d56cc9ffa2",
+        "curatedProduct": {
+          "id": "d585dc0be9fa4755b79038d56cc9ffa2",
+          "name": "ΣΚΛΑΒΕΝΙΤΗΣ Μπαχάρι 25g",
+          "brand": "ΣΚΛΑΒΕΝΙΤΗΣ",
+          "images": [],
+          "category": "Μπαχάρι",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "b2a17c2ad4235ea8574d6027636ccfea",
+            "b2a17c2ad4235ea8574d6027638e65d6"
+          ],
+          "subcategory": "Μπαχαρικά / Καρυκεύματα",
+          "description": null,
+          "image_url": "https://api.posokanei.gov.gr/images/product/d585dc0be9fa4755b79038d56cc9ffa2?v=6a200a7c486cf108a79a4c41",
+          "has_image": true,
+          "updated_at": "2026-10-21T04:34:50.207000",
+          "image_version": "6a200a7c486cf108a79a4c41",
+          "unit": "kg",
+          "unit_quantity": 0.025,
+          "private_label": true,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 0.64,
+            "max_price": 0.64,
+            "avg_price": 0.64,
+            "retailer_count": 1,
+            "min_unit_price": 25.6,
+            "last_computed": null
+          },
+          "retailers": [
+            "sklavenitis"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "",
+              "price": 0.64,
+              "price_normalized": 25.6,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-13",
+        "name": "Μοσχοκάρυδο (τριμμένο)",
+        "amount": 3,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "κ γ μοσχοκάρυδο τριμμένο",
+        "curatedProductId": "dc1bf96252b64ceea3f7dd94dac2bd9f",
+        "curatedProduct": {
+          "id": "dc1bf96252b64ceea3f7dd94dac2bd9f",
+          "name": "ΣΚΛΑΒΕΝΙΤΗΣ Μοσχοκάρυδο τριμμένο 25g",
+          "brand": "ΣΚΛΑΒΕΝΙΤΗΣ",
+          "images": [],
+          "category": "Μοσχοκάρυδο",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "b2a17c2ad4235ea8574d6027636ccfea",
+            "b2a17c2ad4235ea8574d6027638e65d1"
+          ],
+          "subcategory": "Μπαχαρικά / Καρυκεύματα",
+          "description": null,
+          "image_url": "https://api.posokanei.gov.gr/images/product/dc1bf96252b64ceea3f7dd94dac2bd9f?v=6a2009a5486cf108a79a4c3a",
+          "has_image": true,
+          "updated_at": "2026-10-21T04:34:50.197000",
+          "image_version": "6a2009a5486cf108a79a4c3a",
+          "unit": "kg",
+          "unit_quantity": 0.025,
+          "private_label": true,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 1.15,
+            "max_price": 1.15,
+            "avg_price": 1.15,
+            "retailer_count": 1,
+            "min_unit_price": 46,
+            "last_computed": null
+          },
+          "retailers": [
+            "sklavenitis"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "",
+              "price": 1.15,
+              "price_normalized": 46,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-14",
+        "name": "Κύμινο (τριμμένο)",
+        "amount": 5,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "κ γ κύμινο τριμμένο",
+        "curatedProductId": "946668cd8ba74b9682840b8dd204b9ac",
+        "curatedProduct": {
+          "id": "946668cd8ba74b9682840b8dd204b9ac",
+          "name": "ΣΚΛΑΒΕΝΙΤΗΣ Κύμινο Τριμμένο 50g",
+          "brand": "ΣΚΛΑΒΕΝΙΤΗΣ",
+          "images": [],
+          "category": "Κύμινο",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "b2a17c2ad4235ea8574d6027636ccfea",
+            "b2a17c2ad4235ea8574d6027638e6bea"
+          ],
+          "subcategory": "Μπαχαρικά / Καρυκεύματα",
+          "description": null,
+          "image_url": "https://api.posokanei.gov.gr/images/product/946668cd8ba74b9682840b8dd204b9ac?v=6a20096b486cf108a79a4c37",
+          "has_image": true,
+          "updated_at": "2026-10-21T04:34:50.174000",
+          "image_version": "6a20096b486cf108a79a4c37",
+          "unit": "kg",
+          "unit_quantity": 0.05,
+          "private_label": true,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 0.94,
+            "max_price": 0.94,
+            "avg_price": 0.94,
+            "retailer_count": 1,
+            "min_unit_price": 18.8,
+            "last_computed": null
+          },
+          "retailers": [
+            "sklavenitis"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "",
+              "price": 0.94,
+              "price_normalized": 18.8,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-15",
+        "name": "Γαρίφαλο (τριμμένο)",
+        "amount": 1,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "κ γ γαρίφαλο τριμμένο",
+        "curatedProductId": "d4710954e6914b3084d12a4afe73477f",
+        "curatedProduct": {
+          "id": "d4710954e6914b3084d12a4afe73477f",
+          "name": "ΣΚΛΑΒΕΝΙΤΗΣ Γαρύφαλλο τριμμένο 25g",
+          "brand": "ΣΚΛΑΒΕΝΙΤΗΣ",
+          "images": [],
+          "category": "Γαρίφαλο",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "b2a17c2ad4235ea8574d6027636ccfea",
+            "b2a17c2ad4235ea8574d6027638e4e2e"
+          ],
+          "subcategory": "Μπαχαρικά / Καρυκεύματα",
+          "description": null,
+          "image_url": "https://api.posokanei.gov.gr/images/product/d4710954e6914b3084d12a4afe73477f?v=6a2008d3486cf108a79a4c30",
+          "has_image": true,
+          "updated_at": "2026-10-21T04:34:50.077000",
+          "image_version": "6a2008d3486cf108a79a4c30",
+          "unit": "kg",
+          "unit_quantity": 0.025,
+          "private_label": true,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 0.94,
+            "max_price": 0.94,
+            "avg_price": 0.94,
+            "retailer_count": 1,
+            "min_unit_price": 37.6,
+            "last_computed": null
+          },
+          "retailers": [
+            "sklavenitis"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "",
+              "price": 0.94,
+              "price_normalized": 37.6,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-16",
+        "name": "πιπερόριζα",
+        "amount": 1,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "πιπερόριζα",
+        "isCurated": false
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-17",
+        "name": "σποράκια μαραθόσπορο",
+        "amount": 6,
+        "unit": "τεμ",
+        "category": "pantry",
+        "posokaneiQuery": "σποράκια μαραθόσπορο",
+        "isCurated": false
+      },
+      {
+        "id": "custom-κοτ-πουλο-παστιτσ-δα-με-σπετσερικ--0249-ing-18",
+        "name": "5  δαφνόφυλλα",
+        "amount": 4,
+        "unit": "τεμ",
+        "category": "pantry",
+        "posokaneiQuery": "5 δαφνόφυλλα",
+        "curatedProductId": "56ecc7139b9943c38109bd75fc95fe77",
+        "curatedProduct": {
+          "id": "56ecc7139b9943c38109bd75fc95fe77",
+          "name": "ΗΛΙΟΣ Δάφνη Φάκελος 20gr",
+          "brand": "Ήλιος",
+          "images": [],
+          "category": "Δάφνη",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "b2a17c2ad4235ea8574d6027636ccfea",
+            "b2a17c2ad4235ea8574d6027636fc408",
+            "51f3477aa8e24ada9d15026ed0ec9120"
+          ],
+          "subcategory": "Αρωματικά Βότανα",
+          "description": null,
+          "image_url": "https://api.posokanei.gov.gr/images/product/56ecc7139b9943c38109bd75fc95fe77?v=6a5e22d1a91fe626e169155b",
+          "has_image": true,
+          "updated_at": "2026-10-21T04:40:48.419000",
+          "image_version": "6a5e22d1a91fe626e169155b",
+          "unit": "kg",
+          "unit_quantity": 0.02,
+          "private_label": false,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 1,
+            "max_price": 1.97,
+            "avg_price": 1.48,
+            "retailer_count": 2,
+            "min_unit_price": 50,
+            "last_computed": null
+          },
+          "retailers": [
+            "mymarket",
+            "sklavenitis"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "",
+              "price": 1,
+              "price_normalized": 50,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "mymarket",
+              "retailer_display_name": "My Market",
+              "retailer_name": "",
+              "price": 1.97,
+              "price_normalized": 98.5,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
+      }
+    ]
+  },
+  {
     "id": "custom-μοσχαρ-κι-στιφ-δο-παραδοσιακ--3370",
     "title": "Μοσχαράκι Στιφάδο Παραδοσιακό",
     "description": "Για 4 άτομα Προετοιμασία: 20 λεπτά Μαγείρεμα: 75 λεπτά",
@@ -762,17 +1988,78 @@
         "amount": 1,
         "unit": "τεμ",
         "category": "pantry",
-        "posokaneiQuery": "φετ αρμπαρόριζα",
+        "posokaneiQuery": "αρμπαρόριζα",
         "isCurated": false
       },
       {
         "id": "custom-καρ-το-γλυκ--του-κουταλιο--0647-ing-6",
-        "name": "Δυόσμο ή Βασιλικό",
+        "name": "Δυόσμο",
         "amount": 1,
         "unit": "τεμ",
         "category": "produce",
         "posokaneiQuery": "δυόσμο ή βασιλικό",
-        "isCurated": false
+        "curatedProductId": "404128e5915b4059ba07acf6dbe1c1b8",
+        "curatedProduct": {
+          "id": "404128e5915b4059ba07acf6dbe1c1b8",
+          "name": "ECONOMY Δυόσμος 30γρ ",
+          "brand": "ECONOMY ",
+          "images": [],
+          "category": "Δυόσμος",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "b2a17c2ad4235ea8574d6027636ccfea",
+            "b2a17c2ad4235ea8574d6027636fc408",
+            "0b9a147f746148e29ff6e01639436205"
+          ],
+          "subcategory": "Αρωματικά Βότανα",
+          "description": null,
+          "image_url": "https://api.posokanei.gov.gr/images/product/404128e5915b4059ba07acf6dbe1c1b8?v=6a44d444fa2c39a9c257f77d",
+          "has_image": true,
+          "updated_at": "2026-10-21T05:22:23.160000",
+          "image_version": "6a44d444fa2c39a9c257f77d",
+          "unit": "kg",
+          "unit_quantity": 0.03,
+          "private_label": true,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 0.99,
+            "max_price": 0.99,
+            "avg_price": 0.99,
+            "retailer_count": 1,
+            "min_unit_price": 33,
+            "last_computed": null
+          },
+          "retailers": [
+            "market_in"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "market_in",
+              "retailer_display_name": "Market In",
+              "retailer_name": "",
+              "price": 0.99,
+              "price_normalized": 33,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
       },
       {
         "id": "custom-καρ-το-γλυκ--του-κουταλιο--0647-ing-7",
@@ -2955,7 +4242,8 @@
     "prepTimeMinutes": 20,
     "cookTimeMinutes": 70,
     "imageUrl": "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?auto=format&fit=crop&w=600&q=80",
-    "category": "comfort",
+    "category": "meat",
+    "isCurated": true,
     "referenceUrl": "https://akispetretzikis.com/recipe/341/kotopoylo-sto-foyrno-me-patates",
     "instructions": [
       "Πλένουμε και στεγνώνουμε το κοτόπουλο και καθαρίζουμε τις πατάτες κόβοντάς τες κυδωνάτες.",
@@ -2965,73 +4253,75 @@
     ],
     "ingredients": [
       {
-        "id": "chk-chicken",
+        "id": "roast-chicken-potatoes-ing-0",
         "name": "Κοτόπουλο ολόκληρο ή Μπούτια",
         "amount": 1400,
         "unit": "g",
         "category": "meat",
         "posokaneiQuery": "κοτόπουλο μπούτια",
-        "curatedProductId": "chicken-breast-mimikos-700g",
+        "curatedProductId": "758de80f65f34a5d8336733379ea6719",
         "curatedProduct": {
-          "id": "chicken-breast-mimikos-700g",
-          "name": "ΜΙΜΙΚΟΣ Φιλέτο Στήθος Κοτόπουλο 700g",
-          "brand": "ΜΙΜΙΚΟΣ",
-          "category": "Κρεοπωλείο",
+          "id": "758de80f65f34a5d8336733379ea6719",
+          "name": "ΑΒ ΕΠΙΛΟΓΗ Μπούτι Κοτόπουλου Ελληνικό 725g",
+          "brand": "ΑΒ ΕΠΙΛΟΓΗ",
+          "images": [],
+          "category": "Πουλερικά",
           "category_ids": [
-            "cat-meat",
-            "cat-poultry"
+            "fb7311d1172f411dba075194a4120689",
+            "b2a17c2ad4235ea8574d6027636ca82c",
+            "b2a17c2ad4235ea8574d6027636d0ccd"
           ],
-          "unit": "kg",
-          "unit_quantity": 0.7,
+          "subcategory": "Πουλερικά, Αλλαντικά",
+          "description": null,
+          "image_url": "https://api.posokanei.gov.gr/images/product/758de80f65f34a5d8336733379ea6719?v=69d91f89ee13ba2de98f89b5",
           "has_image": true,
-          "image_url": null,
-          "private_label": false,
+          "updated_at": "2026-10-21T05:45:53.321000",
+          "image_version": "69d91f89ee13ba2de98f89b5",
+          "unit": "kg",
+          "unit_quantity": 0.725,
+          "private_label": true,
           "price_drop": false,
-          "available_countries": [
-            "GR"
-          ],
-          "is_international": false,
-          "retailers": [
-            "sklavenitis",
-            "ab_vasilopoulos",
-            "masoutis"
-          ],
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
           "price_stats": {
-            "min_price": 6.95,
-            "max_price": 7.6,
-            "avg_price": 7.25,
-            "min_unit_price": 9.93,
-            "retailer_count": 3
+            "min_price": 3.28,
+            "max_price": 3.28,
+            "avg_price": 3.28,
+            "retailer_count": 1,
+            "min_unit_price": 4.52,
+            "last_computed": null
           },
+          "retailers": [
+            "ab_vasilopoulos"
+          ],
           "retailer_prices": [
-            {
-              "retailer": "sklavenitis",
-              "retailer_display_name": "Σκλαβενίτης",
-              "retailer_name": "Μιμίκος Φιλέτο 700g",
-              "price": 6.95,
-              "price_normalized": 9.93,
-              "is_discount": false,
-              "discount_percentage": null,
-              "last_updated": "2026-10-17T00:00:00",
-              "country": "GR"
-            },
             {
               "retailer": "ab_vasilopoulos",
               "retailer_display_name": "ΑΒ Βασιλόπουλος",
-              "retailer_name": "Μιμίκος Φιλέτο 700g",
-              "price": 7.2,
-              "price_normalized": 10.28,
+              "retailer_name": "",
+              "price": 3.28,
+              "price_normalized": 4.52,
               "is_discount": false,
               "discount_percentage": null,
-              "last_updated": "2026-10-17T00:00:00",
+              "last_updated": "2026-10-21T00:00:00",
               "country": "GR"
             }
-          ]
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
         },
         "isCurated": true
       },
       {
-        "id": "chk-potatoes",
+        "id": "roast-chicken-potatoes-ing-1",
         "name": "Πατάτες",
         "amount": 1000,
         "unit": "g",
@@ -3098,7 +4388,7 @@
         "isCurated": true
       },
       {
-        "id": "chk-lemons",
+        "id": "roast-chicken-potatoes-ing-2",
         "name": "Λεμόνια",
         "amount": 300,
         "unit": "g",
@@ -3164,7 +4454,7 @@
         "isCurated": true
       },
       {
-        "id": "chk-mustard",
+        "id": "roast-chicken-potatoes-ing-3",
         "name": "Μουστάρδα Απαλή",
         "amount": 80,
         "unit": "g",
@@ -3229,7 +4519,7 @@
         "isCurated": true
       },
       {
-        "id": "chk-oil",
+        "id": "roast-chicken-potatoes-ing-4",
         "name": "Ελαιόλαδο",
         "amount": 100,
         "unit": "ml",
@@ -3294,8 +4584,7 @@
         },
         "isCurated": true
       }
-    ],
-    "isCurated": true
+    ]
   },
   {
     "id": "spaghetti-kimas",
@@ -3306,7 +4595,7 @@
     "prepTimeMinutes": 15,
     "cookTimeMinutes": 35,
     "imageUrl": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=600&q=80",
-    "category": "quick",
+    "category": "pasta",
     "referenceUrl": "https://akispetretzikis.com/recipe/3179/makaronia-me-kima",
     "instructions": [
       "Σοτάρουμε το ψιλοκομμένο κρεμμύδι σε ελαιόλαδο και προσθέτουμε τον μοσχαρίσιο κιμά σπάζοντάς τον καλά.",
@@ -5970,6 +7259,7 @@
     "cookTimeMinutes": 0,
     "imageUrl": "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=600&q=80",
     "category": "breakfast",
+    "isCurated": true,
     "referenceUrl": "https://akispetretzikis.com",
     "instructions": [
       "Μοιράζουμε το στραγγιστό γιαούρτι 2% σε δύο μπολ.",
@@ -5978,7 +7268,7 @@
     ],
     "ingredients": [
       {
-        "id": "yog-greek",
+        "id": "recipe-greek-yogurt-bowl-ing-0",
         "name": "Στραγγιστό Γιαούρτι 2%",
         "amount": 400,
         "unit": "g",
@@ -6056,7 +7346,7 @@
         "isCurated": true
       },
       {
-        "id": "yog-honey",
+        "id": "recipe-greek-yogurt-bowl-ing-1",
         "name": "Μέλι Θυμαρίσιο",
         "amount": 40,
         "unit": "g",
@@ -6122,7 +7412,7 @@
         "isCurated": true
       },
       {
-        "id": "yog-walnuts",
+        "id": "recipe-greek-yogurt-bowl-ing-2",
         "name": "Καρύδια",
         "amount": 50,
         "unit": "g",
@@ -6186,9 +7476,77 @@
           ]
         },
         "isCurated": true
+      },
+      {
+        "id": "recipe-greek-yogurt-bowl-ing-3",
+        "name": "Κανέλα Τριμμένη",
+        "amount": 5,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "κανέλα τριμμένη",
+        "curatedProductId": "4b5c83baf824438ab23e4bef4d105a1f",
+        "curatedProduct": {
+          "id": "4b5c83baf824438ab23e4bef4d105a1f",
+          "name": "ΣΚΛΑΒΕΝΙΤΗΣ Κανέλα Τριμμένη 50g",
+          "brand": "ΣΚΛΑΒΕΝΙΤΗΣ",
+          "images": [],
+          "category": "Κανέλα",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "b2a17c2ad4235ea8574d6027636ccfea",
+            "b2a17c2ad4235ea8574d6027638e5ba9"
+          ],
+          "subcategory": "Μπαχαρικά / Καρυκεύματα",
+          "description": null,
+          "image_url": "https://api.posokanei.gov.gr/images/product/4b5c83baf824438ab23e4bef4d105a1f?v=6a200a9e486cf108a79a4c42",
+          "has_image": true,
+          "updated_at": "2026-10-21T04:34:50.116000",
+          "image_version": "6a200a9e486cf108a79a4c42",
+          "unit": "kg",
+          "unit_quantity": 0.05,
+          "private_label": true,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 0.64,
+            "max_price": 0.64,
+            "avg_price": 0.64,
+            "retailer_count": 1,
+            "min_unit_price": 12.8,
+            "last_computed": null
+          },
+          "retailers": [
+            "sklavenitis"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "",
+              "price": 0.64,
+              "price_normalized": 12.8,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
       }
-    ],
-    "isCurated": true
+    ]
   },
   {
     "id": "recipe-horiatiki",
@@ -6733,7 +8091,7 @@
     "cookTimeMinutes": 0,
     "imageUrl": "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=600&q=80",
     "category": "snacks",
-    "referenceUrl": "https://akispetretzikis.com",
+    "isCurated": true,
     "instructions": [
       "Πλένουμε και καθαρίζουμε τα μήλα και τις μπανάνες και τα κόβουμε σε ομοιόμορφες μπουκιές.",
       "Τοποθετούμε τα φρέσκα φρούτα σε μπολ και προσθέτουμε τα ανάλατα αμύγδαλα.",
@@ -6741,25 +8099,33 @@
     ],
     "ingredients": [
       {
-        "id": "fruit-apples",
-        "name": "Μήλα & Μπανάνες",
-        "amount": 400,
+        "id": "recipe-fruit-salad-nuts-ing-0",
+        "name": "Μπανάνες",
+        "amount": 200,
         "unit": "g",
         "category": "produce",
         "posokaneiQuery": "μήλα",
         "isCurated": false
       },
       {
-        "id": "fruit-almonds",
+        "id": "recipe-fruit-salad-nuts-ing-1",
         "name": "Αμύγδαλα Ανάλατα",
         "amount": 50,
         "unit": "g",
         "category": "pantry",
         "posokaneiQuery": "αμύγδαλα",
         "isCurated": false
+      },
+      {
+        "id": "recipe-fruit-salad-nuts-ing-2",
+        "name": "Μηλα",
+        "amount": 100,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "μηλα",
+        "isCurated": false
       }
-    ],
-    "isCurated": true
+    ]
   },
   {
     "id": "custom-σπανακ-πιτα-χωρι-τικη-με-φ-τα-6410",
@@ -6769,7 +8135,7 @@
     "prepTimeMinutes": 25,
     "cookTimeMinutes": 50,
     "imageUrl": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80",
-    "category": "vegetarian",
+    "category": "pies",
     "isCurated": true,
     "instructions": [
       "Πλένουμε και κόβουμε το σπανάκι. Το μαραίνουμε ελαφρώς με λίγο αλάτι.",
@@ -6940,7 +8306,67 @@
         "unit": "g",
         "category": "bakery",
         "posokaneiQuery": "χωριάτικο φύλλο 500γρ",
-        "isCurated": false
+        "curatedProductId": "6f51b62558804ab38a773fea830d0429",
+        "curatedProduct": {
+          "id": "6f51b62558804ab38a773fea830d0429",
+          "name": "ΓΑΛΑΞΙΑΣ Φύλλο Χωριάτικο Κατεψυγμένο 500γρ",
+          "brand": "Γαλαξίας",
+          "images": [],
+          "category": "Φύλλα Ζύμης",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "b2a17c2ad4235ea8574d60276393ddb0",
+            "a195fb71-f731-462d-a70f-9638044665ef",
+            "de35cc4b71634e5ca2367579d10a8aa0"
+          ],
+          "subcategory": "Έτοιμα προϊόντα ζύμης",
+          "description": null,
+          "image_url": "https://api.posokanei.gov.gr/images/product/6f51b62558804ab38a773fea830d0429?v=69dfdc91ee13ba2de98f9bc5",
+          "has_image": true,
+          "updated_at": "2026-10-21T09:15:13.629000",
+          "image_version": "69dfdc91ee13ba2de98f9bc5",
+          "unit": "kg",
+          "unit_quantity": 0.5,
+          "private_label": true,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 2.17,
+            "max_price": 2.17,
+            "avg_price": 2.17,
+            "retailer_count": 1,
+            "min_unit_price": 4.34,
+            "last_computed": null
+          },
+          "retailers": [
+            "galaxias"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "galaxias",
+              "retailer_display_name": "Γαλαξίας",
+              "retailer_name": "",
+              "price": 2.17,
+              "price_normalized": 4.34,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
       },
       {
         "id": "custom-σπανακ-πιτα-χωρι-τικη-με-φ-τα-6410-ing-3",
@@ -7090,16 +8516,253 @@
         "unit": "τεμ",
         "category": "pantry",
         "posokaneiQuery": "αυγά",
-        "isCurated": false
+        "curatedProductId": "2ae525bda7804e48a571d479ffb1249a",
+        "curatedProduct": {
+          "id": "2ae525bda7804e48a571d479ffb1249a",
+          "name": " ΧΡΥΣΑ ΑΥΓΑ Αυγά Φρέσκα Medium 6x 53-63gr",
+          "brand": "Χρυσά αυγά",
+          "images": [],
+          "category": "Αυγά",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "c73514b0-cfca-4c24-ae0d-d14df50bb80b",
+            "b2a17c2ad4235ea8574d6027636c6884"
+          ],
+          "subcategory": "Άλλα Γαλακτοκομικά/Βούτυρα/Αυγά",
+          "description": "Φρέσκα αυγά μεσαίου μεγέθους. Ελληνικό προϊόν.",
+          "image_url": "https://api.posokanei.gov.gr/images/product/2ae525bda7804e48a571d479ffb1249a?v=69cbcc3272191242fc3b1be8",
+          "has_image": true,
+          "updated_at": "2026-10-21T09:17:18.525000",
+          "image_version": "69cbcc3272191242fc3b1be8",
+          "unit": "pcs",
+          "unit_quantity": 6,
+          "private_label": false,
+          "price_drop": true,
+          "price_drop_percentage": 5,
+          "price_drop_from": null,
+          "price_drop_to": 10,
+          "price_drop_start": "2026-08-31",
+          "price_drop_end": "2026-11-30",
+          "price_drop_category": "Γάλα, γιαούρτι, τυρί, αυγά και Γαλακτοκομικά προϊόντα",
+          "price_drop_title": "ΧΡΥΣΑ ΑΥΓΑ ΕΛΛ Α' 6άδα MED  20Χ6",
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 2.22,
+            "max_price": 2.65,
+            "avg_price": 2.34,
+            "retailer_count": 4,
+            "min_unit_price": 0.37,
+            "last_computed": null
+          },
+          "retailers": [
+            "masoutis",
+            "market_in",
+            "mymarket",
+            "galaxias",
+            "kritikos"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "masoutis",
+              "retailer_display_name": "Μασούτης",
+              "retailer_name": "",
+              "price": 2.22,
+              "price_normalized": 0.37,
+              "is_discount": true,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "kritikos",
+              "retailer_display_name": "Κρητικός",
+              "retailer_name": "",
+              "price": 2.22,
+              "price_normalized": 0.37,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "galaxias",
+              "retailer_display_name": "Γαλαξίας",
+              "retailer_name": "",
+              "price": 2.27,
+              "price_normalized": 0.38,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "mymarket",
+              "retailer_display_name": "My Market",
+              "retailer_name": "",
+              "price": 2.65,
+              "price_normalized": 0.44,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
       },
       {
         "id": "custom-σπανακ-πιτα-χωρι-τικη-με-φ-τα-6410-ing-7",
-        "name": "αλάτι & πιπέρι",
+        "name": "Αλάτι",
         "amount": 2,
         "unit": "g",
         "category": "pantry",
         "posokaneiQuery": "αλάτι & πιπέρι",
-        "isCurated": false
+        "curatedProductId": "1e23ac87a51f43d5b8b2958498b83795",
+        "curatedProduct": {
+          "id": "1e23ac87a51f43d5b8b2958498b83795",
+          "name": "ALATI MOU Αλάτι Θαλασσινό Κρήτης 250g",
+          "brand": "ALATI mou",
+          "images": [],
+          "category": "Αλάτι",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "b2a17c2ad4235ea8574d6027636ccfea",
+            "fa468dd63c2849e2b9411f1c317cf446"
+          ],
+          "subcategory": "Μπαχαρικά / Καρυκεύματα",
+          "description": "Το ALATI MOU συλλέγεται από τα άγρια βράχια, με γνώση και κόπο, μόνο από τα ανώτερα στρώματα, επιλέγοντας τον εκλεκτότερο ανθό. Απόλυτα Φυσικό, όπως το έφτιαξε η σοφία της φύσης για τον άνθρωπο. Το ALATI MOU, είναι δώρο της φύσης με πολύτιμη διατροφική αξία, που χαρίζει με ευεργετικά ιχνοστοιχεία στην καθημερινή μας διατροφή. Η απαλή, αυθεντική του γεύση από την αύρα του Αιγαίου, μεταμορφώνει τα καθημερινό σας τραπέζι, σε μια γευστική εμπειρία.",
+          "image_url": "https://api.posokanei.gov.gr/images/product/1e23ac87a51f43d5b8b2958498b83795?v=6a219859486cf108a79a4fc9",
+          "has_image": true,
+          "updated_at": "2026-10-21T04:35:12.078000",
+          "image_version": "6a219859486cf108a79a4fc9",
+          "unit": "kg",
+          "unit_quantity": 0.25,
+          "private_label": false,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 3.98,
+            "max_price": 4,
+            "avg_price": 3.99,
+            "retailer_count": 2,
+            "min_unit_price": 15.92,
+            "last_computed": null
+          },
+          "retailers": [
+            "halkiadakis"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "",
+              "price": 3.98,
+              "price_normalized": 15.92,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "halkiadakis",
+              "retailer_display_name": "Χαλκιαδάκης",
+              "retailer_name": "",
+              "price": 4,
+              "price_normalized": 16,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-σπανακ-πιτα-χωρι-τικη-με-φ-τα-6410-ing-8",
+        "name": "πιπέρι",
+        "amount": 5,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "πιπέρι",
+        "curatedProductId": "be7258dacc8846f09b6194a753526851",
+        "curatedProduct": {
+          "id": "be7258dacc8846f09b6194a753526851",
+          "name": "ΜΙΚΡΕΣ ΦΑΡΜΕΣ ΤΟΥ ΒΟΥΝΟΥ Πιπέρι Τριμμένο Φάκελο 50γρ ",
+          "brand": "  ΜΙΚΡΕΣ ΦΑΡΜΕΣ ΤΟΥ ΒΟΥΝΟΥ",
+          "images": [],
+          "category": "Μαύρο Πιπέρι ",
+          "category_ids": [
+            "fb7311d1172f411dba075194a4120689",
+            "892381b3-bd08-4ff6-9550-b15288b08219",
+            "b2a17c2ad4235ea8574d6027636ccfea",
+            "b2a17c2ad4235ea8574d6027638e4a63",
+            "a647c5b091d74d439221095e1b01a235"
+          ],
+          "subcategory": "Πιπέρι",
+          "description": null,
+          "image_url": "https://api.posokanei.gov.gr/images/product/be7258dacc8846f09b6194a753526851?v=6a44d44ffa2c39a9c257f90e",
+          "has_image": true,
+          "updated_at": "2026-10-21T05:30:10.670000",
+          "image_version": "6a44d44ffa2c39a9c257f90e",
+          "unit": "kg",
+          "unit_quantity": 0.05,
+          "private_label": true,
+          "price_drop": false,
+          "price_drop_percentage": null,
+          "price_drop_from": null,
+          "price_drop_to": null,
+          "price_drop_start": null,
+          "price_drop_end": null,
+          "price_drop_category": null,
+          "price_drop_title": null,
+          "price_drop_company": null,
+          "price_stats": {
+            "min_price": 1.29,
+            "max_price": 1.29,
+            "avg_price": 1.29,
+            "retailer_count": 1,
+            "min_unit_price": 25.8,
+            "last_computed": null
+          },
+          "retailers": [
+            "market_in"
+          ],
+          "retailer_prices": [
+            {
+              "retailer": "market_in",
+              "retailer_display_name": "Market In",
+              "retailer_name": "",
+              "price": 1.29,
+              "price_normalized": 25.8,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-21T00:00:00",
+              "country": "GR"
+            }
+          ],
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false
+        },
+        "isCurated": true
       }
     ]
   }

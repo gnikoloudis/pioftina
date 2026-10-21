@@ -70,12 +70,14 @@ export async function getRetailers(country = "GR"): Promise<Retailer[]> {
     } catch (e) {
       console.warn("[Posokanei Client] Proxy fetch failed:", e);
     }
+    return MOCK_RETAILERS;
   }
 
   try {
     const res = await fetch(`${POSOKANEI_BASE_URL}/meta/retailers?countries=${country}`, {
       headers: POSOKANEI_HEADERS,
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(6000),
     });
 
     if (!res.ok) {
@@ -123,7 +125,7 @@ export async function searchProducts(
   const cached = getCached<ProductPage>(cacheKey);
   if (cached) return cached;
 
-  // If in browser, use serverless proxy to avoid CORS & 403 Forbidden
+  // If in browser, strictly use serverless proxy to avoid CORS & 403 Forbidden
   if (typeof window !== "undefined") {
     try {
       const res = await fetch("/api/posokanei/search", {
@@ -134,14 +136,17 @@ export async function searchProducts(
 
       if (res.ok) {
         const data: ProductPage = await res.json();
+        setCached(cacheKey, data);
         if (data.products && data.products.length > 0) {
-          setCached(cacheKey, data);
           return data;
         }
+        return getFallbackSearchResults(cleanTitle, params);
       }
     } catch (e) {
       console.warn(`[Posokanei Client] Proxy search for "${cleanTitle}" failed:`, e);
     }
+    // Never attempt direct browser requests to external POSOKANEI_BASE_URL
+    return getFallbackSearchResults(cleanTitle, params);
   }
 
   try {
@@ -164,6 +169,7 @@ export async function searchProducts(
       headers: POSOKANEI_HEADERS,
       body: JSON.stringify(searchPayload),
       next: { revalidate: 600 },
+      signal: AbortSignal.timeout(6000),
     });
 
     if (!res.ok) {
@@ -214,6 +220,8 @@ export async function getProductById(id: string): Promise<Product | null> {
     } catch (e) {
       console.warn(`[Posokanei Client] Proxy fetch for product ${id} failed:`, e);
     }
+    const fallback = MOCK_FALLBACK_PRODUCTS.find((p) => p.id === id);
+    return fallback || null;
   }
 
   try {
@@ -222,6 +230,7 @@ export async function getProductById(id: string): Promise<Product | null> {
       {
         headers: POSOKANEI_HEADERS,
         next: { revalidate: 1800 },
+        signal: AbortSignal.timeout(6000),
       }
     );
 
@@ -251,12 +260,17 @@ export async function getCategoryTree(): Promise<CategoryNode[]> {
   const cached = getCached<CategoryNode[]>(cacheKey);
   if (cached) return cached;
 
+  if (typeof window !== "undefined") {
+    return [];
+  }
+
   try {
     const res = await fetch(
       `${POSOKANEI_BASE_URL}/meta/categories/tree?include_counts=true&include_hidden=false`,
       {
         headers: POSOKANEI_HEADERS,
         next: { revalidate: 86400 },
+        signal: AbortSignal.timeout(6000),
       }
     );
 

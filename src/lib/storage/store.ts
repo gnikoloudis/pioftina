@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   MealSlot,
   MealType,
   CourseType,
   UserPreferences,
   Recipe,
+  Ingredient,
   RecipeCategory,
   OptimizedGroceryItem,
   BasketComparison,
@@ -260,12 +261,14 @@ export function useMealPlannerStore() {
               return merged;
             });
 
-            // Update any scheduled meal slots with latest database recipe definitions
-            setSlots((prevSlots) =>
-              prevSlots.map((slot) => {
+            // Update scheduled meal slots only if recipe definitions changed in database
+            setSlots((prevSlots) => {
+              let changed = false;
+              const mapped = prevSlots.map((slot) => {
                 if (!slot || !slot.recipe) return slot;
                 const updated = recipeMap.get(slot.recipe.id);
-                if (updated) {
+                if (updated && (updated.title !== slot.recipe.title || updated.ingredients?.length !== slot.recipe.ingredients?.length)) {
+                  changed = true;
                   return {
                     ...slot,
                     recipe: {
@@ -275,8 +278,9 @@ export function useMealPlannerStore() {
                   };
                 }
                 return slot;
-              })
-            );
+              });
+              return changed ? mapped : prevSlots;
+            });
           }
         })
         .catch((err) => {
@@ -493,8 +497,25 @@ export function useMealPlannerStore() {
     }
   }, [recipeReferenceUrls, isLoaded]);
 
-  // Recalculate grocery list whenever slots or preferences change (async product fetch)
+  const lastRunKeyRef = useRef<string>("");
+
+  // Recalculate grocery list whenever slots, preferences, or custom options change (async product fetch)
   useEffect(() => {
+    if (!isLoaded) return;
+
+    // Cache key to avoid redundant API triggers and prevent maximum update depth loop
+    const slotsKey = slots
+      .map((s) => `${s.id}:${s.recipe?.id}:${s.servings}:${s.recipe?.ingredients?.length || 0}`)
+      .join(";");
+    const prefsKey = `${preferences.householdSize}:${preferences.prioritizeBulk}:${preferences.preferredSupermarkets.join(",")}`;
+    const customOptsKey = Object.keys(customOptions).sort().join(",");
+    const runKey = `${slotsKey}|${prefsKey}|${customOptsKey}`;
+
+    if (runKey === lastRunKeyRef.current) {
+      return;
+    }
+    lastRunKeyRef.current = runKey;
+
     let isCancelled = false;
     setIsOptimizing(true);
 
@@ -543,7 +564,7 @@ export function useMealPlannerStore() {
     return () => {
       isCancelled = true;
     };
-  }, [slots, preferences, isLoaded]);
+  }, [slots, preferences, isLoaded, customOptions]);
 
   // Synchronously re-evaluate prices and comparisons whenever checked, pantry, or excluded status changes
   const applyInstantPriceRecalculation = (
@@ -1049,6 +1070,38 @@ export function useMealPlannerStore() {
     );
   };
 
+  const addIngredientToRecipe = (recipeId: string, ingredient: Ingredient) => {
+    setCustomRecipes((prev) => {
+      const match = prev.find((r) => r.id === recipeId) || allRecipes.find((r) => r.id === recipeId);
+      if (match) {
+        const updatedIngredients = [...(match.ingredients || []), ingredient];
+        const updated: Recipe = { ...match, ingredients: updatedIngredients };
+        persistCustomRecipeToServer(updated);
+        return prev.some((r) => r.id === recipeId)
+          ? prev.map((r) => (r.id === recipeId ? updated : r))
+          : [...prev, updated];
+      }
+      return prev;
+    });
+
+    // Also update any scheduled meal slots using this recipe
+    setSlots((prev) =>
+      prev.map((slot) => {
+        if (slot.recipe?.id === recipeId) {
+          const updatedIngredients = [...(slot.recipe.ingredients || []), ingredient];
+          return {
+            ...slot,
+            recipe: {
+              ...slot.recipe,
+              ingredients: updatedIngredients,
+            },
+          };
+        }
+        return slot;
+      })
+    );
+  };
+
   const deleteCustomRecipe = (recipeId: string) => {
     setCustomRecipes((prev) => {
       const next = prev.filter((r) => r.id !== recipeId);
@@ -1098,6 +1151,7 @@ export function useMealPlannerStore() {
     addCustomRecipe,
     updateCustomRecipe,
     deleteCustomRecipe,
+    addIngredientToRecipe,
     updateRecipeCategory,
     updateRecipeReferenceUrl,
     recipeReferenceUrls,

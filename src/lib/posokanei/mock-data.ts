@@ -57,6 +57,27 @@ export const MOCK_RETAILERS: Retailer[] = [
     logo_url: "https://api.posokanei.gov.gr/images/retailer/market_in",
     website: "https://www.market-in.gr",
   },
+  {
+    id: "halkiadakis",
+    name: "Χαλκιαδάκης",
+    country: "GR",
+    logo_url: "https://api.posokanei.gov.gr/images/retailer/xalkiadakis",
+    website: "https://www.xalkiadakis.gr",
+  },
+  {
+    id: "bazaar",
+    name: "Bazaar",
+    country: "GR",
+    logo_url: "https://api.posokanei.gov.gr/images/retailer/bazaar",
+    website: "https://www.bazaar-online.gr",
+  },
+  {
+    id: "synka",
+    name: "ΣΥΝ.ΚΑ",
+    country: "GR",
+    logo_url: "https://api.posokanei.gov.gr/images/retailer/synka",
+    website: null,
+  },
 ];
 
 export const MOCK_FALLBACK_PRODUCTS: Product[] = [

@@ -16,6 +16,7 @@ import {
 } from "@/lib/agent/recipe-collector";
 import { auditEntireRecipe, auditIngredient } from "@/lib/agent/quantity-auditor";
 import { CurateProductModal } from "@/components/recipes/curate-product-modal";
+import { AddIngredientModal, AddIngredientResult } from "@/components/admin/add-ingredient-modal";
 import { SupermarketBadge } from "@/components/supermarket-badge";
 import {
   Bot,
@@ -39,6 +40,7 @@ import {
   Check,
   Search,
   ExternalLink,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -56,11 +58,11 @@ export function RecipeCurationStudio({
   initialRecipeId,
 }: RecipeCurationStudioProps) {
   const [ingestionMode, setIngestionMode] = useState<IngestionMode>(
-    initialRecipeId ? "catalog" : "prompt"
+    initialRecipeId ? "catalog" : "catalog"
   );
   const [urlInput, setUrlInput] = useState("");
   const [textInput, setTextInput] = useState("");
-  const [promptInput, setPromptInput] = useState("Σπανακόπιτα Χωριάτικη με Φέτα");
+  const [promptInput, setPromptInput] = useState("");
   const [selectedCatalogRecipeId, setSelectedCatalogRecipeId] = useState(initialRecipeId || "");
 
   const [isLoading, setIsLoading] = useState(false);
@@ -104,13 +106,14 @@ export function RecipeCurationStudio({
         return auditEntireRecipe(converted);
       }
     }
-    // Initial pre-loaded draft for immediate interaction
-    const init = generateRecipeFromPrompt("Σπανακόπιτα Χωριάτικη με Φέτα", 4);
-    return auditEntireRecipe(init);
+    return null;
   });
 
   // Modal state for curating an ingredient product
   const [curatingIngredientIndex, setCuratingIngredientIndex] = useState<number | null>(null);
+
+  // Modal state for adding a new ingredient
+  const [isAddIngredientOpen, setIsAddIngredientOpen] = useState(false);
 
   // 1. Ingest via URL
   const handleImportUrl = async () => {
@@ -193,8 +196,17 @@ export function RecipeCurationStudio({
   // 4. Ingest from Catalog
   const handleLoadFromCatalog = (recipeId: string) => {
     setSelectedCatalogRecipeId(recipeId);
+    if (!recipeId) {
+      setDraftRecipe(null);
+      setErrorMessage(null);
+      setSuccessMessage(null);
+      return;
+    }
     const found = allRecipes.find((r) => r.id === recipeId);
-    if (!found) return;
+    if (!found) {
+      setDraftRecipe(null);
+      return;
+    }
 
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -239,6 +251,9 @@ export function RecipeCurationStudio({
     if (initialRecipeId) {
       handleLoadFromCatalog(initialRecipeId);
       setIngestionMode("catalog");
+    } else {
+      setSelectedCatalogRecipeId("");
+      setDraftRecipe(null);
     }
   }, [initialRecipeId]);
 
@@ -309,14 +324,46 @@ export function RecipeCurationStudio({
     setDraftRecipe({ ...draftRecipe, ingredients: updated });
   };
 
-  // HITL: Add New Blank Ingredient
+  // HITL: Open Add Ingredient Modal
   const handleAddIngredient = () => {
+    setIsAddIngredientOpen(true);
+  };
+
+  // HITL: Complete Add Ingredient from Modal
+  const handleAddIngredientComplete = (result: AddIngredientResult) => {
     if (!draftRecipe) return;
-    const newIng = parseIngredientLine("100 γρ. νέο υλικό", draftRecipe.ingredients.length, draftRecipe.servings);
+
+    const newId = `ing-${Date.now()}-${draftRecipe.ingredients.length}`;
+    const rawText = `${result.amount} ${result.unit} ${result.name}`;
+
+    const newAuditIng: AgentIngredientAudit = {
+      ingredientId: newId,
+      name: result.name,
+      originalRawText: rawText,
+      amount: result.amount,
+      unit: result.unit,
+      category: result.category,
+      posokaneiQuery: result.posokaneiQuery,
+      amountPerServing: Number((result.amount / Math.max(1, draftRecipe.servings)).toFixed(1)),
+      warnings: [],
+      matchedProduct: result.product,
+      matchConfidence: result.product ? 100 : 70,
+      isCurated: !!result.product,
+      notes: result.notes,
+    };
+
+    const audited = auditIngredient(
+      newAuditIng,
+      draftRecipe.servings,
+      draftRecipe.category
+    );
+
     setDraftRecipe({
       ...draftRecipe,
-      ingredients: [...draftRecipe.ingredients, newIng],
+      ingredients: [...draftRecipe.ingredients, audited],
     });
+    setSuccessMessage(`Το υλικό «${result.name}» προστέθηκε επιτυχώς!`);
+    setTimeout(() => setSuccessMessage(null), 3000);
   };
 
   // HITL: Curate Product Assignment
@@ -625,8 +672,23 @@ export function RecipeCurationStudio({
                 </h2>
               </div>
 
-              {/* Status Pill */}
-              <div className="flex items-center gap-2 text-xs">
+              {/* Status Pill & Clear Action */}
+              <div className="flex items-center gap-2 text-xs flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDraftRecipe(null);
+                    setSelectedCatalogRecipeId("");
+                    setPromptInput("");
+                    setUrlInput("");
+                    setTextInput("");
+                  }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  title="Καθαρισμός τρέχουσας συνταγής και επιστροφή στην επιλογή"
+                >
+                  <X className="size-3.5" />
+                  Καθαρισμός
+                </button>
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20">
                   {curatedCount}/{draftRecipe.ingredients.length} Επιλεγμένα Προϊόντα
                 </span>
@@ -805,6 +867,7 @@ export function RecipeCurationStudio({
               <Button
                 variant="outline"
                 size="sm"
+                id="btn-add-ingredient"
                 onClick={handleAddIngredient}
                 className="gap-1.5 text-xs"
               >
@@ -1085,6 +1148,99 @@ export function RecipeCurationStudio({
         </div>
       )}
 
+      {/* Empty State when no recipe is selected */}
+      {!draftRecipe && (
+        <div className="p-8 sm:p-12 rounded-2xl bg-card border border-border shadow-xs text-center space-y-6">
+          <div className="size-16 rounded-3xl bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-inner">
+            <Bot className="size-8" />
+          </div>
+
+          <div className="max-w-md mx-auto space-y-2">
+            <h3 className="text-lg font-bold text-foreground font-heading">
+              Καμία Συνταγή σε Επιμέλεια
+            </h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Τα υλικά και οι αντιστοιχίσεις προϊόντων supermarket θα εμφανιστούν μόλις επιλέξετε μια συνταγή από τον κατάλογο ή εισάγετε μια νέα μέσω AI, URL ή κειμένου.
+            </p>
+          </div>
+
+          {/* Quick Actions Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 max-w-3xl mx-auto pt-2 text-left">
+            <button
+              type="button"
+              onClick={() => setIngestionMode("catalog")}
+              className={`p-3.5 rounded-xl border text-xs transition-all ${
+                ingestionMode === "catalog"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                  : "border-border hover:border-primary/40 bg-muted/20 hover:bg-muted/40"
+              }`}
+            >
+              <div className="flex items-center gap-2 font-bold text-foreground mb-1">
+                <BookOpen className="size-4 text-primary" />
+                <span>Από Κατάλογο</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Επιλέξτε μια υπάρχουσα συνταγή για έλεγχο και αντιστοίχιση υλικών.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIngestionMode("prompt")}
+              className={`p-3.5 rounded-xl border text-xs transition-all ${
+                ingestionMode === "prompt"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                  : "border-border hover:border-primary/40 bg-muted/20 hover:bg-muted/40"
+              }`}
+            >
+              <div className="flex items-center gap-2 font-bold text-foreground mb-1">
+                <Sparkles className="size-4 text-primary" />
+                <span>AI Recipe Assistant</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Πληκτρολογήστε ένα πιάτο και δημιουργήστε συνταγή αυτόματα.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIngestionMode("text")}
+              className={`p-3.5 rounded-xl border text-xs transition-all ${
+                ingestionMode === "text"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                  : "border-border hover:border-primary/40 bg-muted/20 hover:bg-muted/40"
+              }`}
+            >
+              <div className="flex items-center gap-2 font-bold text-foreground mb-1">
+                <FileText className="size-4 text-primary" />
+                <span>Επικόλληση Κειμένου</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Αντιγράψτε κείμενο συνταγής από βιβλία ή ιστοσελίδες.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIngestionMode("url")}
+              className={`p-3.5 rounded-xl border text-xs transition-all ${
+                ingestionMode === "url"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                  : "border-border hover:border-primary/40 bg-muted/20 hover:bg-muted/40"
+              }`}
+            >
+              <div className="flex items-center gap-2 font-bold text-foreground mb-1">
+                <LinkIcon className="size-4 text-primary" />
+                <span>Web URL Import</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Άμεση ανάκτηση από ιστοσελίδες συνταγών (π.χ. Άκης, Αργυρώ).
+              </p>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Modal for curating an ingredient product */}
       {curatingIngredientIndex !== null && draftRecipe && (
         <CurateProductModal
@@ -1102,6 +1258,16 @@ export function RecipeCurationStudio({
           }}
           recipeTitle={draftRecipe.title}
           onAssignProduct={handleAssignProductToIngredient}
+        />
+      )}
+
+      {/* Modal for adding a new ingredient */}
+      {isAddIngredientOpen && draftRecipe && (
+        <AddIngredientModal
+          isOpen={isAddIngredientOpen}
+          onClose={() => setIsAddIngredientOpen(false)}
+          recipeTitle={draftRecipe.title}
+          onAddIngredient={handleAddIngredientComplete}
         />
       )}
     </div>
