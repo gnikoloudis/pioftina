@@ -1,0 +1,344 @@
+[
+  {
+    "id": "custom-σπανακ-πιτα-χωρι-τικη-με-φ-τα-6410",
+    "title": "Σπανακόπιτα Χωριάτικη με Φέτα",
+    "description": "Για 4 άτομα Προετοιμασία: 25 λεπτά Ψήσιμο: 50 λεπτά",
+    "servings": 4,
+    "prepTimeMinutes": 25,
+    "cookTimeMinutes": 50,
+    "imageUrl": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80",
+    "category": "vegetarian",
+    "isCurated": true,
+    "instructions": [
+      "Πλένουμε και κόβουμε το σπανάκι. Το μαραίνουμε ελαφρώς με λίγο αλάτι.",
+      "Σε μπολ ανακατεύουμε το σπανάκι, τη θρυμματισμένη φέτα, τα αυγά, τον άνηθο, τα κρεμμυδάκια και τα 2/3 του ελαιολάδου.",
+      "Στρώνουμε τα μισά φύλλα λαδώνοντάς τα, ρίχνουμε τη γέμιση και σκεπάζουμε με τα υπόλοιπα.",
+      "Χαράζουμε σε κομμάτια και ψήνουμε στους 180°C για 50 λεπτά μέχρι να ροδίσει."
+    ],
+    "ingredients": [
+      {
+        "id": "custom-σπανακ-πιτα-χωρι-τικη-με-φ-τα-6410-ing-0",
+        "name": "σπανάκι φρέσκο",
+        "amount": 1000,
+        "unit": "g",
+        "category": "produce",
+        "posokaneiQuery": "σπανάκι",
+        "curatedProductId": "spinach-barba-stathis-1kg",
+        "curatedProduct": {
+          "id": "spinach-barba-stathis-1kg",
+          "name": "ΜΠΑΡΜΠΑ ΣΤΑΘΗΣ Σπανάκι σε Φύλλα 1kg",
+          "brand": "ΜΠΑΡΜΠΑ ΣΤΑΘΗΣ",
+          "category": "Μαναβική & Οπωροπωλείο",
+          "category_ids": [
+            "cat-produce"
+          ],
+          "unit": "kg",
+          "unit_quantity": 1,
+          "has_image": true,
+          "image_url": null,
+          "private_label": false,
+          "price_drop": false,
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false,
+          "retailers": [
+            "sklavenitis",
+            "ab_vasilopoulos",
+            "mymarket",
+            "masoutis"
+          ],
+          "price_stats": {
+            "min_price": 2.8,
+            "max_price": 3.25,
+            "avg_price": 3.02,
+            "min_unit_price": 2.8,
+            "retailer_count": 4
+          },
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "Σπανάκι 1kg",
+              "price": 2.8,
+              "price_normalized": 2.8,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-18T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "ab_vasilopoulos",
+              "retailer_display_name": "ΑΒ Βασιλόπουλος",
+              "retailer_name": "Σπανάκι 1kg",
+              "price": 2.99,
+              "price_normalized": 2.99,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-18T00:00:00",
+              "country": "GR"
+            }
+          ]
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-σπανακ-πιτα-χωρι-τικη-με-φ-τα-6410-ing-1",
+        "name": "φέτα Π.Ο.Π.",
+        "amount": 400,
+        "unit": "g",
+        "category": "dairy",
+        "posokaneiQuery": "φέτα",
+        "curatedProductId": "feta-dodoni-400g",
+        "curatedProduct": {
+          "id": "feta-dodoni-400g",
+          "name": "ΔΩΔΩΝΗ Φέτα Π.Ο.Π. σε άλμη 400g",
+          "brand": "ΔΩΔΩΝΗ",
+          "category": "Τυριά & Γαλακτοκομικά",
+          "category_ids": [
+            "cat-dairy",
+            "cat-cheese"
+          ],
+          "unit": "kg",
+          "unit_quantity": 0.4,
+          "has_image": true,
+          "image_url": "https://api.posokanei.gov.gr/images/product/63c29bd9ca51449ca04fe53ed6b43e7b?v=69fa056bdc4b02f7b4858c1e",
+          "private_label": false,
+          "price_drop": false,
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false,
+          "retailers": [
+            "sklavenitis",
+            "ab_vasilopoulos",
+            "masoutis",
+            "mymarket"
+          ],
+          "price_stats": {
+            "min_price": 5.45,
+            "max_price": 5.95,
+            "avg_price": 5.7,
+            "min_unit_price": 13.63,
+            "retailer_count": 4
+          },
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "Δωδώνη Φέτα 400g",
+              "price": 5.45,
+              "price_normalized": 13.63,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-17T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "ab_vasilopoulos",
+              "retailer_display_name": "ΑΒ Βασιλόπουλος",
+              "retailer_name": "Δωδώνη Φέτα 400g",
+              "price": 5.65,
+              "price_normalized": 14.13,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-17T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "mymarket",
+              "retailer_display_name": "My Market",
+              "retailer_name": "Δωδώνη Φέτα 400g",
+              "price": 5.75,
+              "price_normalized": 14.38,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-17T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "masoutis",
+              "retailer_display_name": "Μασούτης",
+              "retailer_name": "Δωδώνη Φέτα 400g",
+              "price": 5.95,
+              "price_normalized": 14.88,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-17T00:00:00",
+              "country": "GR"
+            }
+          ]
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-σπανακ-πιτα-χωρι-τικη-με-φ-τα-6410-ing-2",
+        "name": "χωριάτικο φύλλο (500γρ)",
+        "amount": 500,
+        "unit": "g",
+        "category": "bakery",
+        "posokaneiQuery": "χωριάτικο φύλλο 500γρ",
+        "isCurated": false
+      },
+      {
+        "id": "custom-σπανακ-πιτα-χωρι-τικη-με-φ-τα-6410-ing-3",
+        "name": "άνηθος",
+        "amount": 50,
+        "unit": "g",
+        "category": "produce",
+        "posokaneiQuery": "άνηθος",
+        "isCurated": false
+      },
+      {
+        "id": "custom-σπανακ-πιτα-χωρι-τικη-με-φ-τα-6410-ing-4",
+        "name": "φρέσκα κρεμμυδάκια",
+        "amount": 4,
+        "unit": "τεμ",
+        "category": "pantry",
+        "posokaneiQuery": "κρεμμύδια",
+        "curatedProductId": "onions-bag-1kg",
+        "curatedProduct": {
+          "id": "onions-bag-1kg",
+          "name": "Κρεμμύδια Ξερά Κίτρινα σε Δίχτυ 1kg",
+          "brand": "Μαναβική Supermarket",
+          "category": "Μαναβική & Οπωροπωλείο",
+          "category_ids": [
+            "cat-produce"
+          ],
+          "unit": "kg",
+          "unit_quantity": 1,
+          "has_image": true,
+          "image_url": null,
+          "private_label": true,
+          "price_drop": false,
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false,
+          "retailers": [
+            "sklavenitis",
+            "ab_vasilopoulos",
+            "lidl",
+            "mymarket"
+          ],
+          "price_stats": {
+            "min_price": 0.85,
+            "max_price": 1.1,
+            "avg_price": 0.95,
+            "min_unit_price": 0.85,
+            "retailer_count": 4
+          },
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "Κρεμμύδια 1kg",
+              "price": 0.85,
+              "price_normalized": 0.85,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-18T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "ab_vasilopoulos",
+              "retailer_display_name": "ΑΒ Βασιλόπουλος",
+              "retailer_name": "Κρεμμύδια 1kg",
+              "price": 0.92,
+              "price_normalized": 0.92,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-18T00:00:00",
+              "country": "GR"
+            }
+          ]
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-σπανακ-πιτα-χωρι-τικη-με-φ-τα-6410-ing-5",
+        "name": "ελαιόλαδο",
+        "amount": 100,
+        "unit": "ml",
+        "category": "pantry",
+        "posokaneiQuery": "ελαιόλαδο",
+        "curatedProductId": "olive-oil-horio-1lt",
+        "curatedProduct": {
+          "id": "olive-oil-horio-1lt",
+          "name": "ΧΩΡΙΟ Εξαιρετικό Παρθένο Ελαιόλαδο Κορωνέικη Ποικιλία 1L",
+          "brand": "ΧΩΡΙΟ",
+          "category": "Έλαια & Σάλτσες",
+          "category_ids": [
+            "cat-oil"
+          ],
+          "unit": "L",
+          "unit_quantity": 1,
+          "has_image": true,
+          "image_url": null,
+          "private_label": false,
+          "price_drop": false,
+          "available_countries": [
+            "GR"
+          ],
+          "is_international": false,
+          "retailers": [
+            "sklavenitis",
+            "ab_vasilopoulos",
+            "mymarket",
+            "galaxias"
+          ],
+          "price_stats": {
+            "min_price": 9.8,
+            "max_price": 11.5,
+            "avg_price": 10.6,
+            "min_unit_price": 9.8,
+            "retailer_count": 4
+          },
+          "retailer_prices": [
+            {
+              "retailer": "sklavenitis",
+              "retailer_display_name": "Σκλαβενίτης",
+              "retailer_name": "Χωριό Ελαιόλαδο 1L",
+              "price": 9.8,
+              "price_normalized": 9.8,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-17T00:00:00",
+              "country": "GR"
+            },
+            {
+              "retailer": "ab_vasilopoulos",
+              "retailer_display_name": "ΑΒ Βασιλόπουλος",
+              "retailer_name": "Χωριό Ελαιόλαδο 1L",
+              "price": 10.2,
+              "price_normalized": 10.2,
+              "is_discount": false,
+              "discount_percentage": null,
+              "last_updated": "2026-10-17T00:00:00",
+              "country": "GR"
+            }
+          ]
+        },
+        "isCurated": true
+      },
+      {
+        "id": "custom-σπανακ-πιτα-χωρι-τικη-με-φ-τα-6410-ing-6",
+        "name": "αυγά",
+        "amount": 3,
+        "unit": "τεμ",
+        "category": "pantry",
+        "posokaneiQuery": "αυγά",
+        "isCurated": false
+      },
+      {
+        "id": "custom-σπανακ-πιτα-χωρι-τικη-με-φ-τα-6410-ing-7",
+        "name": "αλάτι & πιπέρι",
+        "amount": 2,
+        "unit": "g",
+        "category": "pantry",
+        "posokaneiQuery": "αλάτι & πιπέρι",
+        "isCurated": false
+      }
+    ]
+  }
+]

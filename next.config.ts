@@ -4,6 +4,15 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "api.posokanei.gov.gr",
+        pathname: "/**",
+      },
+    ],
+  },
   turbopack: {
     rules: {
       "*.css": {
