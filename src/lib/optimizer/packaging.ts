@@ -482,11 +482,11 @@ export async function generateOptimizedGroceryList(
  */
 export function computeBasketComparisons(
   items: OptimizedGroceryItem[],
-  preferredSupermarkets: string[]
+  preferredSupermarkets: string[] = []
 ): BasketComparison[] {
   // Candidate retailers to compare
   const retailersToCompare =
-    preferredSupermarkets.length > 0
+    preferredSupermarkets && preferredSupermarkets.length > 0
       ? MOCK_RETAILERS.filter((r) => preferredSupermarkets.includes(r.id))
       : MOCK_RETAILERS;
 
@@ -517,7 +517,7 @@ export function computeBasketComparisons(
       const match =
         item.selectedOption?.retailer === retailer.id
           ? item.selectedOption
-          : item.alternativeOptions.find((opt) => opt.retailer === retailer.id);
+          : (item.alternativeOptions || []).find((opt) => opt.retailer === retailer.id);
 
       const itemPrice = match
         ? match.totalPrice

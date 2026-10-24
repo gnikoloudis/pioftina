@@ -12,7 +12,7 @@ export function auditIngredient(
   servings = 4,
   recipeCategory = "traditional"
 ): AgentIngredientAudit {
-  const warnings: AgentQuantityWarning[] = [...(ing.warnings || [])];
+  const warnings: AgentQuantityWarning[] = [];
   const nameLow = ing.name.toLowerCase();
   const queryLow = ing.posokaneiQuery.toLowerCase();
   const amount = ing.amount;
@@ -146,10 +146,15 @@ export function auditIngredient(
     confidence = Math.max(50, confidence - 20);
   }
 
+  // Deduplicate warnings by id
+  const uniqueWarnings = Array.from(
+    new Map(warnings.map((w) => [w.id, w])).values()
+  );
+
   return {
     ...ing,
     amountPerServing,
-    warnings,
+    warnings: uniqueWarnings,
     matchConfidence: confidence,
   };
 }

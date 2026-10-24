@@ -29,9 +29,11 @@ import {
   ExternalLink,
   Link as LinkIcon,
   Plus,
+  Coins,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AddIngredientModal, AddIngredientResult } from "@/components/admin/add-ingredient-modal";
+import { calculateRecipeCost } from "@/lib/recipes/recipe-cost";
 
 interface RecipeDetailModalProps {
   recipe: Recipe | null;
@@ -42,6 +44,7 @@ interface RecipeDetailModalProps {
   onUpdateReferenceUrl?: (recipeId: string, referenceUrl: string) => void;
   onEditInStudio?: (recipeId: string) => void;
   onAddIngredient?: (recipeId: string, ingredient: Ingredient) => void;
+  isAdmin?: boolean;
 }
 
 export function RecipeDetailModal({
@@ -53,6 +56,7 @@ export function RecipeDetailModal({
   onUpdateReferenceUrl,
   onEditInStudio,
   onAddIngredient,
+  isAdmin = false,
 }: RecipeDetailModalProps) {
   const [activeTab, setActiveTab] = useState<"ingredients" | "curation">("ingredients");
   const [curatingIngredient, setCuratingIngredient] = useState<Ingredient | null>(null);
@@ -66,6 +70,11 @@ export function RecipeDetailModal({
   React.useEffect(() => {
     setRefUrlInput(recipe?.referenceUrl || "");
     setIsEditingRefUrl(false);
+  }, [recipe]);
+
+  const costBreakdown = React.useMemo(() => {
+    if (!recipe) return null;
+    return calculateRecipeCost(recipe);
   }, [recipe]);
 
   if (!recipe) return null;
@@ -143,11 +152,11 @@ export function RecipeDetailModal({
                   )}
 
                   {/* Admin edit / add reference link button */}
-                  {onUpdateReferenceUrl && !isEditingRefUrl && (
+                  {isAdmin && onUpdateReferenceUrl && !isEditingRefUrl && (
                     <button
                       onClick={() => setIsEditingRefUrl(true)}
                       className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground px-2 py-0.5 rounded-full hover:bg-muted transition-colors"
-                      title="Προσθήκη ή τροποποίηση του συνδέσμου αναφοράς / πηγής"
+                      title="Προσθήκη ή τροποποίηση του συνδέσμου αναφοράς / πηγής (Admin)"
                     >
                       <LinkIcon className="size-3" />
                       <span>{recipe.referenceUrl ? "Αλλαγή Πηγής" : "+ Προσθήκη Πηγής"}</span>
@@ -200,7 +209,7 @@ export function RecipeDetailModal({
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              {onEditInStudio && (
+              {isAdmin && onEditInStudio && (
                 <Button
                   size="sm"
                   variant="outline"
@@ -209,7 +218,7 @@ export function RecipeDetailModal({
                     onClose();
                   }}
                   className="h-8 text-xs font-semibold gap-1.5 rounded-xl border-primary/30 text-primary hover:bg-primary/10"
-                  title="Επεξεργασία συνταγής και υλικών στο Curation Studio"
+                  title="Επεξεργασία συνταγής και υλικών στο Curation Studio (Admin)"
                 >
                   <Sliders className="size-3.5" />
                   <span className="hidden sm:inline">Επεξεργασία στο Studio</span>
@@ -239,24 +248,26 @@ export function RecipeDetailModal({
               >
                 Υλικά &amp; Συνταγή
               </button>
-              <button
-                id="tab-recipe-curation"
-                onClick={() => setActiveTab("curation")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${
-                  activeTab === "curation"
-                    ? "bg-primary text-primary-foreground shadow-xs"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                <Sliders className="size-3.5" />
-                <span>Επιμέλεια Προϊόντων (Curation)</span>
-                <span className="size-4 rounded-full bg-emerald-500 text-white text-[9px] flex items-center justify-center font-bold">
-                  {recipe.ingredients.filter((i) => i.isCurated || i.curatedProduct).length}
-                </span>
-              </button>
+              {isAdmin && (
+                <button
+                  id="tab-recipe-curation"
+                  onClick={() => setActiveTab("curation")}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${
+                    activeTab === "curation"
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  }`}
+                >
+                  <Sliders className="size-3.5" />
+                  <span>Επιμέλεια Προϊόντων (Admin)</span>
+                  <span className="size-4 rounded-full bg-emerald-500 text-white text-[9px] flex items-center justify-center font-bold">
+                    {recipe.ingredients.filter((i) => i.isCurated || i.curatedProduct).length}
+                  </span>
+                </button>
+              )}
             </div>
 
-            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
               <span className="flex items-center gap-1">
                 <Clock className="size-3.5 text-primary" />
                 {recipe.prepTimeMinutes + recipe.cookTimeMinutes}λ
@@ -265,6 +276,15 @@ export function RecipeDetailModal({
                 <Users className="size-3.5 text-primary" />
                 {recipe.servings} μερίδες
               </span>
+              {costBreakdown && costBreakdown.costPerServing > 0 && (
+                <span
+                  className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20"
+                  title={`Συνολικό κόστος συνταγής: ~${costBreakdown.totalEstimatedCost.toFixed(2)}€ για ${recipe.servings} μερίδες`}
+                >
+                  <Coins className="size-3.5" />
+                  ~{costBreakdown.costPerServing.toFixed(2)} € / μερίδα
+                </span>
+              )}
             </div>
           </div>
 
@@ -275,6 +295,36 @@ export function RecipeDetailModal({
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {recipe.description}
                 </p>
+
+                {/* Cost Estimation Summary Banner */}
+                {costBreakdown && costBreakdown.costPerServing > 0 && (
+                  <div className="p-4 rounded-2xl bg-linear-to-r from-emerald-500/10 via-emerald-500/5 to-teal-500/10 border border-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                    <div className="space-y-0.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                        <Coins className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                        Εκτιμώμενο Κόστος Συνταγής
+                      </span>
+                      <p className="text-xs text-muted-foreground">
+                        Υπολογισμένο με τις καλύτερες τιμές supermarket του Παρατηρητηρίου Τιμών (posokanei.gov.gr).
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3.5 shrink-0 bg-card/80 dark:bg-card/60 px-3.5 py-2 rounded-xl border border-emerald-500/20">
+                      <div className="text-right">
+                        <div className="text-[10px] uppercase font-bold text-muted-foreground">Κόστος / Μερίδα</div>
+                        <div className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400">
+                          ~{costBreakdown.costPerServing.toFixed(2)} €
+                        </div>
+                      </div>
+                      <div className="h-7 w-px bg-emerald-500/30" />
+                      <div className="text-right">
+                        <div className="text-[10px] uppercase font-bold text-muted-foreground">Σύνολο ({recipe.servings} μερ.)</div>
+                        <div className="text-sm font-bold text-foreground">
+                          ~{costBreakdown.totalEstimatedCost.toFixed(2)} €
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-3">
@@ -296,6 +346,7 @@ export function RecipeDetailModal({
                   <div className="divide-y divide-border border border-border rounded-xl overflow-hidden bg-card">
                     {recipe.ingredients.map((ing) => {
                       const aisle = AISLE_CATEGORIES[ing.category];
+                      const ingCost = costBreakdown?.ingredientCosts.find((c) => c.ingredientId === ing.id);
                       return (
                         <div
                           key={ing.id}
@@ -307,10 +358,18 @@ export function RecipeDetailModal({
                               {ing.name}
                             </span>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap justify-end">
                             <span className="font-semibold text-primary">
                               {ing.amount} {ing.unit}
                             </span>
+                            {ingCost && (
+                              <span
+                                className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20"
+                                title={`Εκτιμώμενο αναλογικό κόστος υλικού: ~${ingCost.estimatedCost.toFixed(2)}€ (${ingCost.unitPrice} ${ingCost.unitLabel})`}
+                              >
+                                ~{ingCost.estimatedCost.toFixed(2)} €
+                              </span>
+                            )}
                             <span className={`text-[10px] px-2 py-0.5 rounded-md ${aisle?.badgeColor}`}>
                               {aisle?.nameEl.split("&")[0]}
                             </span>

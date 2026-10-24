@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "tsx src/tests/runner/cli.ts",
+    "test:docs": "tsx src/tests/generate-docs.ts",
+    "test:smoke": "tsx src/tests/runner/cli.ts --tags=smoke",
+    "pentest": "tsx src/tests/security/runner/cli.ts",
+    "test:security": "tsx src/tests/security/runner/cli.ts",
+    "pentest:docs": "tsx src/tests/security/generate-security-docs.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -34,6 +40,7 @@
     "eslint-config-next": "16.4.2",
     "supabase": "^2.121.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }

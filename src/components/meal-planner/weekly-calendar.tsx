@@ -20,6 +20,7 @@ import {
   Calendar,
   UtensilsCrossed,
   Filter,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RecipePicker } from "./recipe-picker";
@@ -43,6 +44,7 @@ interface WeeklyCalendarProps {
   onUpdateReferenceUrl?: (recipeId: string, referenceUrl: string) => void;
   onEditRecipeInStudio?: (recipeId: string) => void;
   onAddIngredient?: (recipeId: string, ingredient: Ingredient) => void;
+  onOpenSaveModal?: () => void;
 }
 
 function getCourseBadge(recipe: Recipe, courseType?: CourseType) {
@@ -92,6 +94,7 @@ export function WeeklyCalendar({
   onUpdateReferenceUrl,
   onEditRecipeInStudio,
   onAddIngredient,
+  onOpenSaveModal,
 }: WeeklyCalendarProps) {
   const [pickerTarget, setPickerTarget] = useState<{
     day: number;
@@ -154,7 +157,21 @@ export function WeeklyCalendar({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-start lg:self-auto shrink-0">
+        <div className="flex items-center gap-2 self-start lg:self-auto shrink-0 flex-wrap">
+          {onOpenSaveModal && (
+            <Button
+              variant="outline"
+              size="sm"
+              id="btn-calendar-save-to-pc"
+              onClick={onOpenSaveModal}
+              className="text-xs gap-1.5 border-primary/30 hover:bg-primary/10 text-primary font-semibold"
+              title="Αποθήκευση του εβδομαδιαίου πλάνου και της λίστας στον υπολογιστή"
+            >
+              <Download className="size-3.5" />
+              <span>Αποθήκευση</span>
+            </Button>
+          )}
+
           <Button
             variant="outline"
             size="sm"

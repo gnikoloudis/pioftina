@@ -277,3 +277,17 @@ export interface PantrySurplusItem {
   category: AisleCategory;
   originMealNames: string[];
 }
+
+export interface UserPantryItem {
+  id: string;
+  name: string;
+  amount: number;
+  unit: "g" | "kg" | "ml" | "l" | "L" | "τεμ" | string;
+  category: AisleCategory;
+  notes?: string;
+  isSurplus?: boolean;
+  originMealNames?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+

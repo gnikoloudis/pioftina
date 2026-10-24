@@ -13,6 +13,7 @@ import {
   BasketComparison,
   PantrySurplusItem,
   PackOption,
+  UserPantryItem,
 } from "@/types/meal-planner";
 import { Product } from "@/lib/posokanei/types";
 import { SEED_RECIPES } from "@/lib/recipes/seed-recipes";
@@ -154,6 +155,39 @@ export const INITIAL_MEAL_SLOTS: MealSlot[] = [
   },
 ];
 
+export const DEFAULT_PANTRY_ITEMS: UserPantryItem[] = [
+  {
+    id: "pantry-olive-oil",
+    name: "Εξαιρετικό Παρθένο Ελαιόλαδο",
+    amount: 1,
+    unit: "L",
+    category: "pantry",
+    notes: "Βασικό ντουλάπι μαγειρικής",
+    createdAt: "2026-10-01T00:00:00.000Z",
+    updatedAt: "2026-10-01T00:00:00.000Z",
+  },
+  {
+    id: "pantry-sea-salt",
+    name: "Αλάτι Ψιλό Θαλασσινό",
+    amount: 1,
+    unit: "kg",
+    category: "pantry",
+    notes: "Ντουλάπι μπαχαρικών",
+    createdAt: "2026-10-01T00:00:00.000Z",
+    updatedAt: "2026-10-01T00:00:00.000Z",
+  },
+  {
+    id: "pantry-oregano",
+    name: "Ρίγανη Ελληνική",
+    amount: 50,
+    unit: "g",
+    category: "pantry",
+    notes: "Μπαχαρικά & βότανα",
+    createdAt: "2026-10-01T00:00:00.000Z",
+    updatedAt: "2026-10-01T00:00:00.000Z",
+  },
+];
+
 const STORAGE_PREFIX = "pioftina_v2_";
 const STORAGE_KEYS = {
   SLOTS: `${STORAGE_PREFIX}meal_slots`,
@@ -161,6 +195,7 @@ const STORAGE_KEYS = {
   CUSTOM_RECIPES: `${STORAGE_PREFIX}custom_recipes`,
   CHECKED_ITEMS: `${STORAGE_PREFIX}checked_items`,
   PANTRY_ITEMS: `${STORAGE_PREFIX}pantry_items`,
+  USER_PANTRY_ITEMS: `${STORAGE_PREFIX}user_pantry_items`,
   EXCLUDED_ITEMS: `${STORAGE_PREFIX}excluded_items`,
   CUSTOM_OPTIONS: `${STORAGE_PREFIX}custom_pack_options`,
   CURATIONS: `${STORAGE_PREFIX}recipe_curations`,
@@ -177,6 +212,7 @@ export function useMealPlannerStore() {
   const [recipeReferenceUrls, setRecipeReferenceUrls] = useState<Record<string, string>>({});
   const [checkedItemIds, setCheckedItemIds] = useState<string[]>([]);
   const [pantryItemIds, setPantryItemIds] = useState<string[]>([]);
+  const [userPantryItems, setUserPantryItems] = useState<UserPantryItem[]>(DEFAULT_PANTRY_ITEMS);
   const [excludedItemIds, setExcludedItemIds] = useState<string[]>([]);
   const [customOptions, setCustomOptions] = useState<Record<string, PackOption>>({});
   const [isLoaded, setIsLoaded] = useState(false);
@@ -362,6 +398,16 @@ export function useMealPlannerStore() {
         } catch (_) {}
       }
 
+      const storedUserPantry = localStorage.getItem(STORAGE_KEYS.USER_PANTRY_ITEMS);
+      if (storedUserPantry) {
+        try {
+          const parsed = JSON.parse(storedUserPantry);
+          if (Array.isArray(parsed)) {
+            setUserPantryItems(parsed);
+          }
+        } catch (_) {}
+      }
+
       const storedExcluded = localStorage.getItem(STORAGE_KEYS.EXCLUDED_ITEMS);
       if (storedExcluded) {
         try {
@@ -460,6 +506,15 @@ export function useMealPlannerStore() {
       console.error(e);
     }
   }, [pantryItemIds, isLoaded]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    try {
+      localStorage.setItem(STORAGE_KEYS.USER_PANTRY_ITEMS, JSON.stringify(userPantryItems));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [userPantryItems, isLoaded]);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -891,6 +946,47 @@ export function useMealPlannerStore() {
     );
   };
 
+  // Pantry Item CRUD Operations
+  const addPantryItem = (item: Omit<UserPantryItem, "id" | "createdAt" | "updatedAt">) => {
+    const newItem: UserPantryItem = {
+      ...item,
+      id: `pantry-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setUserPantryItems((prev) => [newItem, ...prev]);
+  };
+
+  const updatePantryItem = (id: string, updates: Partial<UserPantryItem>) => {
+    setUserPantryItems((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? { ...item, ...updates, updatedAt: new Date().toISOString() }
+          : item
+      )
+    );
+  };
+
+  const deletePantryItem = (id: string) => {
+    setUserPantryItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const addSurplusToPantry = (surplus: PantrySurplusItem) => {
+    const newItem: UserPantryItem = {
+      id: `pantry-surplus-${Date.now()}`,
+      name: surplus.ingredientName,
+      amount: surplus.amount,
+      unit: surplus.unit,
+      category: surplus.category,
+      notes: `Πλεόνασμα από: ${surplus.originMealNames.join(", ")}`,
+      isSurplus: true,
+      originMealNames: surplus.originMealNames,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setUserPantryItems((prev) => [newItem, ...prev]);
+  };
+
   // Helper to persist custom recipe to server disk
   const persistCustomRecipeToServer = async (recipe: Recipe) => {
     try {
@@ -1127,6 +1223,11 @@ export function useMealPlannerStore() {
     groceryItems,
     basketComparisons,
     pantrySurplus,
+    userPantryItems,
+    addPantryItem,
+    updatePantryItem,
+    deletePantryItem,
+    addSurplusToPantry,
     totalCost,
     remainingCost,
     purchasedCost,

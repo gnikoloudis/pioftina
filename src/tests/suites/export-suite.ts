@@ -1,0 +1,218 @@
+import { TestSuite } from "../core/types";
+import {
+  generatePlanAndShoppingListText,
+  generatePlanAndShoppingListHtml,
+  PlanExportData,
+} from "@/lib/export/plan-exporter";
+import { INITIAL_MEAL_SLOTS, DEFAULT_PREFERENCES } from "@/lib/storage/store";
+import { SEED_RECIPES } from "@/lib/recipes/seed-recipes";
+import { OptimizedGroceryItem } from "@/types/meal-planner";
+
+const SAMPLE_GROCERY_ITEMS: OptimizedGroceryItem[] = [
+  {
+    ingredientId: "ing-tomato",
+    ingredientName: "Ντομάτες",
+    category: "produce",
+    rawRequiredAmount: 1200,
+    rawUnit: "g",
+    normalizedRequiredAmount: 1.2,
+    normalizedUnit: "kg",
+    alternativeOptions: [],
+    surplusAmount: 300,
+    surplusUnit: "g",
+    isChecked: false,
+    inPantry: false,
+    isExcluded: false,
+    selectedOption: {
+      product: {} as any,
+      packCount: 1,
+      packSize: 1.5,
+      packUnit: "kg",
+      totalQuantity: 1.5,
+      totalPrice: 2.1,
+      unitPrice: 1.4,
+      retailer: "sklavenitis",
+      retailerName: "Σκλαβενίτης",
+      isBulk: false,
+    },
+  },
+  {
+    ingredientId: "ing-feta",
+    ingredientName: "Φέτα ΠΟΠ",
+    category: "dairy",
+    rawRequiredAmount: 400,
+    rawUnit: "g",
+    normalizedRequiredAmount: 0.4,
+    normalizedUnit: "kg",
+    alternativeOptions: [],
+    surplusAmount: 0,
+    surplusUnit: "g",
+    isChecked: true,
+    inPantry: false,
+    isExcluded: false,
+    selectedOption: {
+      product: {} as any,
+      packCount: 1,
+      packSize: 400,
+      packUnit: "g",
+      totalQuantity: 400,
+      totalPrice: 4.8,
+      unitPrice: 12.0,
+      retailer: "ab_vasilopoulos",
+      retailerName: "ΑΒ Βασιλόπουλος",
+      isBulk: false,
+    },
+  },
+];
+
+export const exportSuite: TestSuite = {
+  id: "suite-export",
+  name: "Εξαγωγή & Αποθήκευση στον Υπολογιστή (Save to PC)",
+  category: "export",
+  description:
+    "Δοκιμές για την ορθή παραγωγή του εβδομαδιαίου πλάνου και της λίστας αγορών σε αρχείο .txt, εκτυπώσιμο HTML/PDF και JSON backup.",
+  tests: [
+    {
+      id: "TEST-EXP-01",
+      title: "Ορθή παραγωγή αρχείου κειμένου (.txt) με πλήρες πρόγραμμα και λίστα",
+      category: "export",
+      severity: "high",
+      tags: ["export", "text", "week-plan", "grocery-list"],
+      description:
+        "Επαληθεύει ότι το παραγόμενο αρχείο κειμένου περιέχει τις 7 ημέρες, τα προγραμματισμένα γεύματα με μερίδες, και τα είδη της λίστας με κουτάκια [ ].",
+      documentation:
+        "Η συνάρτηση generatePlanAndShoppingListText πρέπει να επιστρέφει ένα πλήρες, δομημένο κείμενο UTF-8 με διαχωριστικά και σύνολα.",
+      run: ({ assert, assertContains }) => {
+        const testData: PlanExportData = {
+          slots: INITIAL_MEAL_SLOTS,
+          groceryItems: SAMPLE_GROCERY_ITEMS,
+          preferences: DEFAULT_PREFERENCES,
+          totalCost: 6.9,
+          remainingCost: 2.1,
+          purchasedCost: 4.8,
+          totalSavings: 1.5,
+          pantrySurplus: [
+            {
+              id: "surplus-tomato",
+              ingredientName: "Ντομάτες",
+              amount: 300,
+              unit: "g",
+              category: "produce",
+              originMealNames: ["Μουσακάς", "Χωριάτικη"],
+            },
+          ],
+        };
+
+        const text = generatePlanAndShoppingListText(testData);
+
+        assert(text.length > 500, "Το παραγόμενο κείμενο πρέπει να είναι αναλυτικό (>500 χαρακτήρες)");
+        assertContains(text, "PIOFTINA.GR", "Πρέπει να περιέχει την ταυτότητα της εφαρμογής");
+        assertContains(text, "ΕΒΔΟΜΑΔΙΑΙΟ ΠΡΟΓΡΑΜΜΑ ΓΕΥΜΑΤΩΝ", "Πρέπει να περιέχει την ενότητα προγράμματος");
+        assertContains(text, "ΟΡΓΑΝΩΜΕΝΗ ΛΙΣΤΑ ΑΓΟΡΩΝ", "Πρέπει να περιέχει την ενότητα λίστας αγορών");
+        assertContains(text, "[ΔΕΥΤΕΡΑ]", "Πρέπει να περιλαμβάνει τις ημέρες της εβδομάδας");
+        assertContains(text, "Μουσακάς", "Πρέπει να περιλαμβάνει τις επιλεγμένες συνταγές");
+        assertContains(text, "Μερίδες:", "Πρέπει να αναγράφει τις μερίδες ανά γεύμα");
+        assertContains(text, "Ντομάτες", "Πρέπει να περιλαμβάνει τα υλικά της λίστας");
+        assertContains(text, "[ ]", "Πρέπει να περιλαμβάνει checkboxes για τα μη αγορασμένα υλικά");
+        assertContains(text, "[X]", "Πρέπει να περιλαμβάνει [X] για τα ήδη αγορασμένα υλικά");
+        assertContains(text, "€6.90", "Πρέπει να αναγράφει το εκτιμώμενο κόστος");
+        assertContains(text, "ΑΠΟΘΗΚΗ & ΠΛΕΟΝΑΣΜΑ", "Πρέπει να περιλαμβάνει την ενότητα πλεονάσματος");
+      },
+    },
+
+    {
+      id: "TEST-EXP-02",
+      title: "Εκτυπώσιμη HTML διάταξη (A4 Print / Save as PDF)",
+      category: "export",
+      severity: "high",
+      tags: ["export", "html", "print", "pdf"],
+      description:
+        "Ελέγχει ότι η παραγόμενη σελίδα HTML για εκτύπωση είναι έγκυρη, περιέχει @media print styles και πίνακα γευμάτων.",
+      documentation:
+        "Το HTML έγγραφο πρέπει να είναι αυτόνομο με inline CSS για άμεση εκτύπωση ή εξαγωγή σε PDF χωρίς εξωτερικές εξαρτήσεις.",
+      run: ({ assert, assertContains }) => {
+        const testData: PlanExportData = {
+          slots: INITIAL_MEAL_SLOTS,
+          groceryItems: SAMPLE_GROCERY_ITEMS,
+          preferences: DEFAULT_PREFERENCES,
+          totalCost: 12.5,
+          remainingCost: 12.5,
+          purchasedCost: 0,
+          totalSavings: 2.0,
+        };
+
+        const html = generatePlanAndShoppingListHtml(testData);
+
+        assertContains(html, "<!DOCTYPE html>", "Πρέπει να είναι πλήρες έγγραφο HTML5");
+        assertContains(html, '<html lang="el">', "Πρέπει να έχει ορισμένη ελληνική γλώσσα");
+        assertContains(html, "@media print", "Πρέπει να περιέχει κανόνες εκτύπωσης @media print");
+        assertContains(html, "meal-table", "Πρέπει να περιέχει πίνακα γευμάτων");
+        assertContains(html, "shopping-grid", "Πρέπει να περιέχει grid λίστας αγορών");
+        assertContains(html, "checkbox-box", "Πρέπει να περιέχει κουτάκια επιλογής για εκτύπωση");
+      },
+    },
+
+    {
+      id: "TEST-EXP-03",
+      title: "Ανθεκτικότητα σε κενό πλάνο & κενή λίστα αγορών",
+      category: "export",
+      severity: "medium",
+      tags: ["export", "resilience", "edge-case"],
+      description:
+        "Επιβεβαιώνει ότι η εξαγωγή δεν καταρρέει ακόμη κι αν ο χρήστης δεν έχει επιλέξει κανένα γεύμα ή αν η λίστα είναι κενή.",
+      documentation:
+        "Πρέπει να εμφανίζονται επεξηγηματικά μηνύματα κενής κατάστασης χωρίς uncaught errors.",
+      run: ({ assert, assertContains }) => {
+        const emptyData: PlanExportData = {
+          slots: [],
+          groceryItems: [],
+          preferences: DEFAULT_PREFERENCES,
+          totalCost: 0,
+          remainingCost: 0,
+          purchasedCost: 0,
+          totalSavings: 0,
+        };
+
+        const text = generatePlanAndShoppingListText(emptyData);
+        assert(typeof text === "string" && text.length > 100, "Πρέπει να επιστρέφει έγκυρο κείμενο");
+        assertContains(text, "Δεν έχουν προγραμματιστεί γεύματα", "Πρέπει να χειρίζεται κενές ημέρες");
+
+        const html = generatePlanAndShoppingListHtml(emptyData);
+        assert(typeof html === "string" && html.includes("<!DOCTYPE html>"), "Πρέπει να επιστρέφει έγκυρο HTML");
+      },
+    },
+
+    {
+      id: "TEST-EXP-04",
+      title: "Εγκυρότητα δομής ψηφιακού αντιγράφου JSON Backup",
+      category: "export",
+      severity: "medium",
+      tags: ["export", "json", "backup"],
+      description:
+        "Επαληθεύει ότι τα δεδομένα πλάνου και ρυθμίσεων μπορούν να σειριοποιηθούν σε JSON χωρίς circular references.",
+      documentation:
+        "Το JSON backup επιτρέπει την τοπική αποθήκευση του πλήρους configuration του χρήστη.",
+      run: ({ assert }) => {
+        const backupPayload = {
+          version: "1.0",
+          exportedAt: new Date().toISOString(),
+          preferences: DEFAULT_PREFERENCES,
+          slots: INITIAL_MEAL_SLOTS.map((s) => ({
+            day: s.day,
+            mealType: s.mealType,
+            recipeId: s.recipe?.id,
+            recipeTitle: s.recipe?.title,
+            servings: s.servings,
+          })),
+        };
+
+        const jsonStr = JSON.stringify(backupPayload, null, 2);
+        assert(jsonStr.length > 200, "Το JSON payload πρέπει να σειριοποιείται ορθά");
+
+        const parsed = JSON.parse(jsonStr);
+        assert(parsed.version === "1.0", "Η έκδοση backup πρέπει να είναι 1.0");
+        assert(Array.isArray(parsed.slots) && parsed.slots.length > 0, "Πρέπει να περιέχει τη λίστα slots");
+      },
+    },
+  ],
+};

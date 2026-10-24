@@ -3,6 +3,8 @@ import { execFile } from "child_process";
 import { parseRawRecipeText, parseIngredientLine } from "@/lib/agent/recipe-collector";
 import { auditEntireRecipe } from "@/lib/agent/quantity-auditor";
 import { AgentParsedRecipe } from "@/types/recipe-agent";
+import { verifyAdminRequest } from "@/lib/security/admin-auth";
+import { checkRateLimit, createRateLimitResponse } from "@/lib/security/rate-limiter";
 
 const BROWSER_HEADERS: Record<string, string> = {
   "User-Agent":
@@ -70,31 +72,66 @@ async function fetchWithCurlFallback(targetUrl: string): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
+    // 1. Verify admin authorization
+    const isAdmin = await verifyAdminRequest(req);
+    if (!isAdmin) {
+      return NextResponse.json(
+        { success: false, error: "Απαιτούνται δικαιώματα διαχειριστή για την ανάκτηση συνταγών." },
+        { status: 401 }
+      );
+    }
+
+    // 2. Strict rate limiting & cooldown for heavy scraping (max 6 req/min, 3s cooldown)
+    const rateCheck = checkRateLimit(req, {
+      limit: 6,
+      windowMs: 60 * 1000,
+      cooldownMs: 3000,
+      prefix: "recipe_import",
+    });
+    if (!rateCheck.allowed) {
+      return createRateLimitResponse(rateCheck);
+    }
+
     const body = await req.json();
     const url = body?.url?.trim();
 
-    if (!url || !url.startsWith("http")) {
+    if (!url || typeof url !== "string") {
       return NextResponse.json(
         { success: false, error: "Παρακαλούμε εισάγετε έγκυρο σύνδεσμο (URL) συνταγής." },
         { status: 400 }
       );
     }
 
-    // Basic SSRF protection
+    // Comprehensive SSRF & Protocol protection
     try {
       const parsedUrl = new URL(url);
-      const host = parsedUrl.hostname.toLowerCase();
-      if (
-        host === "localhost" ||
-        host === "127.0.0.1" ||
-        host === "::1" ||
-        host.startsWith("192.168.") ||
-        host.startsWith("10.") ||
-        host.startsWith("172.16.") ||
-        host.endsWith(".local")
-      ) {
+      if (!parsedUrl.protocol || !["http:", "https:"].includes(parsedUrl.protocol)) {
         return NextResponse.json(
-          { success: false, error: "Μη έγκυρη διεύθυνση URL (ιδιωτικό δίκτυο)." },
+          { success: false, error: "Μη επιτρεπόμενο πρωτόκολλο URL (επιτρέπεται μόνο http/https)." },
+          { status: 400 }
+        );
+      }
+
+      const host = parsedUrl.hostname.toLowerCase();
+      const cleanHost = host.replace(/^\[|\]$/g, "");
+      const isPrivateOrLoopback =
+        cleanHost === "localhost" ||
+        cleanHost === "127.0.0.1" ||
+        cleanHost === "::1" ||
+        cleanHost === "0.0.0.0" ||
+        cleanHost === "::" ||
+        cleanHost.startsWith("127.") ||
+        cleanHost.startsWith("192.168.") ||
+        cleanHost.startsWith("10.") ||
+        cleanHost.startsWith("169.254.") ||
+        cleanHost.startsWith("::ffff:127.") ||
+        /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(cleanHost) ||
+        cleanHost.endsWith(".local") ||
+        cleanHost.endsWith(".internal");
+
+      if (isPrivateOrLoopback) {
+        return NextResponse.json(
+          { success: false, error: "Μη έγκυρη διεύθυνση URL (ιδιωτικό δίκτυο / loopback / cloud metadata)." },
           { status: 400 }
         );
       }

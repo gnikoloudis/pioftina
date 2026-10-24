@@ -188,6 +188,20 @@ export function StorePreferencesModal({
               Όταν είναι ενεργό, το σύστημα προτείνει μεγαλύτερες ή οικογενειακές συσκευασίες εφόσον προσφέρουν χαμηλότερη τιμή ανά κιλό/λίτρο (€/kg ή €/L) και αποθηκεύει το υπόλοιπο στο ντουλάπι σας.
             </p>
           </div>
+
+          {/* Email Newsletter Section */}
+          <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+                <span className="text-base">📩</span>
+                <span>Ενημερώσεις &amp; Προσφορές Supermarket</span>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Λάβετε εβδομαδιαία οικονομικά μενού, προσφορές από τα επιλεγμένα σούπερ μάρκετ σας και συμβουλές εξοικονόμησης.
+            </p>
+            <NewsletterFormCompact />
+          </div>
         </div>
 
         {/* Footer */}
@@ -205,5 +219,81 @@ export function StorePreferencesModal({
         </div>
       </div>
     </div>
+  );
+}
+
+function NewsletterFormCompact() {
+  const [email, setEmail] = useState("");
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("pioftina_newsletter_subscribed");
+      const storedEmail = localStorage.getItem("pioftina_newsletter_email");
+      if (stored === "true" && storedEmail) {
+        setIsSubscribed(true);
+        setEmail(storedEmail);
+      }
+    } catch (_) {}
+  }, []);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !email.includes("@")) return;
+
+    setIsLoading(true);
+    setMsg(null);
+
+    try {
+      const res = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), source: "settings" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsSubscribed(true);
+        setMsg("✓ Καταχωρήθηκε!");
+        try {
+          localStorage.setItem("pioftina_newsletter_subscribed", "true");
+          localStorage.setItem("pioftina_newsletter_email", email.trim());
+        } catch (_) {}
+      } else {
+        setMsg(data.error || "Σφάλμα");
+      }
+    } catch {
+      setMsg("Σφάλμα δικτύου");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubscribe} className="space-y-2">
+      <div className="flex items-center gap-2">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Το email σας..."
+          className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-input bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 font-medium"
+        />
+        <Button
+          type="submit"
+          size="sm"
+          disabled={isLoading || !email.trim()}
+          className="text-xs h-8 px-3 rounded-xl font-semibold"
+        >
+          {isLoading ? "..." : isSubscribed ? "Ενημέρωση" : "Εγγραφή"}
+        </Button>
+      </div>
+      {msg && (
+        <p className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 animate-in fade-in">
+          {msg}
+        </p>
+      )}
+    </form>
   );
 }

@@ -23,9 +23,11 @@ import {
   Tag,
   ExternalLink,
   Sliders,
+  Coins,
 } from "lucide-react";
 import { RecipeDetailModal } from "@/components/meal-planner/recipe-detail-modal";
 import { Button } from "@/components/ui/button";
+import { calculateRecipeCost } from "@/lib/recipes/recipe-cost";
 
 interface RecipeListViewProps {
   recipes: Recipe[];
@@ -36,6 +38,7 @@ interface RecipeListViewProps {
   onUpdateReferenceUrl?: (recipeId: string, referenceUrl: string) => void;
   onEditRecipeInStudio?: (recipeId: string) => void;
   onAddIngredient?: (recipeId: string, ingredient: Ingredient) => void;
+  isAdmin?: boolean;
 }
 
 export function RecipeListView({
@@ -47,6 +50,7 @@ export function RecipeListView({
   onUpdateReferenceUrl,
   onEditRecipeInStudio,
   onAddIngredient,
+  isAdmin = false,
 }: RecipeListViewProps) {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -235,19 +239,34 @@ export function RecipeListView({
             </div>
 
             <div className="px-5 py-3 border-t border-border/60 bg-muted/20 flex items-center justify-between gap-2">
-              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                <Users className="size-3.5" />
-                {recipe.servings} μερίδες
-              </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Users className="size-3.5" />
+                  {recipe.servings} μερίδες
+                </span>
+                {(() => {
+                  const cost = calculateRecipeCost(recipe);
+                  if (cost.costPerServing <= 0) return null;
+                  return (
+                    <span
+                      className="inline-flex items-center gap-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shadow-2xs"
+                      title={`Εκτιμώμενο κόστος: ~${cost.costPerServing.toFixed(2)}€ ανά μερίδα (Σύνολο: ~${cost.totalEstimatedCost.toFixed(2)}€)`}
+                    >
+                      <Coins className="size-3 text-emerald-600 dark:text-emerald-400" />
+                      ~{cost.costPerServing.toFixed(2)} €/μερ.
+                    </span>
+                  );
+                })()}
+              </div>
 
               <div className="flex items-center gap-1.5">
-                {onEditRecipeInStudio && (
+                {isAdmin && onEditRecipeInStudio && (
                   <Button
                     variant="ghost"
                     size="xs"
                     onClick={() => onEditRecipeInStudio(recipe.id)}
                     className="text-xs gap-1 text-primary hover:bg-primary/10 hover:text-primary font-medium"
-                    title="Επεξεργασία συνταγής στο Studio"
+                    title="Επεξεργασία συνταγής στο Studio (Admin)"
                   >
                     <Sliders className="size-3" />
                     Επεξεργασία
@@ -278,6 +297,7 @@ export function RecipeListView({
           onUpdateReferenceUrl={onUpdateReferenceUrl}
           onEditInStudio={onEditRecipeInStudio}
           onAddIngredient={onAddIngredient}
+          isAdmin={isAdmin}
         />
       )}
     </div>

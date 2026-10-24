@@ -30,6 +30,7 @@ import {
   Trash2,
   EyeOff,
   RotateCcw,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -47,6 +48,7 @@ interface GroceryListViewProps {
   onRestoreAllExcluded?: () => void;
   onUpdateItemOption: (ingredientId: string, option: PackOption) => void;
   onCurateProduct?: (ingredientId: string, product: Product) => void;
+  onOpenSaveModal?: () => void;
 }
 
 export function GroceryListView({
@@ -63,6 +65,7 @@ export function GroceryListView({
   onRestoreAllExcluded,
   onUpdateItemOption,
   onCurateProduct,
+  onOpenSaveModal,
 }: GroceryListViewProps) {
   const [selectedItemForModal, setSelectedItemForModal] =
     useState<OptimizedGroceryItem | null>(null);
@@ -139,7 +142,7 @@ export function GroceryListView({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
           <Button
             variant="outline"
             size="sm"
@@ -148,6 +151,20 @@ export function GroceryListView({
           >
             {hideChecked ? "Εμφάνιση όλων" : "Απόκρυψη αγορασμένων"}
           </Button>
+
+          {onOpenSaveModal && (
+            <Button
+              variant="outline"
+              size="sm"
+              id="btn-grocery-save-to-pc"
+              onClick={onOpenSaveModal}
+              className="text-xs gap-1.5 border-primary/30 hover:bg-primary/10 text-primary font-semibold"
+              title="Αποθήκευση της λίστας αγορών και του πλάνου στον υπολογιστή"
+            >
+              <Download className="size-3.5" />
+              <span>Αποθήκευση</span>
+            </Button>
+          )}
 
           <Button
             variant="outline"

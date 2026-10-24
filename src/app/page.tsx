@@ -7,8 +7,15 @@ import { GroceryListView } from "@/components/grocery-list/grocery-list-view";
 import { RecipeListView } from "@/components/recipes/recipe-list-view";
 import { PantryView } from "@/components/pantry/pantry-view";
 import { RecipeCurationStudio } from "@/components/admin/recipe-curation-studio";
+import { TestCenterView } from "@/components/admin/test-center-view";
+import Link from "next/link";
 import { StorePreferencesModal } from "@/components/settings/store-preferences-modal";
 import { SupermarketBadge } from "@/components/supermarket-badge";
+import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { AdminLoginModal } from "@/components/admin/admin-login-modal";
+import { NewsletterCard } from "@/components/newsletter/newsletter-card";
+import { NewsletterModal } from "@/components/newsletter/newsletter-modal";
+import { SavePlanModal } from "@/components/meal-planner/save-plan-modal";
 import {
   CalendarDays,
   ShoppingCart,
@@ -20,6 +27,10 @@ import {
   CheckCircle2,
   Users,
   Bot,
+  Shield,
+  Lock,
+  Mail,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -31,6 +42,11 @@ export default function Home() {
     groceryItems,
     basketComparisons,
     pantrySurplus,
+    userPantryItems,
+    addPantryItem,
+    updatePantryItem,
+    deletePantryItem,
+    addSurplusToPantry,
     totalCost,
     remainingCost,
     purchasedCost,
@@ -56,13 +72,29 @@ export default function Home() {
     updateSlotServings,
   } = useMealPlannerStore();
 
+  const { isAdmin, login: adminLogin, logout: adminLogout } = useAdminAuth();
+  const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
+  const [isNewsletterModalOpen, setIsNewsletterModalOpen] = useState(false);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+
   const [activeTab, setActiveTab] = useState<
-    "planner" | "grocery" | "recipes" | "pantry" | "curation-studio"
+    "planner" | "grocery" | "recipes" | "pantry" | "curation-studio" | "test-center"
   >("planner");
   const [editingRecipeId, setEditingRecipeId] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+  // If visitor is on curation-studio or test-center and is not an admin, redirect to planner
+  React.useEffect(() => {
+    if (!isAdmin && (activeTab === "curation-studio" || activeTab === "test-center")) {
+      setActiveTab("planner");
+    }
+  }, [isAdmin, activeTab]);
+
   const handleEditRecipeInStudio = (recipeId: string) => {
+    if (!isAdmin) {
+      setIsAdminLoginOpen(true);
+      return;
+    }
     setEditingRecipeId(recipeId);
     setActiveTab("curation-studio");
   };
@@ -100,8 +132,48 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Quick Preference Pill & Settings Button */}
-          <div className="flex items-center gap-2.5">
+          {/* Quick Actions, Newsletter, Preferences & Admin Status */}
+          <div className="flex items-center gap-2">
+            {/* Save to PC Trigger Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              id="header-save-plan-btn"
+              onClick={() => setIsSaveModalOpen(true)}
+              className="h-9 px-3 rounded-xl gap-1.5 text-xs font-semibold text-foreground border-border hover:bg-muted/50"
+              title="Αποθήκευση του εβδομαδιαίου πλάνου και της λίστας αγορών στον υπολογιστή"
+            >
+              <Download className="size-3.5 text-primary" />
+              <span className="hidden sm:inline">Αποθήκευση στον Υπολογιστή</span>
+            </Button>
+
+            {/* Newsletter Trigger Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsNewsletterModalOpen(true)}
+              className="h-9 px-3 rounded-xl gap-1.5 text-xs font-semibold text-primary border-primary/20 hover:bg-primary/5"
+              title="Εγγραφή για νέα και προσφορές"
+            >
+              <Mail className="size-3.5" />
+              <span className="hidden md:inline">Νέα &amp; Προσφορές</span>
+            </Button>
+
+            {/* Admin Badge if logged in */}
+            {isAdmin && (
+              <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs font-bold shrink-0">
+                <Shield className="size-3.5 text-amber-600" />
+                <span>Admin</span>
+                <button
+                  onClick={adminLogout}
+                  className="ml-1 text-[10px] text-muted-foreground hover:text-foreground underline"
+                  title="Αποσύνδεση διαχειριστή"
+                >
+                  Έξοδος
+                </button>
+              </div>
+            )}
+
             <div
               onClick={() => setIsSettingsOpen(true)}
               className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-muted/40 cursor-pointer transition-colors text-xs"
@@ -133,6 +205,19 @@ export default function Home() {
             >
               <Settings className="size-4" />
             </Button>
+
+            {!isAdmin && (
+              <Button
+                variant="ghost"
+                size="sm"
+                id="header-admin-login-btn"
+                onClick={() => setIsAdminLoginOpen(true)}
+                className="size-9 p-0 rounded-xl text-muted-foreground/50 hover:text-foreground hover:bg-muted/50"
+                title="Σύνδεση Διαχειριστή (Admin)"
+              >
+                <Lock className="size-3.5" />
+              </Button>
+            )}
           </div>
         </div>
 
@@ -256,36 +341,67 @@ export default function Home() {
           >
             <Box className="size-4" />
             <span>Αποθήκη &amp; Πλεόνασμα</span>
-            {pantrySurplus.length > 0 && (
+            {(userPantryItems.length > 0 || pantrySurplus.length > 0) && (
               <span className="size-5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs flex items-center justify-center font-bold">
-                {pantrySurplus.length}
+                {userPantryItems.length + pantrySurplus.length}
               </span>
             )}
           </button>
-          <button
-            id="tab-btn-curation-studio"
-            onClick={() => {
-              setEditingRecipeId(null);
-              setActiveTab("curation-studio");
-            }}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${
-              activeTab === "curation-studio"
-                ? "bg-primary text-primary-foreground shadow-xs"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-            }`}
-          >
-            <Bot className="size-4 text-primary" />
-            <span>Curation Studio</span>
-            <span
-              className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${
+          {/* Curation Studio Tab: Available ONLY to administrator */}
+          {isAdmin && (
+            <button
+              id="tab-btn-curation-studio"
+              onClick={() => {
+                setEditingRecipeId(null);
+                setActiveTab("curation-studio");
+              }}
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${
                 activeTab === "curation-studio"
-                  ? "bg-white/20 text-white border-white/30"
-                  : "bg-primary/10 text-primary border-primary/20"
+                  ? "bg-primary text-primary-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               }`}
             >
-              AI Agent
-            </span>
-          </button>
+              <Bot className="size-4 text-primary" />
+              <span>Curation Studio</span>
+              <span
+                className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${
+                  activeTab === "curation-studio"
+                    ? "bg-white/20 text-white border-white/30"
+                    : "bg-primary/10 text-primary border-primary/20"
+                }`}
+              >
+                Admin
+              </span>
+            </button>
+          )}
+
+          {/* Test Center Tab: Available ONLY to administrator */}
+          {isAdmin && (
+            <button
+              id="tab-btn-test-center"
+              onClick={() => {
+                setEditingRecipeId(null);
+                setActiveTab("test-center");
+              }}
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${
+                activeTab === "test-center"
+                  ? "bg-primary text-primary-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
+            >
+              <CheckCircle2 className="size-4 text-emerald-500" />
+              <span>Test Center</span>
+              <span
+                className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${
+                  activeTab === "test-center"
+                    ? "bg-white/20 text-white border-white/30"
+                    : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                }`}
+              >
+                QA
+              </span>
+            </button>
+          )}
         </div>
 
         {/* Tab Views */}
@@ -302,6 +418,7 @@ export default function Home() {
               onUpdateReferenceUrl={updateRecipeReferenceUrl}
               onEditRecipeInStudio={handleEditRecipeInStudio}
               onAddIngredient={addIngredientToRecipe}
+              onOpenSaveModal={() => setIsSaveModalOpen(true)}
             />
           )}
 
@@ -320,6 +437,7 @@ export default function Home() {
               onRestoreAllExcluded={restoreAllExcludedItems}
               onUpdateItemOption={updateItemPackOption}
               onCurateProduct={curateGroceryIngredient}
+              onOpenSaveModal={() => setIsSaveModalOpen(true)}
             />
           )}
 
@@ -329,6 +447,10 @@ export default function Home() {
               onCurateProduct={curateIngredientProduct}
               onResetCuration={resetIngredientCuration}
               onOpenCurationStudio={() => {
+                if (!isAdmin) {
+                  setIsAdminLoginOpen(true);
+                  return;
+                }
                 setEditingRecipeId(null);
                 setActiveTab("curation-studio");
               }}
@@ -336,6 +458,7 @@ export default function Home() {
               onUpdateReferenceUrl={updateRecipeReferenceUrl}
               onEditRecipeInStudio={handleEditRecipeInStudio}
               onAddIngredient={addIngredientToRecipe}
+              isAdmin={isAdmin}
             />
           )}
 
@@ -343,11 +466,16 @@ export default function Home() {
             <PantryView
               surplusItems={pantrySurplus}
               groceryItems={groceryItems}
+              userPantryItems={userPantryItems}
               onTogglePantry={toggleItemPantry}
+              onAddPantryItem={addPantryItem}
+              onUpdatePantryItem={updatePantryItem}
+              onDeletePantryItem={deletePantryItem}
+              onAddSurplusToPantry={addSurplusToPantry}
             />
           )}
 
-          {activeTab === "curation-studio" && (
+          {activeTab === "curation-studio" && isAdmin && (
             <RecipeCurationStudio
               allRecipes={allRecipes}
               initialRecipeId={editingRecipeId}
@@ -362,11 +490,20 @@ export default function Home() {
               }}
             />
           )}
+
+          {activeTab === "test-center" && isAdmin && (
+            <TestCenterView onBackToApp={() => setActiveTab("planner")} />
+          )}
         </div>
       </main>
 
+      {/* Newsletter Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-8 w-full">
+        <NewsletterCard source="footer" />
+      </section>
+
       {/* Footer */}
-      <footer className="mt-auto border-t border-border/80 bg-muted/20 py-6 px-4 text-center text-xs text-muted-foreground">
+      <footer className="mt-auto border-t border-border/80 bg-muted/20 py-6 px-4 text-center text-xs text-muted-foreground space-y-2">
         <p>
           pioftina.gr &bull; Δεδομένα τιμών και προϊόντων από το επίσημο Παρατηρητήριο Τιμών{" "}
           <a
@@ -381,6 +518,36 @@ export default function Home() {
         <p className="mt-1">
           Έξυπνος προγραμματισμός γευμάτων &bull; Βελτιστοποίηση μεγεθών συσκευασίας &bull; Μείωση σπατάλης τροφίμων
         </p>
+
+        {/* Administrator Link / Status */}
+        <div className="pt-2 text-[11px] text-muted-foreground/70 flex items-center justify-center gap-2">
+          {isAdmin ? (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 font-semibold border border-amber-500/20">
+              <Shield className="size-3" />
+              <span>Συνδεδεμένος ως Διαχειριστής</span>
+              <span>&bull;</span>
+              <Link href="/admin/tests" className="underline hover:text-foreground">
+                Test Center
+              </Link>
+              <span>&bull;</span>
+              <button
+                onClick={adminLogout}
+                className="underline hover:text-foreground transition-colors cursor-pointer"
+              >
+                Αποσύνδεση
+              </button>
+            </span>
+          ) : (
+            <button
+              id="footer-admin-login-btn"
+              onClick={() => setIsAdminLoginOpen(true)}
+              className="inline-flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer opacity-70 hover:opacity-100"
+            >
+              <Lock className="size-3" />
+              <span>Διαχείριση (Admin)</span>
+            </button>
+          )}
+        </div>
       </footer>
 
       {/* Preferences Modal */}
@@ -389,6 +556,36 @@ export default function Home() {
         onClose={() => setIsSettingsOpen(false)}
         preferences={preferences}
         onSave={updatePreferences}
+      />
+
+      {/* Admin Login Modal */}
+      <AdminLoginModal
+        isOpen={isAdminLoginOpen}
+        onClose={() => setIsAdminLoginOpen(false)}
+        onLogin={adminLogin}
+        onSuccess={() => setActiveTab("curation-studio")}
+      />
+
+      {/* Newsletter Modal */}
+      <NewsletterModal
+        isOpen={isNewsletterModalOpen}
+        onClose={() => setIsNewsletterModalOpen(false)}
+      />
+
+      {/* Save Plan & Shopping List to PC Modal */}
+      <SavePlanModal
+        isOpen={isSaveModalOpen}
+        onClose={() => setIsSaveModalOpen(false)}
+        data={{
+          slots,
+          groceryItems,
+          preferences,
+          totalCost,
+          remainingCost,
+          purchasedCost,
+          totalSavings,
+          pantrySurplus,
+        }}
       />
     </div>
   );

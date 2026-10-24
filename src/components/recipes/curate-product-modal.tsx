@@ -67,6 +67,15 @@ export function CurateProductModal({
     }
   }, [ingredient]);
 
+  // Debounced search on typing (350ms)
+  useEffect(() => {
+    if (!isOpen || !ingredient || !searchQuery.trim()) return;
+    const timer = setTimeout(() => {
+      executeSearch(searchQuery, selectedCategory);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchQuery, selectedCategory]);
+
   if (!isOpen || !ingredient) return null;
 
   async function executeSearch(query: string, category: string) {

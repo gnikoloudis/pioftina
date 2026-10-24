@@ -58,6 +58,13 @@ export const MOCK_RETAILERS: Retailer[] = [
     website: "https://www.market-in.gr",
   },
   {
+    id: "chalkiadakis",
+    name: "Χαλκιαδάκης",
+    country: "GR",
+    logo_url: "https://api.posokanei.gov.gr/images/retailer/xalkiadakis",
+    website: "https://www.xalkiadakis.gr",
+  },
+  {
     id: "halkiadakis",
     name: "Χαλκιαδάκης",
     country: "GR",
@@ -79,6 +86,14 @@ export const MOCK_RETAILERS: Retailer[] = [
     website: null,
   },
 ];
+
+export function getRetailerName(retailerId?: string): string {
+  if (!retailerId) return "";
+  const match = MOCK_RETAILERS.find(
+    (r) => r.id.toLowerCase() === retailerId.toLowerCase()
+  );
+  return match?.name || retailerId;
+}
 
 export const MOCK_FALLBACK_PRODUCTS: Product[] = [
   // Φέτα

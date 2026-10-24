@@ -43,6 +43,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import NextLink from "next/link";
 
 interface RecipeCurationStudioProps {
   allRecipes: Recipe[];
@@ -68,6 +69,16 @@ export function RecipeCurationStudio({
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+
+  // Cooldown countdown timer
+  React.useEffect(() => {
+    if (cooldownSeconds <= 0) return;
+    const timer = setInterval(() => {
+      setCooldownSeconds((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldownSeconds]);
 
   // Active Draft Recipe under HITL review
   const [draftRecipe, setDraftRecipe] = useState<AgentParsedRecipe | null>(() => {
@@ -117,6 +128,11 @@ export function RecipeCurationStudio({
 
   // 1. Ingest via URL
   const handleImportUrl = async () => {
+    if (cooldownSeconds > 0) {
+      setErrorMessage(`Παρακαλώ περιμένετε ${cooldownSeconds} δευτερόλεπτα πριν την επόμενη ανάκτηση.`);
+      return;
+    }
+
     if (!urlInput.trim()) {
       setErrorMessage("Παρακαλούμε εισάγετε ένα έγκυρο URL συνταγής.");
       return;
@@ -134,12 +150,16 @@ export function RecipeCurationStudio({
       });
 
       const data = await res.json();
-      if (!data.success) {
+      if (!res.ok || !data.success) {
+        if (res.status === 429) {
+          setCooldownSeconds(data.retryAfter || 5);
+        }
         throw new Error(data.error || "Αποτυχία εισαγωγής συνταγής.");
       }
 
       setDraftRecipe(data.recipe);
       setSuccessMessage("Η συνταγή ανακτήθηκε και αναλύθηκε επιτυχώς!");
+      setCooldownSeconds(3); // Standard 3s cooldown after successful scrape
     } catch (err: any) {
       setErrorMessage(err.message || "Σφάλμα κατά την ανάκτηση της συνταγής.");
     } finally {
@@ -444,15 +464,24 @@ export function RecipeCurationStudio({
             </div>
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onViewRecipesTab}
-            className="text-xs gap-1.5 shrink-0 self-start sm:self-auto"
-          >
-            <BookOpen className="size-3.5" />
-            Προβολή Καταλόγου
-          </Button>
+          <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+            <NextLink
+              href="/admin/tests"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 hover:bg-emerald-600/20 transition-colors"
+            >
+              <CheckCircle2 className="size-3.5 text-emerald-600" />
+              <span>Test Center &amp; QA</span>
+            </NextLink>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onViewRecipesTab}
+              className="text-xs gap-1.5"
+            >
+              <BookOpen className="size-3.5" />
+              Προβολή Καταλόγου
+            </Button>
+          </div>
         </div>
 
         {/* Source Ingestion Tabs */}
@@ -585,11 +614,15 @@ export function RecipeCurationStudio({
                 />
                 <Button
                   onClick={handleImportUrl}
-                  disabled={isLoading || !urlInput.trim()}
+                  disabled={isLoading || !urlInput.trim() || cooldownSeconds > 0}
                   className="gap-1.5 shrink-0"
                 >
                   <ExternalLink className="size-3.5" />
-                  {isLoading ? "Ανάκτηση..." : "Ανάκτηση & Audit"}
+                  {isLoading
+                    ? "Ανάκτηση..."
+                    : cooldownSeconds > 0
+                    ? `Περιμένετε ${cooldownSeconds}s`
+                    : "Ανάκτηση & Audit"}
                 </Button>
               </div>
               <p className="text-[11px] text-muted-foreground">
@@ -1018,9 +1051,9 @@ export function RecipeCurationStudio({
                     {/* Agent Audit Warnings with 1-click Fix */}
                     {hasWarnings && (
                       <div className="space-y-1.5 pt-1">
-                        {ing.warnings.map((w) => (
+                        {Array.from(new Map((ing.warnings || []).map((w) => [w.id, w])).values()).map((w, wIdx) => (
                           <div
-                            key={w.id}
+                            key={`${w.id}-${wIdx}`}
                             className={`p-2.5 rounded-xl text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${
                               w.severity === "error"
                                 ? "bg-destructive/10 text-destructive border border-destructive/20"
