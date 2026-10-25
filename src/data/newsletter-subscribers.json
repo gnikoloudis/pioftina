@@ -1235,5 +1235,30 @@
     "source": "footer",
     "status": "active",
     "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnsbixf-289a",
+    "email": "test-user-1792930151551@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T12:09:11.571Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnsbkx0-srmk",
+    "email": "test-1792930154127@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-25T12:09:14.148Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
   }
 ]

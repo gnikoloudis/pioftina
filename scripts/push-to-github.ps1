@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Automated pre-push quality gate & deployment script for pioftina.gr to GitHub.
+    Automated pre-push quality gate and deployment script for pioftina.gr to GitHub.
 .DESCRIPTION
     Runs TypeScript type checks, full test suites, OWASP penetration testing,
     and pushes to https://github.com/gnikoloudis/pioftina.git.
@@ -11,7 +11,7 @@
 .EXAMPLE
     .\scripts\push-to-github.ps1
 .EXAMPLE
-    .\scripts\push-to-github.ps1 -CommitMessage "feat: add new recipe curation feature"
+    .\scripts\push-to-github.ps1 -CommitMessage "feat: add new feature"
 #>
 [CmdletBinding()]
 param (
@@ -24,12 +24,12 @@ $repoRoot = (Get-Item $PSScriptRoot).Parent.FullName
 Set-Location $repoRoot
 
 Write-Host "=================================================================" -ForegroundColor Cyan
-Write-Host "  🚀 pioftina.gr — GitHub Deployment & Quality Gate Pipeline   " -ForegroundColor Green
+Write-Host "  pioftina.gr - GitHub Deployment and Quality Gate Pipeline      " -ForegroundColor Green
 Write-Host "=================================================================" -ForegroundColor Cyan
-Write-Host "Target Repository: https://github.com/gnikoloudis/pioftina.git" -ForegroundColor Gray
+Write-Host "Target: https://github.com/gnikoloudis/pioftina.git" -ForegroundColor Gray
 Write-Host ""
 
-# 1. Check & Configure Git Remote
+# 1. Check and Configure Git Remote
 $targetRemote = "https://github.com/gnikoloudis/pioftina.git"
 $existingRemotes = git remote -v 2>&1
 if ($existingRemotes -match "origin\s+") {
@@ -44,29 +44,29 @@ if ($existingRemotes -match "origin\s+") {
 Write-Host "[2/6] Running TypeScript type check (tsc --noEmit)..." -ForegroundColor Cyan
 & npx tsc --noEmit
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "❌ TypeScript compilation failed. Fix type errors before pushing."
+    Write-Error "TypeScript compilation failed. Fix type errors before pushing."
     exit 1
 }
-Write-Host "      ✓ TypeScript compilation passed (0 errors)." -ForegroundColor Green
+Write-Host "      [OK] TypeScript compilation passed (0 errors)." -ForegroundColor Green
 
 # 3. Quality Gate: Full Test Suite
 if (-not $SkipTests) {
     Write-Host "[3/6] Running Full Test Suite (46 Tests across 9 Suites)..." -ForegroundColor Cyan
     & npm test
     if ($LASTEXITCODE -ne 0) {
-        Write-Error "❌ Test suite failed. Push aborted."
+        Write-Error "Test suite failed. Push aborted."
         exit 1
     }
-    Write-Host "      ✓ All tests passed (100%)." -ForegroundColor Green
+    Write-Host "      [OK] All tests passed (100 percent)." -ForegroundColor Green
 
     # 4. Quality Gate: OWASP Penetration Testing
     Write-Host "[4/6] Running OWASP ASVS Penetration Testing Audit (32 Rules)..." -ForegroundColor Cyan
     & npm run pentest
     if ($LASTEXITCODE -ne 0) {
-        Write-Error "❌ Security audit failed. Push aborted."
+        Write-Error "Security audit failed. Push aborted."
         exit 1
     }
-    Write-Host "      ✓ Security audit passed (Grade A+)." -ForegroundColor Green
+    Write-Host "      [OK] Security audit passed (Grade A+)." -ForegroundColor Green
 
     # Sync documentation
     & npm run test:docs
@@ -75,20 +75,20 @@ if (-not $SkipTests) {
     Write-Host "[3/6] Skipping tests (-SkipTests specified)." -ForegroundColor Yellow
 }
 
-# 5. Git Staging & Commit
-Write-Host "[5/6] Checking git status & preparing commit..." -ForegroundColor Cyan
+# 5. Git Staging and Commit
+Write-Host "[5/6] Checking git status and preparing commit..." -ForegroundColor Cyan
 git add .
 $status = git status --porcelain
 if ($status) {
     Write-Host "      Committing staged changes..." -ForegroundColor Gray
     git commit -m $CommitMessage
     if ($LASTEXITCODE -ne 0) {
-        Write-Error "❌ Git commit failed."
+        Write-Error "Git commit failed."
         exit 1
     }
-    Write-Host "      ✓ Changes committed successfully." -ForegroundColor Green
+    Write-Host "      [OK] Changes committed successfully." -ForegroundColor Green
 } else {
-    Write-Host "      ✓ Working tree clean, no new changes to commit." -ForegroundColor Gray
+    Write-Host "      [OK] Working tree clean, no new changes to commit." -ForegroundColor Gray
 }
 
 # 6. Push to GitHub
@@ -96,12 +96,12 @@ Write-Host "[6/6] Pushing to GitHub (origin main)..." -ForegroundColor Cyan
 git branch -M main
 git push -u origin main
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "❌ Git push failed. Verify your GitHub network connection or authentication credentials."
+    Write-Error "Git push failed. Verify your GitHub network connection or authentication credentials."
     exit 1
 }
 
 Write-Host ""
 Write-Host "=================================================================" -ForegroundColor Green
-Write-Host "  🎉 SUCCESS: Application source code pushed to GitHub!         " -ForegroundColor Green
+Write-Host "  SUCCESS: Application source code pushed to GitHub!             " -ForegroundColor Green
 Write-Host "  URL: https://github.com/gnikoloudis/pioftina                  " -ForegroundColor Cyan
 Write-Host "=================================================================" -ForegroundColor Green
