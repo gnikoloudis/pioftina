@@ -260,6 +260,7 @@ export interface OptimizedGroceryItem {
   curatedProduct?: Product;
   isCurated?: boolean;
   isUnmatched?: boolean;
+  sourceMealTitles?: string[];
 }
 
 export interface BasketComparison {

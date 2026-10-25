@@ -19,6 +19,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { generateBundleText, downloadTextFile } from "@/lib/export/plan-exporter";
 
 interface BundleCardProps {
   bundle: ProductBundle;
@@ -51,47 +52,18 @@ export function BundleCard({
   };
 
   const handleExport = () => {
-    // 1. Automatically ensure bundle items are added to user's active grocery list
-    if (onAddBundleToGroceryList) {
-      onAddBundleToGroceryList(bundle);
-      setIsAdded(true);
-      setIsSaved(true);
-      setTimeout(() => {
-        setIsAdded(false);
-        setIsSaved(false);
-      }, 3000);
-    }
+    // 1. Indicate saved state
+    setIsSaved(true);
+    setTimeout(() => {
+      setIsSaved(false);
+    }, 2500);
 
     // 2. Download bundle text file
     if (onExportBundle) {
       onExportBundle(bundle);
     } else {
-      // Default direct download as text
-      const content = [
-        `====================================================`,
-        `ΠΑΚΕΤΟ: ${bundle.title} (${bundle.cadenceLabel})`,
-        `Κατηγορία: ${bundle.category === "cleaning" ? "Καθαριότητα Σπιτιού" : "Βρεφική Φροντίδα"}`,
-        `Εκτιμώμενη Χαμηλότερη Τιμή: €${bundle.estimatedTotalEur.toFixed(2)} (@ ${bundle.bestStoreName})`,
-        `Εκτιμώμενο Κέρδος: €${bundle.estimatedSavingsEur.toFixed(2)}`,
-        `====================================================\n`,
-        `ΠΡΟΪΟΝΤΑ ΠΑΚΕΤΟΥ (Προστέθηκαν και στη Λίστα Αγορών σας):`,
-        ...bundle.items.map(
-          (item, idx) =>
-            `${idx + 1}. ${item.name} (${item.brand}) - Ποσότητα: ${item.quantity} [${item.unitLabel}] ~ €${(item.referencePriceEur * item.quantity).toFixed(2)}`
-        ),
-        `\n====================================================`,
-        `Δημιουργήθηκε από το pioftina.gr • ${new Date().toLocaleDateString("el-GR")}`,
-      ].join("\n");
-
-      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${bundle.slug}-pioftina.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const content = generateBundleText(bundle);
+      downloadTextFile(`${bundle.slug}-pioftina.txt`, content);
     }
   };
 
@@ -289,7 +261,7 @@ export function BundleCard({
               ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
               : "hover:bg-background"
           }`}
-          title="Αποθήκευση λίστας πακέτου σε αρχείο κειμένου και προσθήκη στη Λίστα Αγορών"
+          title="Αποθήκευση λίστας πακέτου σε αρχείο κειμένου (.txt) στον υπολογιστή"
         >
           {isSaved ? (
             <CheckCircle2 className="size-3.5 text-emerald-600 dark:text-emerald-400" />

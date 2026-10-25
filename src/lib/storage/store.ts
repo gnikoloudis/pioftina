@@ -1272,6 +1272,7 @@ export function useMealPlannerStore() {
         isCurated: true,
         isUnmatched: false,
         isAvailable: true,
+        sourceMealTitles: [bundle.title],
       };
     });
 

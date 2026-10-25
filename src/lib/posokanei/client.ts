@@ -6,6 +6,8 @@ import {
   CategoryNode,
 } from "./types";
 import { MOCK_RETAILERS, MOCK_FALLBACK_PRODUCTS } from "./mock-data";
+import { UpstreamGovernor } from "./upstream-governor";
+import { normalizeGreekTerm } from "./search-cache";
 
 const POSOKANEI_BASE_URL =
   process.env.POSOKANEI_API_URL?.replace(/\\$/, "") ||
@@ -28,7 +30,7 @@ interface CacheEntry<T> {
 }
 
 const memoryCache = new Map<string, CacheEntry<unknown>>();
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL_MS = 60 * 60 * 1000; // 60 minutes
 
 function getCached<T>(key: string): T | null {
   const entry = memoryCache.get(key);
@@ -73,41 +75,49 @@ export async function getRetailers(country = "GR"): Promise<Retailer[]> {
     return MOCK_RETAILERS;
   }
 
-  try {
-    const res = await fetch(`${POSOKANEI_BASE_URL}/meta/retailers?countries=${country}`, {
-      headers: POSOKANEI_HEADERS,
-      next: { revalidate: 3600 },
-      signal: AbortSignal.timeout(6000),
-    });
+  return UpstreamGovernor.execute(
+    `retailers_${country}`,
+    async () => {
+      const res = await fetch(`${POSOKANEI_BASE_URL}/meta/retailers?countries=${country}`, {
+        headers: POSOKANEI_HEADERS,
+        next: { revalidate: 86400 },
+        signal: AbortSignal.timeout(6000),
+      });
 
-    if (!res.ok) {
-      console.warn(`[Posokanei] /meta/retailers returned HTTP ${res.status}, falling back to mock`);
-      return MOCK_RETAILERS;
-    }
+      UpstreamGovernor.reportUpstreamStatus(res.status);
 
-    const json = await res.json();
-    const rawRetailers: Retailer[] = json.retailers || [];
-    const filtered = rawRetailers.filter(
-      (r) => country === "all" || r.country.toUpperCase() === country.toUpperCase()
-    );
+      if (!res.ok) {
+        console.warn(`[Posokanei] /meta/retailers returned HTTP ${res.status}, falling back to mock`);
+        return MOCK_RETAILERS;
+      }
 
-    // Map logo URLs to absolute URLs if relative
-    const mapped = filtered.map((r) => ({
-      ...r,
-      logo_url: r.logo_url
-        ? r.logo_url.startsWith("http")
-          ? r.logo_url
-          : `${POSOKANEI_BASE_URL}${r.logo_url}`
-        : null,
-    }));
+      const json = await res.json();
+      const rawRetailers: any[] = json.retailers || [];
+      const filtered = rawRetailers.filter(
+        (r) =>
+          (r.is_active === undefined || r.is_active) &&
+          !r.is_hidden &&
+          (!r.country || r.country.toUpperCase() === country.toUpperCase())
+      );
 
-    const result = mapped.length > 0 ? mapped : MOCK_RETAILERS;
-    setCached(cacheKey, result);
-    return result;
-  } catch (error) {
-    console.error("[Posokanei] Error fetching retailers:", error);
-    return MOCK_RETAILERS;
-  }
+      const mapped: Retailer[] = filtered.map((r) => ({
+        id: r.id,
+        name: r.name,
+        country: r.country,
+        website: r.website || null,
+        logo_url: r.logo_url
+          ? r.logo_url.startsWith("http")
+            ? r.logo_url
+            : `${POSOKANEI_BASE_URL}${r.logo_url}`
+          : null,
+      }));
+
+      const result = mapped.length > 0 ? mapped : MOCK_RETAILERS;
+      setCached(cacheKey, result);
+      return result;
+    },
+    () => MOCK_RETAILERS
+  );
 }
 
 /**
@@ -120,12 +130,14 @@ export async function searchProducts(
   const page = params.page || 1;
   const pageSize = params.page_size || 20;
   const categoryId = params.category_id || "";
-  const cacheKey = `search_${cleanTitle}_${categoryId}_${page}_${pageSize}_${params.sort_by || ""}_${params.sort_order || ""}`;
+  const normTitle = normalizeGreekTerm(cleanTitle);
+  const cacheKey = `search_${normTitle}_${categoryId}_${page}_${pageSize}_${params.sort_by || ""}_${params.sort_order || ""}`;
 
+  // 1. Check in-memory session cache first (works in both client and server)
   const cached = getCached<ProductPage>(cacheKey);
   if (cached) return cached;
 
-  // If in browser, strictly use serverless proxy to avoid CORS & 403 Forbidden
+  // 2. Browser Execution: strictly use serverless proxy to avoid CORS & 403 Forbidden
   if (typeof window !== "undefined") {
     try {
       const res = await fetch("/api/posokanei/search", {
@@ -141,62 +153,69 @@ export async function searchProducts(
           return data;
         }
         return getFallbackSearchResults(cleanTitle, params);
+      } else {
+        // Non-OK response (e.g. 429/500/503): gracefully serve fallback without throwing
+        console.info(`[Posokanei Client] Proxy returned HTTP ${res.status} for "${cleanTitle}". Serving verified fallback data.`);
+        return getFallbackSearchResults(cleanTitle, params);
       }
     } catch (e) {
       console.warn(`[Posokanei Client] Proxy search for "${cleanTitle}" failed:`, e);
-    }
-    // Never attempt direct browser requests to external POSOKANEI_BASE_URL
-    return getFallbackSearchResults(cleanTitle, params);
-  }
-
-  try {
-    const searchPayload: Record<string, unknown> = {
-      title: cleanTitle,
-      page,
-      page_size: pageSize,
-      sort_by: params.sort_by || "unit_price",
-      sort_order: params.sort_order || "asc",
-    };
-    if (params.category_id) {
-      searchPayload.category_id = params.category_id;
-    }
-    if (params.category_ids && params.category_ids.length > 0) {
-      searchPayload.category_ids = params.category_ids;
-    }
-
-    const res = await fetch(`${POSOKANEI_BASE_URL}/products/search`, {
-      method: "POST",
-      headers: POSOKANEI_HEADERS,
-      body: JSON.stringify(searchPayload),
-      next: { revalidate: 600 },
-      signal: AbortSignal.timeout(6000),
-    });
-
-    if (!res.ok) {
-      console.warn(`[Posokanei] Search for "${cleanTitle}" failed with HTTP ${res.status}`);
       return getFallbackSearchResults(cleanTitle, params);
     }
-
-    const data: ProductPage = await res.json();
-    
-    // Ensure product image_url is absolute
-    if (data.products) {
-      data.products = data.products.map((p) => ({
-        ...p,
-        image_url: p.image_url
-          ? p.image_url.startsWith("http")
-            ? p.image_url
-            : `${POSOKANEI_BASE_URL}${p.image_url}`
-          : null,
-      }));
-    }
-
-    setCached(cacheKey, data);
-    return data;
-  } catch (error) {
-    console.error(`[Posokanei] Error searching "${cleanTitle}":`, error);
-    return getFallbackSearchResults(cleanTitle, params);
   }
+
+  // 3. Server Execution: Protect posokanei.gov.gr with UpstreamGovernor rate limiting & circuit breaker
+  return UpstreamGovernor.execute(
+    `search_${cleanTitle}`,
+    async () => {
+      const searchPayload: Record<string, unknown> = {
+        title: cleanTitle,
+        page,
+        page_size: pageSize,
+        sort_by: params.sort_by || "unit_price",
+        sort_order: params.sort_order || "asc",
+      };
+      if (params.category_id) {
+        searchPayload.category_id = params.category_id;
+      }
+      if (params.category_ids && params.category_ids.length > 0) {
+        searchPayload.category_ids = params.category_ids;
+      }
+
+      const res = await fetch(`${POSOKANEI_BASE_URL}/products/search`, {
+        method: "POST",
+        headers: POSOKANEI_HEADERS,
+        body: JSON.stringify(searchPayload),
+        next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(6000),
+      });
+
+      UpstreamGovernor.reportUpstreamStatus(res.status);
+
+      if (!res.ok) {
+        console.warn(`[Posokanei] Search for "${cleanTitle}" failed with HTTP ${res.status}`);
+        return getFallbackSearchResults(cleanTitle, params);
+      }
+
+      const data: ProductPage = await res.json();
+
+      // Ensure product image_url is absolute
+      if (data.products) {
+        data.products = data.products.map((p) => ({
+          ...p,
+          image_url: p.image_url
+            ? p.image_url.startsWith("http")
+              ? p.image_url
+              : `${POSOKANEI_BASE_URL}${p.image_url}`
+            : null,
+        }));
+      }
+
+      setCached(cacheKey, data);
+      return data;
+    },
+    () => getFallbackSearchResults(cleanTitle, params)
+  );
 }
 
 /**
@@ -224,32 +243,35 @@ export async function getProductById(id: string): Promise<Product | null> {
     return fallback || null;
   }
 
-  try {
-    const res = await fetch(
-      `${POSOKANEI_BASE_URL}/products/${id}?countries=GR&include_tax=true&include_history=true`,
-      {
-        headers: POSOKANEI_HEADERS,
-        next: { revalidate: 1800 },
-        signal: AbortSignal.timeout(6000),
+  return UpstreamGovernor.execute(
+    `product_${id}`,
+    async () => {
+      const res = await fetch(
+        `${POSOKANEI_BASE_URL}/products/${id}?countries=GR&include_tax=true&include_history=true`,
+        {
+          headers: POSOKANEI_HEADERS,
+          next: { revalidate: 86400 },
+          signal: AbortSignal.timeout(6000),
+        }
+      );
+
+      UpstreamGovernor.reportUpstreamStatus(res.status);
+
+      if (!res.ok) {
+        const fallback = MOCK_FALLBACK_PRODUCTS.find((p) => p.id === id);
+        return fallback || null;
       }
-    );
 
-    if (!res.ok) {
-      const fallback = MOCK_FALLBACK_PRODUCTS.find((p) => p.id === id);
-      return fallback || null;
-    }
+      const product: Product = await res.json();
+      if (product.image_url && !product.image_url.startsWith("http")) {
+        product.image_url = `${POSOKANEI_BASE_URL}${product.image_url}`;
+      }
 
-    const product: Product = await res.json();
-    if (product.image_url && !product.image_url.startsWith("http")) {
-      product.image_url = `${POSOKANEI_BASE_URL}${product.image_url}`;
-    }
-
-    setCached(cacheKey, product);
-    return product;
-  } catch (error) {
-    console.error(`[Posokanei] Error getting product ${id}:`, error);
-    return MOCK_FALLBACK_PRODUCTS.find((p) => p.id === id) || null;
-  }
+      setCached(cacheKey, product);
+      return product;
+    },
+    () => MOCK_FALLBACK_PRODUCTS.find((p) => p.id === id) || null
+  );
 }
 
 /**
@@ -264,39 +286,46 @@ export async function getCategoryTree(): Promise<CategoryNode[]> {
     return [];
   }
 
-  try {
-    const res = await fetch(
-      `${POSOKANEI_BASE_URL}/meta/categories/tree?include_counts=true&include_hidden=false`,
-      {
-        headers: POSOKANEI_HEADERS,
-        next: { revalidate: 86400 },
-        signal: AbortSignal.timeout(6000),
-      }
-    );
+  return UpstreamGovernor.execute(
+    "category_tree",
+    async () => {
+      const res = await fetch(
+        `${POSOKANEI_BASE_URL}/meta/categories/tree?include_counts=true&include_hidden=false`,
+        {
+          headers: POSOKANEI_HEADERS,
+          next: { revalidate: 86400 },
+          signal: AbortSignal.timeout(6000),
+        }
+      );
 
-    if (!res.ok) return [];
+      UpstreamGovernor.reportUpstreamStatus(res.status);
 
-    const json = await res.json();
-    const tree: CategoryNode[] = json.tree || [];
-    setCached(cacheKey, tree);
-    return tree;
-  } catch (error) {
-    console.error("[Posokanei] Error getting category tree:", error);
-    return [];
-  }
+      if (!res.ok) return [];
+
+      const json = await res.json();
+      const tree: CategoryNode[] = json.tree || [];
+      setCached(cacheKey, tree);
+      return tree;
+    },
+    () => []
+  );
 }
 
-function getFallbackSearchResults(
+export function getFallbackSearchResults(
   query: string,
   params: ProductSearchQuery
 ): ProductPage {
-  const q = query.toLowerCase();
-  const matched = MOCK_FALLBACK_PRODUCTS.filter(
-    (p) =>
-      p.name.toLowerCase().includes(q) ||
-      p.brand.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q)
-  );
+  const normQ = normalizeGreekTerm(query);
+  const matched = MOCK_FALLBACK_PRODUCTS.filter((p) => {
+    const normName = normalizeGreekTerm(p.name);
+    const normBrand = normalizeGreekTerm(p.brand);
+    const normCat = normalizeGreekTerm(p.category);
+    return (
+      normName.includes(normQ) ||
+      normBrand.includes(normQ) ||
+      normCat.includes(normQ)
+    );
+  });
 
   return {
     products: matched,

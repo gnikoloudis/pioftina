@@ -1,26 +1,16 @@
 import { NextResponse } from "next/server";
-import { searchProducts } from "@/lib/posokanei/client";
+import { searchProducts, getFallbackSearchResults } from "@/lib/posokanei/client";
 import { ProductSearchQuery } from "@/lib/posokanei/types";
-import { checkRateLimit, createRateLimitResponse } from "@/lib/security/rate-limiter";
+import { checkRateLimit } from "@/lib/security/rate-limiter";
 import {
   getCachedSearch,
   setCachedSearch,
   getPendingSearch,
   setPendingSearch,
+  buildNormalizedCacheKey,
 } from "@/lib/posokanei/search-cache";
 
 async function executeSearchLogic(body: ProductSearchQuery, request: Request) {
-  // 1. Rate limiting per client (max 30 requests/min, 400ms cooldown)
-  const rateCheck = checkRateLimit(request, {
-    limit: 30,
-    windowMs: 60 * 1000,
-    cooldownMs: 400,
-    prefix: "search",
-  });
-  if (!rateCheck.allowed) {
-    return createRateLimitResponse(rateCheck);
-  }
-
   if (!body.title || typeof body.title !== "string" || !body.title.trim()) {
     return NextResponse.json(
       { error: "Query 'title' is required" },
@@ -28,20 +18,11 @@ async function executeSearchLogic(body: ProductSearchQuery, request: Request) {
     );
   }
 
-  const cacheKey = JSON.stringify({
-    title: body.title.trim().toLowerCase(),
-    cat: body.category_id || "",
-    cats: body.category_ids || [],
-    page: body.page || 1,
-    size: body.page_size || 24,
-    sort: body.sort_by || "unit_price",
-    order: body.sort_order || "asc",
-  });
+  const cacheKey = buildNormalizedCacheKey(body);
 
-  // 2. Check in-memory search cache
+  // 1. Check in-memory search cache FIRST (0ms, 0 upstream cost, no rate limit penalty)
   const cached = getCachedSearch(cacheKey);
   if (cached) {
-    // If retailer ranking requested, apply
     if (body.retailer && cached.products) {
       const sorted = [...cached.products].sort((a, b) => {
         const aHas = a.retailers.includes(body.retailer!);
@@ -55,20 +36,49 @@ async function executeSearchLogic(body: ProductSearchQuery, request: Request) {
     return NextResponse.json(cached);
   }
 
-  // 3. Deduplicate in-flight pending searches
+  // 2. Deduplicate in-flight pending searches
   let searchPromise = getPendingSearch(cacheKey);
-  if (!searchPromise) {
-    searchPromise = searchProducts({
-      title: body.title,
-      category_id: body.category_id,
-      category_ids: body.category_ids,
-      page: body.page || 1,
-      page_size: body.page_size || 24,
-      sort_by: body.sort_by || "unit_price",
-      sort_order: body.sort_order || "asc",
-    });
-    setPendingSearch(cacheKey, searchPromise);
+  if (searchPromise) {
+    const result = await searchPromise;
+    return NextResponse.json(result);
   }
+
+  // 3. Rate limiting per client for newly initiated searches (max 60 req/min, 0ms cooldown)
+  const rateCheck = checkRateLimit(request, {
+    limit: 60,
+    windowMs: 60 * 1000,
+    cooldownMs: 0,
+    prefix: "search",
+  });
+
+  if (!rateCheck.allowed) {
+    // Return verified local fallback gracefully with 200 OK so client console and UI never fail
+    const fallback = getFallbackSearchResults(body.title, body);
+    const retryAfter = rateCheck.retryAfterSeconds || Math.ceil(rateCheck.resetMs / 1000) || 1;
+    return NextResponse.json(
+      { ...fallback, rateLimited: true },
+      {
+        headers: {
+          "Retry-After": retryAfter.toString(),
+          "X-RateLimit-Limit": rateCheck.limit.toString(),
+          "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": new Date(Date.now() + rateCheck.resetMs).toUTCString(),
+        },
+      }
+    );
+  }
+
+  // 4. Execute search with upstream governor protection
+  searchPromise = searchProducts({
+    title: body.title,
+    category_id: body.category_id,
+    category_ids: body.category_ids,
+    page: body.page || 1,
+    page_size: body.page_size || 24,
+    sort_by: body.sort_by || "unit_price",
+    sort_order: body.sort_order || "asc",
+  });
+  setPendingSearch(cacheKey, searchPromise);
 
   const result = await searchPromise;
   setCachedSearch(cacheKey, result);

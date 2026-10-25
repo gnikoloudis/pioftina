@@ -23,18 +23,30 @@ const POPULAR_PANTRY_STAPLES = [
   { name: "Ζάχαρη Λευκή", unit: "kg", amount: 1, category: "pantry" as AisleCategory },
   { name: "Τοματοπολτός", unit: "g", amount: 400, category: "pantry" as AisleCategory },
   { name: "Αυγά Φρέσκα", unit: "τεμ", amount: 6, category: "dairy" as AisleCategory },
+  { name: "Μωρομάντηλα Sensitive", unit: "τεμ", amount: 1, category: "baby" as AisleCategory },
+  { name: "Χαρτί Κουζίνας 3πλο", unit: "τεμ", amount: 2, category: "household" as AisleCategory },
+  { name: "Απορρυπαντικό Πιάτων", unit: "L", amount: 1, category: "household" as AisleCategory },
 ];
+
+interface PantryItemModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (item: Omit<UserPantryItem, "id" | "createdAt" | "updatedAt">) => void;
+  initialItem?: UserPantryItem | null;
+  defaultCategory?: AisleCategory;
+}
 
 export function PantryItemModal({
   isOpen,
   onClose,
   onSave,
   initialItem,
+  defaultCategory = "pantry",
 }: PantryItemModalProps) {
   const [name, setName] = useState("");
   const [amount, setAmount] = useState<number>(1);
   const [unit, setUnit] = useState("kg");
-  const [category, setCategory] = useState<AisleCategory>("pantry");
+  const [category, setCategory] = useState<AisleCategory>(defaultCategory);
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -49,11 +61,11 @@ export function PantryItemModal({
       setName("");
       setAmount(1);
       setUnit("kg");
-      setCategory("pantry");
+      setCategory(defaultCategory);
       setNotes("");
     }
     setError(null);
-  }, [initialItem, isOpen]);
+  }, [initialItem, isOpen, defaultCategory]);
 
   if (!isOpen) return null;
 

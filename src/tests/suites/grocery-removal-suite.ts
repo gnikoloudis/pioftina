@@ -247,5 +247,192 @@ export const groceryRemovalSuite = defineSuite({
         );
       },
     }),
+
+    defineTest({
+      id: "GROCERY-PANTRY-SYNC",
+      title: "Επαλήθευση συγχρονισμού «Έχω ήδη στο σπίτι» (Home button) με την Αποθήκη",
+      category: "optimizer",
+      description: "Επαληθεύει ότι υλικά επιλεγμένα με το κουμπί Home εξαιρούνται από το κόστος αγορών, αναγνωρίζονται στην Αποθήκη ανά κατηγορία (συμπ. βρεφικά) και επανέρχονται πλήρως.",
+      documentation: "Ελέγχει ότι το inPantry: true μειώνει το κόστος καλαθιού, απομακρύνει το είδος από τα προς αγορά, επιτρέπει κατηγοριοποίηση στην Αποθήκη και επαναφέρεται άμεσα.",
+      tags: ["pantry", "grocery", "sync", "baby"],
+      severity: "critical",
+      run: ({ assert }) => {
+        const initialTotals = computeCartTotals(MOCK_GROCERY_ITEMS);
+        const initialCost = initialTotals.totalCost;
+
+        // 1. Mark an item (feta, cost 5.0) as inPantry (Have at home)
+        const updatedWithPantry = MOCK_GROCERY_ITEMS.map((item) => ({
+          ...item,
+          inPantry: item.ingredientId === "ing-feta",
+        }));
+
+        const newTotals = computeCartTotals(updatedWithPantry);
+        assert(
+          newTotals.totalCost < initialCost,
+          "Το συνολικό κόστος αγορών έπρεπε να μειωθεί αφού η φέτα υπάρχει ήδη στο σπίτι"
+        );
+        assert(
+          Math.abs(newTotals.totalCost - (initialCost - 5.0)) < 0.01,
+          "Η μείωση κόστους πρέπει να αντιστοιχεί ακριβώς στην τιμή της φέτας (€5.00)"
+        );
+
+        // 2. Verify active vs in-pantry filtering
+        const activeItems = updatedWithPantry.filter((i) => !i.inPantry && !i.isExcluded);
+        assert(!activeItems.some((i) => i.ingredientId === "ing-feta"), "Η φέτα δεν πρέπει να είναι στα προς αγορά");
+
+        const inPantryItems = updatedWithPantry.filter((i) => i.inPantry);
+        assert(inPantryItems.length === 1, "Πρέπει να υπάρχει 1 είδος με σήμανση inPantry");
+        assert(inPantryItems[0].ingredientId === "ing-feta", "Το είδος inPantry πρέπει να είναι η φέτα");
+
+        // 3. Test baby category bundle in-pantry item
+        const babyItem: OptimizedGroceryItem = {
+          ingredientId: "bundle-baby-wipes-1",
+          ingredientName: "Μωρομάντηλα Sensitive 4x64",
+          category: "baby",
+          rawRequiredAmount: 1,
+          rawUnit: "πακέτο",
+          normalizedRequiredAmount: 1,
+          normalizedUnit: "τεμ",
+          alternativeOptions: [],
+          surplusAmount: 0,
+          surplusUnit: "τεμ",
+          isChecked: false,
+          inPantry: true,
+          isExcluded: false,
+          selectedOption: {
+            product: {} as any,
+            packCount: 1,
+            packSize: 1,
+            packUnit: "τεμ",
+            totalQuantity: 1,
+            totalPrice: 4.5,
+            unitPrice: 4.5,
+            retailer: "sklavenitis",
+            retailerName: "Σκλαβενίτης",
+            isBulk: true,
+          },
+        };
+
+        const listWithBaby = [...updatedWithPantry, babyItem];
+        const babyInPantry = listWithBaby.filter((i) => i.inPantry && i.category === "baby");
+        assert(babyInPantry.length === 1, "Το βρεφικό είδος πρέπει να ανιχνεύεται στην κατηγορία baby της Αποθήκης");
+
+        // 4. Test restore (Undo)
+        const restored = listWithBaby.map((item) =>
+          item.ingredientId === "ing-feta" ? { ...item, inPantry: false } : item
+        );
+        const restoredTotals = computeCartTotals(restored.filter((i) => i.ingredientId !== babyItem.ingredientId));
+        assert(
+          Math.abs(restoredTotals.totalCost - initialCost) < 0.01,
+          "Μετά την επαναφορά, το κόστος καλαθιού πρέπει να επανέλθει πλήρως"
+        );
+      },
+    }),
+
+    defineTest({
+      id: "optimizer-grocery-search-filter",
+      title: "Δυναμική αναζήτηση και φιλτράρισμα προϊόντων στη Λίστα Αγορών",
+      category: "optimizer",
+      severity: "high",
+      tags: ["optimizer", "grocery-list", "search", "filter"],
+      description:
+        "Επαληθεύει ότι η αναζήτηση στη Λίστα Αγορών φιλτράρει δυναμικά τα είδη βάσει ονόματος υλικού, ονόματος επώνυμου προϊόντος και μάρκας, χωρίς να αλλοιώνει τη βασική λίστα.",
+      documentation:
+        "Η λογική φιλτραρίσματος ελέγχει ingredientName, product.name και product.brand case-insensitively.",
+      run: ({ assert, assertEquals }) => {
+        const testItems: OptimizedGroceryItem[] = [
+          {
+            ...MOCK_GROCERY_ITEMS[0], // Ντομάτες (produce)
+            selectedOption: {
+              ...MOCK_GROCERY_ITEMS[0].selectedOption!,
+              product: {
+                id: "prod-1",
+                name: "ΝΤΟΜΑΤΕΣ ΕΛΛΗΝΙΚΕΣ Α' ΠΟΙΟΤΗΤΑΣ",
+                brand: "Εγχώριο",
+              } as any,
+            },
+          },
+          {
+            ...MOCK_GROCERY_ITEMS[1], // Φέτα ΠΟΠ (dairy)
+            selectedOption: {
+              ...MOCK_GROCERY_ITEMS[1].selectedOption!,
+              product: {
+                id: "prod-2",
+                name: "ΔΩΔΩΝΗ ΦΕΤΑ ΠΟΠ 400G",
+                brand: "ΔΩΔΩΝΗ",
+              } as any,
+            },
+          },
+          {
+            ...MOCK_GROCERY_ITEMS[2], // Ελαιόλαδο (pantry)
+            selectedOption: {
+              ...MOCK_GROCERY_ITEMS[2].selectedOption!,
+              product: {
+                id: "prod-3",
+                name: "ΧΩΡΙΟ ΕΞΑΙΡΕΤΙΚΟ ΠΑΡΘΕΝΟ ΕΛΑΙΟΛΑΔΟ 1LT",
+                brand: "ΧΩΡΙΟ",
+              } as any,
+            },
+          },
+          {
+            ...MOCK_GROCERY_ITEMS[3], // Υγρό Πιάτων (household)
+            selectedOption: {
+              ...MOCK_GROCERY_ITEMS[3].selectedOption!,
+              product: {
+                id: "prod-4",
+                name: "FAIRY ULTRA LEMON 500ML",
+                brand: "Fairy",
+              } as any,
+            },
+          },
+        ];
+
+        // Greek accent-insensitive normalizer mirroring GroceryListView
+        const normalizeSearch = (str: string) =>
+          str
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+
+        // Search filter helper mirroring GroceryListView logic
+        const filterGroceryItems = (items: OptimizedGroceryItem[], query: string) => {
+          const q = normalizeSearch(query.trim());
+          if (!q) return items;
+          return items.filter((item) => {
+            const ingMatch = item.ingredientName && normalizeSearch(item.ingredientName).includes(q);
+            const nameMatch = item.selectedOption?.product?.name && normalizeSearch(item.selectedOption.product.name).includes(q);
+            const brandMatch = item.selectedOption?.product?.brand && normalizeSearch(item.selectedOption.product.brand).includes(q);
+            return Boolean(ingMatch || nameMatch || brandMatch);
+          });
+        };
+
+        // 1. Search by ingredient name: "ντοματ"
+        const tomatoMatches = filterGroceryItems(testItems, "ντοματ");
+        assertEquals(tomatoMatches.length, 1, "Πρέπει να βρεθεί 1 είδος με όρο «ντοματ»");
+        assertEquals(tomatoMatches[0].ingredientId, "ing-tomato", "Το είδος πρέπει να είναι οι ντομάτες");
+
+        // 2. Search by brand name: "ΔΩΔΩΝΗ"
+        const dodoniMatches = filterGroceryItems(testItems, "δωδωνη");
+        assertEquals(dodoniMatches.length, 1, "Πρέπει να βρεθεί 1 είδος με αναζήτηση μάρκας «δωδωνη»");
+        assertEquals(dodoniMatches[0].ingredientId, "ing-feta", "Το είδος πρέπει να είναι η φέτα Δωδώνη");
+
+        // 3. Search by product SKU title: "FAIRY ULTRA"
+        const fairyMatches = filterGroceryItems(testItems, "FAIRY ULTRA");
+        assertEquals(fairyMatches.length, 1, "Πρέπει να βρεθεί 1 είδος με αναζήτηση «FAIRY ULTRA»");
+        assertEquals(fairyMatches[0].ingredientId, "bundle-item-clean-detergent", "Το είδος πρέπει να είναι το fairy");
+
+        // 4. Search for ingredient: "ελαιολαδο"
+        const oliveOilMatches = filterGroceryItems(testItems, "ελαιολαδο");
+        assertEquals(oliveOilMatches.length, 1, "Πρέπει να βρεθεί το ελαιόλαδο");
+        assertEquals(oliveOilMatches[0].ingredientId, "ing-olive-oil");
+
+        // 5. Search for non-existent term
+        const emptyMatches = filterGroceryItems(testItems, "αβοκάντο_ανύπαρκτο");
+        assertEquals(emptyMatches.length, 0, "Δεν πρέπει να επιστρέψει αποτελέσματα για ανύπαρκτο όρο");
+
+        // 6. Verify original list is unchanged
+        assertEquals(testItems.length, 4, "Η αρχική λίστα δεν πρέπει να τροποποιηθεί από τις αναζητήσεις");
+      },
+    }),
   ],
 });

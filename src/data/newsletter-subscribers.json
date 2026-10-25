@@ -990,5 +990,188 @@
     "source": "footer",
     "status": "active",
     "userAgent": "node"
+  },
+  {
+    "id": "sub-mvniv5cx-95au",
+    "email": "test-user-1792914270927@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T07:44:30.945Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnjobeo-f1v7",
+    "email": "test-user-1792915631786@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T08:07:11.808Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnjoz7h-fos1",
+    "email": "test-user-1792915662631@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T08:07:42.653Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnqcc4q-pdpe",
+    "email": "test-user-1792926830007@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T11:13:50.186Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnqccug-8zgf",
+    "email": "test-user-1792926831070@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T11:13:51.112Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnqcd3x-wd7f",
+    "email": "test-1792926831421@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-25T11:13:51.453Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnqe5fd-y2u1",
+    "email": "test-user-1792926914788@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T11:15:14.809Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnqez3n-vwmg",
+    "email": "test-user-1792926953043@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T11:15:53.267Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnqezpp-v71n",
+    "email": "test-user-1792926954024@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T11:15:54.061Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnqezwm-xh7b",
+    "email": "test-1792926954275@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-25T11:15:54.310Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnqgk8x-a5w3",
+    "email": "test-user-1792927027123@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T11:17:07.329Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnqgkvn-8mnk",
+    "email": "test-user-1792927028107@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T11:17:08.147Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnqgl2h-ds0f",
+    "email": "test-1792927028343@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-25T11:17:08.393Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnqlyyt-u5bi",
+    "email": "test-user-1792927279663@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T11:21:19.685Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnqsp78-416r",
+    "email": "test-user-1792927593599@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T11:26:33.620Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
   }
 ]

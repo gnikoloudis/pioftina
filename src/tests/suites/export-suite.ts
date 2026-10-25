@@ -2,11 +2,13 @@ import { TestSuite } from "../core/types";
 import {
   generatePlanAndShoppingListText,
   generatePlanAndShoppingListHtml,
+  generateBundleText,
   PlanExportData,
 } from "@/lib/export/plan-exporter";
 import { INITIAL_MEAL_SLOTS, DEFAULT_PREFERENCES } from "@/lib/storage/initial-data";
 import { SEED_RECIPES } from "@/lib/recipes/seed-recipes";
 import { OptimizedGroceryItem } from "@/types/meal-planner";
+import { ProductBundle } from "@/types/bundles";
 
 const SAMPLE_GROCERY_ITEMS: OptimizedGroceryItem[] = [
   {
@@ -303,6 +305,80 @@ export const exportSuite: TestSuite = {
         const htmlOutput = generatePlanAndShoppingListHtml(testData);
         assertContains(htmlOutput, "Ariel All-in-1 Pods", "Το HTML πρέπει να περιλαμβάνει το προϊόν καθαριότητας");
         assertContains(htmlOutput, "Pampers Premium Care", "Το HTML πρέπει να περιλαμβάνει το βρεφικό προϊόν");
+      },
+    },
+    {
+      id: "TEST-EXP-06",
+      title: "Ανεξάρτητη εξαγωγή αρχείου πακέτου (.txt) χωρίς προσθήκη στο καλάθι (Decoupled Export)",
+      category: "export",
+      severity: "high",
+      tags: ["export", "bundles", "decoupled"],
+      description:
+        "Επαληθεύει ότι το πάτημα «Αποθήκευση» παράγει πλήρες αρχείο .txt του πακέτου με τιμές και προϊόντα, χωρίς να προσθέτει αυτόματα τα είδη στη Λίστα Αγορών.",
+      documentation:
+        "Η συνάρτηση generateBundleText πρέπει να περιλαμβάνει τον τίτλο του πακέτου, το φθηνότερο σούπερ μάρκετ, τη λίστα προϊόντων και να μην εμφανίζει ψευδές μήνυμα ότι προστέθηκαν στη λίστα.",
+      run: ({ assert, assertEquals, assertContains }) => {
+        const mockBundle: ProductBundle = {
+          id: "bundle-cleaning-starter-test",
+          category: "cleaning",
+          title: "Βασικό Πακέτο Καθαριότητας Σπιτιού",
+          slug: "starter-clean-pack",
+          description: "Όλα τα βασικά απορρυπαντικά και καθαριστικά για το σπίτι σε προνομιακή τιμή.",
+          badge: "Best Value",
+          icon: "🧼",
+          cadence: "monthly",
+          cadenceLabel: "Μηνιαίο Πακέτο",
+          estimatedTotalEur: 14.85,
+          estimatedSavingsEur: 3.20,
+          bestStoreId: "sklavenitis",
+          bestStoreName: "Σκλαβενίτης",
+          isPublished: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          items: [
+            {
+              id: "item-pods",
+              name: "Ariel All-in-1 Pods Color",
+              brand: "Ariel",
+              categoryTag: "Απορρυπαντικό Ρούχων",
+              quantity: 1,
+              unitLabel: "38 κάψουλες",
+              posokaneiQuery: "ariel all in 1 pods",
+              referencePriceEur: 9.85,
+            },
+            {
+              id: "item-dish",
+              name: "Fairy Ultra Υγρό Πιάτων 500ml",
+              brand: "Fairy",
+              categoryTag: "Υγρό Πιάτων",
+              quantity: 2,
+              unitLabel: "500ml",
+              posokaneiQuery: "fairy ultra lemon",
+              referencePriceEur: 2.50,
+            },
+          ],
+        };
+
+        const bundleTxt = generateBundleText(mockBundle);
+
+        // Header and metadata assertions
+        assertContains(bundleTxt, "Βασικό Πακέτο Καθαριότητας Σπιτιού", "Πρέπει να περιέχει τον τίτλο");
+        assertContains(bundleTxt, "Μηνιαίο Πακέτο", "Πρέπει να περιέχει τη συχνότητα/cadence");
+        assertContains(bundleTxt, "Καθαριότητα Σπιτιού", "Πρέπει να περιέχει την κατηγορία");
+        assertContains(bundleTxt, "14.85", "Πρέπει να περιέχει τη χαμηλότερη τιμή");
+        assertContains(bundleTxt, "Σκλαβενίτης", "Πρέπει να περιέχει το φθηνότερο σούπερ μάρκετ");
+        assertContains(bundleTxt, "3.20", "Πρέπει να περιέχει το εκτιμώμενο κέρδος");
+
+        // Item assertions
+        assertContains(bundleTxt, "Ariel All-in-1 Pods Color", "Πρέπει να περιέχει το 1ο προϊόν");
+        assertContains(bundleTxt, "Fairy Ultra Υγρό Πιάτων", "Πρέπει να περιέχει το 2ο προϊόν");
+
+        // Decoupling verification: shouldn't state it was added to grocery list
+        assert(
+          !bundleTxt.includes("(Προστέθηκαν και στη Λίστα Αγορών σας)"),
+          "Το εξαγόμενο αρχείο δεν πρέπει να περιέχει το παλιό μήνυμα αυτόματης προσθήκης στο καλάθι"
+        );
+        assertContains(bundleTxt, "ΠΡΟΪΟΝΤΑ ΠΑΚΕΤΟΥ:", "Πρέπει να περιέχει καθαρή επικεφαλίδα προϊόντων");
       },
     },
   ],

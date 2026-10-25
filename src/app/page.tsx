@@ -141,7 +141,8 @@ export default function Home() {
   };
 
   const activeGroceryItemsCount = groceryItems.filter((i) => !i.inPantry && !i.isExcluded).length;
-  const activePantryItemsCount = userPantryItems.length + pantrySurplus.length;
+  const inPantryGroceryCount = groceryItems.filter((i) => i.inPantry).length;
+  const activePantryItemsCount = userPantryItems.length + pantrySurplus.length + inPantryGroceryCount;
   const scheduledMealsCount = slots.filter((s) => s.recipe !== null).length;
 
   return (
@@ -273,11 +274,10 @@ export default function Home() {
               <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
                 <button
                   onClick={() => setActiveTab("planner")}
-                  className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${
-                    activeTab === "planner"
+                  className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${activeTab === "planner"
                       ? "bg-primary text-primary-foreground shadow-xs"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  }`}
+                    }`}
                 >
                   <CalendarDays className="size-4" />
                   <span>Πρόγραμμα Γευμάτων</span>
@@ -290,11 +290,10 @@ export default function Home() {
 
                 <button
                   onClick={() => setActiveTab("recipes")}
-                  className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${
-                    activeTab === "recipes"
+                  className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${activeTab === "recipes"
                       ? "bg-primary text-primary-foreground shadow-xs"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  }`}
+                    }`}
                 >
                   <BookOpen className="size-4" />
                   <span>Συνταγές</span>
@@ -308,20 +307,18 @@ export default function Home() {
                       setEditingRecipeId(null);
                       setActiveTab("curation-studio");
                     }}
-                    className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${
-                      activeTab === "curation-studio"
+                    className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${activeTab === "curation-studio"
                         ? "bg-primary text-primary-foreground shadow-xs"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    }`}
+                      }`}
                   >
                     <Bot className="size-4 text-primary" />
                     <span>Recipe Studio</span>
                     <span
-                      className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${
-                        activeTab === "curation-studio"
+                      className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${activeTab === "curation-studio"
                           ? "bg-white/20 text-white border-white/30"
                           : "bg-primary/10 text-primary border-primary/20"
-                      }`}
+                        }`}
                     >
                       Admin
                     </span>
@@ -329,7 +326,7 @@ export default function Home() {
                 )}
 
                 {/* Test Center Tab: Available ONLY to administrator */}
-                {isAdmin && (
+                {/*isAdmin && (
                   <button
                     id="tab-btn-test-center"
                     onClick={() => {
@@ -354,7 +351,7 @@ export default function Home() {
                       QA
                     </span>
                   </button>
-                )}
+                )*/}
               </div>
 
               {/* Direct CTA buttons to Universal Pantry & Universal Shopping List */}
@@ -545,6 +542,7 @@ export default function Home() {
               onUpdatePantryItem={updatePantryItem}
               onDeletePantryItem={deletePantryItem}
               onAddSurplusToPantry={addSurplusToPantry}
+              onNavigateSection={setActiveSection}
             />
           </div>
         )}

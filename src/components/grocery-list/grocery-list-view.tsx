@@ -92,6 +92,7 @@ export function GroceryListView({
     message: string;
   } | null>(null);
   const [notificationToast, setNotificationToast] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Auto-dismiss undo toast after 6 seconds
   useEffect(() => {
@@ -114,9 +115,35 @@ export function GroceryListView({
   // Calculate progress & active items (excluding pantry and deleted/excluded items)
   const activeItems = items.filter((i) => !i.inPantry && !i.isExcluded);
   const excludedItems = items.filter((i) => i.isExcluded);
+  const inPantryItems = items.filter((i) => i.inPantry);
   const checkedCount = activeItems.filter((i) => i.isChecked).length;
   const progressPercent =
     activeItems.length > 0 ? Math.round((checkedCount / activeItems.length) * 100) : 0;
+
+  // Greek accent-insensitive search normalizer (e.g. ελαιολαδο matches Ελαιόλαδο)
+  const normalizeSearch = (str: string) =>
+    str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
+  // Real-time grocery item search query
+  const queryNorm = normalizeSearch(searchQuery.trim());
+
+  // Active items matching search query
+  const matchingActiveItems = activeItems.filter((item) => {
+    if (!queryNorm) return true;
+    const ingredientMatch = item.ingredientName && normalizeSearch(item.ingredientName).includes(queryNorm);
+    const productNameMatch = item.selectedOption?.product?.name && normalizeSearch(item.selectedOption.product.name).includes(queryNorm);
+    const brandMatch = item.selectedOption?.product?.brand && normalizeSearch(item.selectedOption.product.brand).includes(queryNorm);
+    return Boolean(ingredientMatch || productNameMatch || brandMatch);
+  });
+
+  // Items visible after both hideChecked and search filters
+  const matchingVisibleItems = matchingActiveItems.filter((item) => {
+    if (hideChecked && item.isChecked) return false;
+    return true;
+  });
 
   // Identify unavailable items (without official product SKU or price)
   const unavailableItems = activeItems.filter(
@@ -392,17 +419,84 @@ export function GroceryListView({
         </div>
       ) : (
         <div className="space-y-4">
-          {categoriesInUse.map((catKey) => {
-            let catItems = items.filter((i) => i.category === catKey && !i.inPantry && !i.isExcluded);
-            if (hideChecked) {
-              catItems = catItems.filter((i) => !i.isChecked);
-            }
-            if (catItems.length === 0) return null;
+          {/* Real-time Grocery Search Bar */}
+          <div className="relative">
+            <div className="relative flex items-center">
+              <Search className="absolute left-3.5 size-4 text-muted-foreground pointer-events-none" />
+              <input
+                id="grocery-search-input"
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Αναζήτηση προϊόντος ή υλικού στη Λίστα Αγορών (π.χ. γάλα, barilla, ελαιόλαδο)..."
+                className="w-full pl-10 pr-10 py-2.5 rounded-2xl border border-border bg-card text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary shadow-xs transition-all"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  id="btn-clear-grocery-search"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                  title="Καθαρισμός αναζήτησης"
+                  aria-label="Καθαρισμός αναζήτησης"
+                >
+                  <X className="size-4" />
+                </button>
+              )}
+            </div>
+            {queryNorm && (
+              <div className="flex items-center justify-between mt-2 px-1 text-xs text-muted-foreground">
+                <span>
+                  Βρέθηκαν <strong>{matchingVisibleItems.length}</strong> {matchingVisibleItems.length === 1 ? "προϊόν" : "προϊόντα"} για <strong>«{searchQuery.trim()}»</strong>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="text-primary hover:underline font-semibold text-xs"
+                >
+                  Καθαρισμός φίλτρου
+                </button>
+              </div>
+            )}
+          </div>
 
-            const aisle = AISLE_CATEGORIES[catKey];
-            const isCollapsed = collapsedAisles.includes(catKey);
+          {/* Empty search results state */}
+          {queryNorm && matchingVisibleItems.length === 0 ? (
+            <div className="py-12 text-center text-muted-foreground bg-card border border-border rounded-2xl p-6">
+              <Search className="size-8 mx-auto text-muted-foreground/50 mb-2" />
+              <p className="text-base font-semibold text-foreground">Δεν βρέθηκαν προϊόντα στη λίστα</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Δεν υπάρχει προϊόν ή υλικό που να ταιριάζει με τον όρο «{searchQuery}».
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSearchQuery("")}
+                className="mt-4 text-xs"
+              >
+                Επαναφορά όλων των προϊόντων
+              </Button>
+            </div>
+          ) : (
+            categoriesInUse.map((catKey) => {
+              let catItems = items.filter((i) => i.category === catKey && !i.inPantry && !i.isExcluded);
+              if (hideChecked) {
+                catItems = catItems.filter((i) => !i.isChecked);
+              }
+              if (queryNorm) {
+                catItems = catItems.filter((item) => {
+                  const ingredientMatch = item.ingredientName && normalizeSearch(item.ingredientName).includes(queryNorm);
+                  const productNameMatch = item.selectedOption?.product?.name && normalizeSearch(item.selectedOption.product.name).includes(queryNorm);
+                  const brandMatch = item.selectedOption?.product?.brand && normalizeSearch(item.selectedOption.product.brand).includes(queryNorm);
+                  return Boolean(ingredientMatch || productNameMatch || brandMatch);
+                });
+              }
+              if (catItems.length === 0) return null;
 
-            return (
+              const aisle = AISLE_CATEGORIES[catKey];
+              const isCollapsed = queryNorm ? false : collapsedAisles.includes(catKey);
+
+              return (
               <div
                 key={catKey}
                 className="rounded-2xl border border-border bg-card shadow-xs overflow-hidden"
@@ -671,7 +765,14 @@ export function GroceryListView({
 
                               {/* Pantry button */}
                               <button
-                                onClick={() => onTogglePantry(item.ingredientId)}
+                                onClick={() => {
+                                  onTogglePantry(item.ingredientId);
+                                  setNotificationToast(
+                                    !item.inPantry
+                                      ? `Το είδος «${item.ingredientName}» σημειώθηκε ως διαθέσιμο στην Αποθήκη`
+                                      : `Το είδος «${item.ingredientName}» επανήλθε στη Λίστα Αγορών`
+                                  );
+                                }}
                                 className="p-1.5 text-muted-foreground hover:text-primary rounded-md transition-colors"
                                 title="Το έχω ήδη στο σπίτι (εξαίρεση από τη λίστα)"
                               >
@@ -702,7 +803,69 @@ export function GroceryListView({
                 )}
               </div>
             );
-          })}
+          })
+        )}
+        </div>
+      )}
+
+      {/* In-Pantry items drawer (Have at home) */}
+      {inPantryItems.length > 0 && (
+        <div className="rounded-2xl border border-dashed border-emerald-500/30 p-4 bg-emerald-500/5">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Home className="size-4 text-emerald-600 dark:text-emerald-400" />
+              <span className="text-xs font-bold text-foreground">
+                Υλικά που έχετε ήδη στο σπίτι ({inPantryItems.length})
+              </span>
+              <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold hidden sm:inline">
+                (Εξαιρέθηκαν από το κόστος αγορών)
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => {
+                  inPantryItems.forEach((i) => onTogglePantry(i.ingredientId));
+                  setNotificationToast("Όλα τα είδη επανήλθαν στη λίστα αγορών");
+                }}
+                className="text-xs text-primary hover:underline h-7"
+                title="Επαναφορά όλων των υλικών στη λίστα αγορών"
+              >
+                Επαναφορά όλων
+              </Button>
+            </div>
+          </div>
+          <div className="mt-2.5 divide-y divide-border/40">
+            {inPantryItems.map((item) => (
+              <div
+                key={`pantry-drawer-${item.ingredientId}`}
+                className="py-2 flex items-center justify-between gap-2 text-xs"
+              >
+                <div className="flex items-center gap-2 text-foreground font-medium">
+                  <span className="text-muted-foreground line-through">{item.ingredientName}</span>
+                  <span className="text-[11px] text-muted-foreground">
+                    ({item.rawRequiredAmount} {item.rawUnit})
+                  </span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                    🏠 Στην Αποθήκη
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="xs"
+                  onClick={() => {
+                    onTogglePantry(item.ingredientId);
+                    setNotificationToast(`«${item.ingredientName}» επανήλθε στη Λίστα Αγορών`);
+                  }}
+                  className="h-6 text-[11px] gap-1 border-primary/30 text-primary hover:bg-primary/10"
+                >
+                  <RotateCcw className="size-3" />
+                  Επαναφορά
+                </Button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

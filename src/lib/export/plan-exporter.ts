@@ -9,6 +9,7 @@ import {
   AisleCategory,
 } from "@/types/meal-planner";
 import { getRetailerName } from "@/lib/posokanei/mock-data";
+import { ProductBundle } from "@/types/bundles";
 
 /**
  * Standard Greek uppercase helper that strips tonoi (e.g. ΔΕΥΤΕΡΑ instead of ΔΕΥΤΈΡΑ).
@@ -620,6 +621,31 @@ export function downloadTextFile(filename: string, content: string) {
  */
 export function downloadJsonFile(filename: string, data: any) {
   downloadBlob(filename, JSON.stringify(data, null, 2), "application/json;charset=utf-8");
+}
+
+/**
+ * Formats an individual ProductBundle into a structured text report (.txt)
+ * for direct export/download to the user's PC without mutating their shopping cart.
+ */
+export function generateBundleText(bundle: ProductBundle): string {
+  const divider = "=".repeat(52);
+  const content = [
+    divider,
+    `ΠΑΚΕΤΟ: ${bundle.title} (${bundle.cadenceLabel})`,
+    `Κατηγορία: ${bundle.category === "cleaning" ? "Καθαριότητα Σπιτιού" : "Βρεφική Φροντίδα"}`,
+    `Εκτιμώμενη Χαμηλότερη Τιμή: €${bundle.estimatedTotalEur.toFixed(2)} (@ ${bundle.bestStoreName})`,
+    `Εκτιμώμενο Κέρδος: €${bundle.estimatedSavingsEur.toFixed(2)}`,
+    `${divider}\n`,
+    `ΠΡΟΪΟΝΤΑ ΠΑΚΕΤΟΥ:`,
+    ...bundle.items.map(
+      (item, idx) =>
+        `${idx + 1}. ${item.name} (${item.brand}) - Ποσότητα: ${item.quantity} [${item.unitLabel}] ~ €${(item.referencePriceEur * item.quantity).toFixed(2)}`
+    ),
+    `\n${divider}`,
+    `Δημιουργήθηκε από το pioftina.gr • ${new Date().toLocaleDateString("el-GR")}`,
+  ].join("\n");
+
+  return content;
 }
 
 /**

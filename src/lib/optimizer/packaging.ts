@@ -342,28 +342,35 @@ export async function generateOptimizedGroceryList(
         allOptions.push(...variantOptions);
       }
     } else {
-      // Case 2: Uncurated -> Execute automatic search with safety filtering
-      let searchRes = await searchProducts({
-        title: agg.query,
-        page: 1,
-        page_size: 10,
-        sort_by: "unit_price",
-        sort_order: "asc",
-      });
-
-      const validProducts = (searchRes.products || []).filter((p) =>
-        isEligibleProductCandidate(p, agg)
+      // Case 2: Uncurated -> First check local verified fallback products to prevent network bursts & rate limits
+      const queryLower = agg.query.toLowerCase().trim();
+      const localMatches = MOCK_FALLBACK_PRODUCTS.filter(
+        (p) =>
+          (p.name.toLowerCase().includes(queryLower) ||
+           p.category.toLowerCase().includes(queryLower)) &&
+          isEligibleProductCandidate(p, agg)
       );
 
-      // If no valid products returned from API, check fallback products
+      let validProducts: Product[] = [...localMatches];
+
+      // If local catalog has no matches, perform search via API proxy
       if (validProducts.length === 0) {
-        const fallbackValid = MOCK_FALLBACK_PRODUCTS.filter(
-          (p) =>
-            (p.name.toLowerCase().includes(agg.query.toLowerCase()) ||
-             p.category.toLowerCase().includes(agg.query.toLowerCase())) &&
+        try {
+          const searchRes = await searchProducts({
+            title: agg.query,
+            page: 1,
+            page_size: 10,
+            sort_by: "unit_price",
+            sort_order: "asc",
+          });
+
+          const apiValid = (searchRes.products || []).filter((p) =>
             isEligibleProductCandidate(p, agg)
-        );
-        validProducts.push(...fallbackValid);
+          );
+          validProducts.push(...apiValid);
+        } catch {
+          // Gracefully continue
+        }
       }
 
       for (const prod of validProducts.slice(0, 5)) {
@@ -432,6 +439,7 @@ export async function generateOptimizedGroceryList(
       isCurated: agg.isCurated,
       isUnmatched: selectedOption?.isSynthetic === true,
       isAvailable: selectedOption?.isSynthetic !== true,
+      sourceMealTitles: agg.sourceMealTitles,
     });
 
     // If there is significant surplus (e.g. > 100g or 0.1kg), register it for the pantry
