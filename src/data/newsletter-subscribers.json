@@ -880,5 +880,17 @@
     "source": "footer",
     "status": "active",
     "userAgent": "node"
+  },
+  {
+    "id": "sub-mvngw8m6-n5qn",
+    "email": "test-user-1792910962564@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T06:49:22.590Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
   }
 ]

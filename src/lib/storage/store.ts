@@ -23,6 +23,7 @@ import {
   generateOptimizedGroceryList,
   computeBasketComparisons,
   computeCartTotals,
+  evaluatePackOptions,
 } from "@/lib/optimizer/packaging";
 
 import {
@@ -782,7 +783,7 @@ export function useMealPlannerStore() {
     );
   };
 
-  // Curate an ingredient directly from the grocery list across all active meal slots
+  // Curate / change an ingredient product directly from the grocery list
   const curateGroceryIngredient = (ingredientQuery: string, product: Product) => {
     // 1. Update any slots having ingredients matching ingredientQuery
     setSlots((prev) =>
@@ -818,6 +819,76 @@ export function useMealPlannerStore() {
         return slot;
       })
     );
+
+    // 2. If it's a bundle item, update addedBundleItems
+    if (ingredientQuery.startsWith("bundle-")) {
+      setAddedBundleItems((prev) => {
+        const next = prev.map((item) => {
+          if (item.ingredientId === ingredientQuery) {
+            const itemPrice = product.price_stats?.min_price || product.retailer_prices?.[0]?.price || 3.0;
+            const lineTotal = Math.round(itemPrice * item.rawRequiredAmount * 100) / 100;
+            const storeId = product.retailer_prices?.[0]?.retailer || "sklavenitis";
+            const storeName = product.retailer_prices?.[0]?.retailer_display_name || "Σκλαβενίτης";
+            return {
+              ...item,
+              ingredientName: product.name,
+              curatedProduct: product,
+              isCurated: true,
+              selectedOption: {
+                ...item.selectedOption!,
+                product,
+                unitPrice: itemPrice,
+                totalPrice: lineTotal,
+                retailer: storeId,
+                retailerName: storeName,
+              },
+            };
+          }
+          return item;
+        });
+        try {
+          localStorage.setItem(STORAGE_KEYS.BUNDLE_ITEMS, JSON.stringify(next));
+        } catch (_) {}
+        return next;
+      });
+    }
+
+    // 3. Immediately reflect in groceryItems and re-evaluate pricing
+    setGroceryItems((prev) => {
+      const next = prev.map((item) => {
+        if (
+          item.ingredientId === ingredientQuery ||
+          item.ingredientName.toLowerCase().trim() === ingredientQuery.toLowerCase().trim()
+        ) {
+          const options = evaluatePackOptions(
+            product,
+            item.normalizedRequiredAmount || item.rawRequiredAmount,
+            preferences.preferredSupermarkets
+          );
+          const bestOption = options[0] || item.selectedOption;
+          return {
+            ...item,
+            ingredientName: product.name,
+            curatedProduct: product,
+            isCurated: true,
+            isAvailable: true,
+            isSynthetic: false,
+            selectedOption: bestOption,
+            alternativeOptions: options.slice(1),
+          };
+        }
+        return item;
+      });
+
+      const totals = computeCartTotals(next);
+      const comparisons = computeBasketComparisons(next, preferences.preferredSupermarkets);
+      setTotalCost(totals.totalCost);
+      setRemainingCost(totals.remainingCost);
+      setPurchasedCost(totals.purchasedCost);
+      setTotalSavings(totals.totalBulkSavings);
+      setBasketComparisons(comparisons);
+      return next;
+    });
   };
 
   // Reset an ingredient's curation back to default auto-mapped product

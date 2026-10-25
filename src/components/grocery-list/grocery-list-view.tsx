@@ -91,6 +91,7 @@ export function GroceryListView({
     ids: string[];
     message: string;
   } | null>(null);
+  const [notificationToast, setNotificationToast] = useState<string | null>(null);
 
   // Auto-dismiss undo toast after 6 seconds
   useEffect(() => {
@@ -100,6 +101,15 @@ export function GroceryListView({
     }, 6000);
     return () => clearTimeout(timer);
   }, [undoToast]);
+
+  // Auto-dismiss notification toast after 4 seconds
+  useEffect(() => {
+    if (!notificationToast) return;
+    const timer = setTimeout(() => {
+      setNotificationToast(null);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [notificationToast]);
 
   // Calculate progress & active items (excluding pantry and deleted/excluded items)
   const activeItems = items.filter((i) => !i.inPantry && !i.isExcluded);
@@ -632,14 +642,15 @@ export function GroceryListView({
                             ) : null}
 
                             <div className="flex items-center gap-1.5">
-                              {/* Open pack selector or curation modal */}
+                              {/* Open pack selector or search similar product modal */}
                               {isUnavailable ? (
                                 <Button
                                   variant="outline"
                                   size="xs"
-                                  onClick={() => setCuratingItem(item)}
+                                  id={`btn-curate-item-${item.ingredientId}`}
+                                  onClick={() => setSelectedItemForModal(item)}
                                   className="h-7 text-xs gap-1 border-amber-500/30 text-amber-700 dark:text-amber-400 hover:bg-amber-500/10"
-                                  title="Αντιστοίχιση με υπαρκτό προϊόν supermarket"
+                                  title="Αναζήτηση και αντιστοίχιση προϊόντος supermarket"
                                 >
                                   <Search className="size-3" />
                                   Αντιστοίχιση
@@ -648,9 +659,10 @@ export function GroceryListView({
                                 <Button
                                   variant="outline"
                                   size="xs"
+                                  id={`btn-change-item-${item.ingredientId}`}
                                   onClick={() => setSelectedItemForModal(item)}
                                   className="h-7 text-xs gap-1 text-muted-foreground hover:text-foreground"
-                                  title="Αλλαγή μεγέθους συσκευασίας ή supermarket"
+                                  title="Αλλαγή προϊόντος ή μεγέθους συσκευασίας"
                                 >
                                   <Package className="size-3" />
                                   Αλλαγή
@@ -764,6 +776,17 @@ export function GroceryListView({
           onClose={() => setSelectedItemForModal(null)}
           onSelectOption={(newOption) => {
             onUpdateItemOption(selectedItemForModal.ingredientId, newOption);
+            setNotificationToast(`Επιλέχθηκε συσκευασία: ${newOption.packCount} × ${newOption.packSize} ${newOption.packUnit} (${newOption.retailerName})`);
+            setSelectedItemForModal(null);
+          }}
+          onSelectNewProduct={(newProduct, newOption) => {
+            if (onCurateProduct) {
+              onCurateProduct(selectedItemForModal.ingredientId, newProduct);
+            }
+            if (newOption) {
+              onUpdateItemOption(selectedItemForModal.ingredientId, newOption);
+            }
+            setNotificationToast(`Το προϊόν άλλαξε σε: ${newProduct.name}`);
             setSelectedItemForModal(null);
           }}
         />
@@ -956,6 +979,21 @@ export function GroceryListView({
               <X className="size-3.5" />
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Floating Notification Toast */}
+      {notificationToast && (
+        <div className="fixed bottom-6 left-6 z-50 max-w-md bg-foreground text-background shadow-2xl rounded-2xl px-4 py-3 flex items-center gap-2.5 animate-in slide-in-from-bottom-2 fade-in duration-200 text-xs font-semibold">
+          <Sparkles className="size-4 text-amber-400 shrink-0" />
+          <span className="truncate">{notificationToast}</span>
+          <button
+            type="button"
+            onClick={() => setNotificationToast(null)}
+            className="p-1 rounded-lg hover:bg-background/20 transition-colors ml-auto cursor-pointer"
+          >
+            <X className="size-3.5" />
+          </button>
         </div>
       )}
     </div>
