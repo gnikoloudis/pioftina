@@ -12,7 +12,8 @@
     "test:smoke": "tsx src/tests/runner/cli.ts --tags=smoke",
     "pentest": "tsx src/tests/security/runner/cli.ts",
     "test:security": "tsx src/tests/security/runner/cli.ts",
-    "pentest:docs": "tsx src/tests/security/generate-security-docs.ts"
+    "pentest:docs": "tsx src/tests/security/generate-security-docs.ts",
+    "ship": "powershell -ExecutionPolicy Bypass -File ./scripts/push-to-github.ps1"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

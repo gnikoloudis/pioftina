@@ -1,0 +1,40 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    name: Build, Test & Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: TypeScript Type Check
+        run: npx tsc --noEmit
+
+      - name: Run Full Test Suite (46 Tests)
+        run: npm test
+
+      - name: Run OWASP Penetration Test Suite (32 Rules)
+        run: npm run pentest
+
+      - name: Build Application Bundle
+        run: npm run build
+        env:
+          NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+          ADMIN_SECRET_KEY: "ci-test-admin-secret-key-123456"
