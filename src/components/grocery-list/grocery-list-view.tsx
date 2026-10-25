@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   OptimizedGroceryItem,
   BasketComparison,
@@ -9,6 +9,8 @@ import {
   AisleCategory,
   Ingredient,
 } from "@/types/meal-planner";
+
+const CATEGORIES_IN_USE = Object.keys(AISLE_CATEGORIES) as AisleCategory[];
 import { Product } from "@/lib/posokanei/types";
 import { SupermarketBadge } from "@/components/supermarket-badge";
 import { StoreComparisonWidget } from "./store-comparison-widget";
@@ -112,59 +114,85 @@ export function GroceryListView({
     return () => clearTimeout(timer);
   }, [notificationToast]);
 
-  // Calculate progress & active items (excluding pantry and deleted/excluded items)
-  const activeItems = items.filter((i) => !i.inPantry && !i.isExcluded);
-  const excludedItems = items.filter((i) => i.isExcluded);
-  const inPantryItems = items.filter((i) => i.inPantry);
-  const checkedCount = activeItems.filter((i) => i.isChecked).length;
-  const progressPercent =
-    activeItems.length > 0 ? Math.round((checkedCount / activeItems.length) * 100) : 0;
+  // Memoized derivations
+  const activeItems = useMemo(() => items.filter((i) => !i.inPantry && !i.isExcluded), [items]);
+  const excludedItems = useMemo(() => items.filter((i) => i.isExcluded), [items]);
+  const inPantryItems = useMemo(() => items.filter((i) => i.inPantry), [items]);
+  const checkedCount = useMemo(() => activeItems.filter((i) => i.isChecked).length, [activeItems]);
+  const progressPercent = useMemo(
+    () => (activeItems.length > 0 ? Math.round((checkedCount / activeItems.length) * 100) : 0),
+    [activeItems.length, checkedCount]
+  );
 
   // Greek accent-insensitive search normalizer (e.g. ελαιολαδο matches Ελαιόλαδο)
-  const normalizeSearch = (str: string) =>
+  const normalizeSearch = useCallback((str: string) =>
     str
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
+      .toLowerCase(), []);
 
   // Real-time grocery item search query
-  const queryNorm = normalizeSearch(searchQuery.trim());
+  const queryNorm = useMemo(() => normalizeSearch(searchQuery.trim()), [searchQuery, normalizeSearch]);
 
-  // Active items matching search query
-  const matchingActiveItems = activeItems.filter((item) => {
-    if (!queryNorm) return true;
-    const ingredientMatch = item.ingredientName && normalizeSearch(item.ingredientName).includes(queryNorm);
-    const productNameMatch = item.selectedOption?.product?.name && normalizeSearch(item.selectedOption.product.name).includes(queryNorm);
-    const brandMatch = item.selectedOption?.product?.brand && normalizeSearch(item.selectedOption.product.brand).includes(queryNorm);
-    return Boolean(ingredientMatch || productNameMatch || brandMatch);
-  });
+  // Pre-categorize active, visible items in a single O(N) pass across all aisles
+  const categorizedItems = useMemo(() => {
+    const map = {} as Record<AisleCategory, OptimizedGroceryItem[]>;
+    for (const key of CATEGORIES_IN_USE) {
+      map[key] = [];
+    }
 
-  // Items visible after both hideChecked and search filters
-  const matchingVisibleItems = matchingActiveItems.filter((item) => {
-    if (hideChecked && item.isChecked) return false;
-    return true;
-  });
+    for (const item of items) {
+      if (item.inPantry || item.isExcluded) continue;
+      if (hideChecked && item.isChecked) continue;
+
+      if (queryNorm) {
+        const ingredientMatch = item.ingredientName && normalizeSearch(item.ingredientName).includes(queryNorm);
+        const productNameMatch = item.selectedOption?.product?.name && normalizeSearch(item.selectedOption.product.name).includes(queryNorm);
+        const brandMatch = item.selectedOption?.product?.brand && normalizeSearch(item.selectedOption.product.brand).includes(queryNorm);
+        if (!ingredientMatch && !productNameMatch && !brandMatch) {
+          continue;
+        }
+      }
+
+      if (map[item.category]) {
+        map[item.category].push(item);
+      }
+    }
+    return map;
+  }, [items, hideChecked, queryNorm, normalizeSearch]);
+
+  const matchingVisibleItemsCount = useMemo(() => {
+    let count = 0;
+    for (const key of CATEGORIES_IN_USE) {
+      count += categorizedItems[key]?.length || 0;
+    }
+    return count;
+  }, [categorizedItems]);
 
   // Identify unavailable items (without official product SKU or price)
-  const unavailableItems = activeItems.filter(
-    (i) =>
-      i.isUnmatched ||
-      i.isAvailable === false ||
-      i.selectedOption?.isSynthetic ||
-      !i.selectedOption?.totalPrice ||
-      i.selectedOption.totalPrice <= 0
+  const unavailableItems = useMemo(
+    () =>
+      activeItems.filter(
+        (i) =>
+          i.isUnmatched ||
+          i.isAvailable === false ||
+          i.selectedOption?.isSynthetic ||
+          !i.selectedOption?.totalPrice ||
+          i.selectedOption.totalPrice <= 0
+      ),
+    [activeItems]
   );
 
-  const toggleAisleCollapse = (categoryKey: string) => {
+  const toggleAisleCollapse = useCallback((categoryKey: string) => {
     setCollapsedAisles((prev) =>
       prev.includes(categoryKey)
         ? prev.filter((k) => k !== categoryKey)
         : [...prev, categoryKey]
     );
-  };
+  }, []);
 
   // Single-item removal with instant Undo toast
-  const handleRemoveSingleItem = (item: OptimizedGroceryItem) => {
+  const handleRemoveSingleItem = useCallback((item: OptimizedGroceryItem) => {
     if (onToggleExcluded) {
       onToggleExcluded(item.ingredientId);
       setSelectedBulkIds((prev) => prev.filter((id) => id !== item.ingredientId));
@@ -173,10 +201,10 @@ export function GroceryListView({
         message: `Το είδος «${item.ingredientName}» αφαιρέθηκε από τη λίστα`,
       });
     }
-  };
+  }, [onToggleExcluded]);
 
   // Bulk removal helper
-  const handleRemoveMultiple = (ids: string[], label: string) => {
+  const handleRemoveMultiple = useCallback((ids: string[], label: string) => {
     if (ids.length === 0) return;
     if (onExcludeMultiple) {
       onExcludeMultiple(ids);
@@ -188,44 +216,44 @@ export function GroceryListView({
       ids,
       message: label,
     });
-  };
+  }, [onExcludeMultiple, onToggleExcluded]);
 
   // Quick action: Remove all purchased/checked items
-  const handleRemoveCheckedItems = () => {
+  const handleRemoveCheckedItems = useCallback(() => {
     const checkedIds = activeItems.filter((i) => i.isChecked).map((i) => i.ingredientId);
     if (checkedIds.length === 0) return;
     handleRemoveMultiple(
       checkedIds,
       `${checkedIds.length} ${checkedIds.length === 1 ? "αγορασμένο είδος αφαιρέθηκε" : "αγορασμένα είδη αφαιρέθηκαν"}`
     );
-  };
+  }, [activeItems, handleRemoveMultiple]);
 
   // Bulk select toggles
-  const toggleSelectBulkItem = (id: string) => {
+  const toggleSelectBulkItem = useCallback((id: string) => {
     setSelectedBulkIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
-  };
+  }, []);
 
-  const toggleSelectAllCategory = (catItems: OptimizedGroceryItem[]) => {
+  const toggleSelectAllCategory = useCallback((catItems: OptimizedGroceryItem[]) => {
     const catIds = catItems.map((i) => i.ingredientId);
-    const allSelected = catIds.every((id) => selectedBulkIds.includes(id));
-    if (allSelected) {
-      setSelectedBulkIds((prev) => prev.filter((id) => !catIds.includes(id)));
-    } else {
-      setSelectedBulkIds((prev) => Array.from(new Set([...prev, ...catIds])));
-    }
-  };
+    setSelectedBulkIds((prev) => {
+      const allSelected = catIds.every((id) => prev.includes(id));
+      if (allSelected) {
+        return prev.filter((id) => !catIds.includes(id));
+      } else {
+        return Array.from(new Set([...prev, ...catIds]));
+      }
+    });
+  }, []);
 
-  const handleSelectAll = () => {
-    if (selectedBulkIds.length === activeItems.length) {
-      setSelectedBulkIds([]);
-    } else {
-      setSelectedBulkIds(activeItems.map((i) => i.ingredientId));
-    }
-  };
+  const handleSelectAll = useCallback(() => {
+    setSelectedBulkIds((prev) =>
+      prev.length === activeItems.length ? [] : activeItems.map((i) => i.ingredientId)
+    );
+  }, [activeItems]);
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = useCallback(() => {
     if (selectedBulkIds.length === 0) return;
     const count = selectedBulkIds.length;
     handleRemoveMultiple(
@@ -233,18 +261,18 @@ export function GroceryListView({
       `${count} ${count === 1 ? "επιλεγμένο είδος αφαιρέθηκε" : "επιλεγμένα είδη αφαιρέθηκαν"}`
     );
     setIsBulkMode(false);
-  };
+  }, [selectedBulkIds, handleRemoveMultiple]);
 
-  const handleRemoveCategory = (catKey: AisleCategory, catItems: OptimizedGroceryItem[]) => {
+  const handleRemoveCategory = useCallback((catKey: AisleCategory, catItems: OptimizedGroceryItem[]) => {
     const catIds = catItems.map((i) => i.ingredientId);
     const aisleName = AISLE_CATEGORIES[catKey]?.nameEl || "κατηγορία";
     handleRemoveMultiple(
       catIds,
       `Όλα τα είδη (${catIds.length}) από «${aisleName}» αφαιρέθηκαν`
     );
-  };
+  }, [handleRemoveMultiple]);
 
-  const handleUndo = () => {
+  const handleUndo = useCallback(() => {
     if (!undoToast) return;
     if (onRestoreExcludedItems) {
       onRestoreExcludedItems(undoToast.ids);
@@ -252,10 +280,7 @@ export function GroceryListView({
       undoToast.ids.forEach((id) => onToggleExcluded(id));
     }
     setUndoToast(null);
-  };
-
-  // Group items by category
-  const categoriesInUse = Object.keys(AISLE_CATEGORIES) as AisleCategory[];
+  }, [undoToast, onRestoreExcludedItems, onToggleExcluded]);
 
   return (
     <div className="space-y-6">
@@ -291,7 +316,7 @@ export function GroceryListView({
           {/* Progress bar */}
           <div className="w-full sm:w-64 h-2 bg-muted rounded-full overflow-hidden mt-2">
             <div
-              className="h-full bg-gradient-to-r from-blue-600 to-sky-500 rounded-full transition-all duration-300"
+              className="h-full bg-gradient-to-r from-blue-600 to-sky-500 rounded-full transition-[width] duration-300 ease-out"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -447,7 +472,7 @@ export function GroceryListView({
             {queryNorm && (
               <div className="flex items-center justify-between mt-2 px-1 text-xs text-muted-foreground">
                 <span>
-                  Βρέθηκαν <strong>{matchingVisibleItems.length}</strong> {matchingVisibleItems.length === 1 ? "προϊόν" : "προϊόντα"} για <strong>«{searchQuery.trim()}»</strong>
+                  Βρέθηκαν <strong>{matchingVisibleItemsCount}</strong> {matchingVisibleItemsCount === 1 ? "προϊόν" : "προϊόντα"} για <strong>«{searchQuery.trim()}»</strong>
                 </span>
                 <button
                   type="button"
@@ -461,7 +486,7 @@ export function GroceryListView({
           </div>
 
           {/* Empty search results state */}
-          {queryNorm && matchingVisibleItems.length === 0 ? (
+          {queryNorm && matchingVisibleItemsCount === 0 ? (
             <div className="py-12 text-center text-muted-foreground bg-card border border-border rounded-2xl p-6">
               <Search className="size-8 mx-auto text-muted-foreground/50 mb-2" />
               <p className="text-base font-semibold text-foreground">Δεν βρέθηκαν προϊόντα στη λίστα</p>
@@ -478,19 +503,8 @@ export function GroceryListView({
               </Button>
             </div>
           ) : (
-            categoriesInUse.map((catKey) => {
-              let catItems = items.filter((i) => i.category === catKey && !i.inPantry && !i.isExcluded);
-              if (hideChecked) {
-                catItems = catItems.filter((i) => !i.isChecked);
-              }
-              if (queryNorm) {
-                catItems = catItems.filter((item) => {
-                  const ingredientMatch = item.ingredientName && normalizeSearch(item.ingredientName).includes(queryNorm);
-                  const productNameMatch = item.selectedOption?.product?.name && normalizeSearch(item.selectedOption.product.name).includes(queryNorm);
-                  const brandMatch = item.selectedOption?.product?.brand && normalizeSearch(item.selectedOption.product.brand).includes(queryNorm);
-                  return Boolean(ingredientMatch || productNameMatch || brandMatch);
-                });
-              }
+            CATEGORIES_IN_USE.map((catKey) => {
+              const catItems = categorizedItems[catKey] || [];
               if (catItems.length === 0) return null;
 
               const aisle = AISLE_CATEGORIES[catKey];
@@ -604,7 +618,7 @@ export function GroceryListView({
                                   e.stopPropagation();
                                   toggleSelectBulkItem(item.ingredientId);
                                 }}
-                                className={`mt-0.5 size-5 rounded-md border flex items-center justify-center transition-all ${
+                                className={`mt-0.5 size-5 rounded-md border flex items-center justify-center transition-colors ${
                                   isSelectedInBulk
                                     ? "bg-primary border-primary text-primary-foreground shadow-2xs"
                                     : "border-muted-foreground/40 hover:border-primary bg-background"
@@ -617,7 +631,7 @@ export function GroceryListView({
                               <button
                                 type="button"
                                 onClick={() => onToggleChecked(item.ingredientId)}
-                                className={`mt-0.5 size-5 rounded-md border flex items-center justify-center transition-all ${
+                                className={`mt-0.5 size-5 rounded-md border flex items-center justify-center transition-colors ${
                                   item.isChecked
                                     ? "bg-primary border-primary text-primary-foreground shadow-2xs"
                                     : "border-muted-foreground/40 hover:border-primary"

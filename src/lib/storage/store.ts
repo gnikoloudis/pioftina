@@ -520,11 +520,14 @@ export function useMealPlannerStore() {
         preferences.preferredSupermarkets
       );
 
-      setTotalCost(totals.totalCost);
-      setRemainingCost(totals.remainingCost);
-      setPurchasedCost(totals.purchasedCost);
-      setTotalSavings(totals.totalBulkSavings);
-      setBasketComparisons(comparisons);
+      // Defer secondary state updates outside of updater callback so React 19 batches them without re-entrant renders
+      queueMicrotask(() => {
+        setTotalCost(totals.totalCost);
+        setRemainingCost(totals.remainingCost);
+        setPurchasedCost(totals.purchasedCost);
+        setTotalSavings(totals.totalBulkSavings);
+        setBasketComparisons(comparisons);
+      });
 
       return updated;
     });

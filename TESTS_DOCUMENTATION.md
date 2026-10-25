@@ -3,8 +3,8 @@
 > Αυτό το έγγραφο παράγεται αυτόματα και περιλαμβάνει αναλυτικά όλα τα tests του `pioftina.gr`, τις κατηγορίες τους, τι επαληθεύει το καθένα και πώς να προσθέσετε νέα tests.
 
 - **Σύνολο Σουιτών**: 9
-- **Σύνολο Καταχωρημένων Tests**: 45
-- **Τελευταία Ενημέρωση**: 25/10/2026, 1:26:40 μ.μ.
+- **Σύνολο Καταχωρημένων Tests**: 46
+- **Τελευταία Ενημέρωση**: 25/10/2026, 1:55:19 μ.μ.
 
 ---
 
@@ -184,6 +184,7 @@ defineTest({
 | 3 | **Κρυπτογραφική υπογραφή και επικύρωση Admin Token** | `security-admin-auth-hmac-token` | 🔴 Critical | `security, admin, auth` | Ελέγχει ότι το createAdminToken δημιουργεί έγκυρο HMAC-signed token και ότι το verifyAdminToken το επικυρώνει. |
 | 4 | **Απόρριψη παραποιημένου ή ληγμένου Admin Token** | `security-admin-tampered-token-rejection` | 🔴 Critical | `security, admin` | Επιβεβαιώνει ότι οποιοδήποτε πλαστό ή αλλοιωμένο HMAC token απορρίπτεται άμεσα. |
 | 5 | **In-Memory Search Cache (10m TTL & Deduplication)** | `security-posokanei-search-cache-ttl` | 🟠 High | `posokanei, performance, cache` | Επαληθεύει ότι η search cache αποθηκεύει και ανακτά αποτελέσματα χωρίς περιττά HTTP calls. |
+| 6 | **Ασφάλεια & Προσβασιμότητα Φορμών: Έλεγχος Autofill (id, name) & Όριο 255 Χαρακτήρων** | `security-form-fields-autofill-and-length-control` | 🟠 High | `security, form-fields, autofill, input-validation, minor-finding` | Επαληθεύει ότι το πεδίο email διαθέτει μοναδικά attributes (id, name, autoComplete) για browser autofill και επιβάλλει όριο μήκους 255 χαρακτήρων σε client και server. |
 
 #### Αναλυτικές Λεπτομέρειες Ελέγχων Σουίτας:
 - **`security-rate-limiter-sliding-window` - Έλεγχος sliding-window Rate Limiter ανά IP**:
@@ -206,6 +207,10 @@ defineTest({
   - *Σκοπός*: Επαληθεύει ότι η search cache αποθηκεύει και ανακτά αποτελέσματα χωρίς περιττά HTTP calls.
   - *Τεκμηρίωση*: Ελέγχει get/set στη searchCache και επιβεβαιώνει ότι η cache επιστρέφει ακριβώς τα αποθηκευμένα αντικείμενα.
   - *Tags*: `posokanei`, `performance`, `cache`
+- **`security-form-fields-autofill-and-length-control` - Ασφάλεια & Προσβασιμότητα Φορμών: Έλεγχος Autofill (id, name) & Όριο 255 Χαρακτήρων**:
+  - *Σκοπός*: Επαληθεύει ότι το πεδίο email διαθέτει μοναδικά attributes (id, name, autoComplete) για browser autofill και επιβάλλει όριο μήκους 255 χαρακτήρων σε client και server.
+  - *Τεκμηρίωση*: Ελέγχει ότι τα form inputs διαθέτουν id, name, autoComplete='email', maxLength={255} και ότι διευθύνσεις άνω των 255 χαρακτήρων απορρίπτονται άμεσα με 400 Bad Request.
+  - *Tags*: `security`, `form-fields`, `autofill`, `input-validation`, `minor-finding`
 
 ---
 

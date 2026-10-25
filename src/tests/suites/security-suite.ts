@@ -7,6 +7,8 @@ import {
 } from "@/lib/security/admin-auth";
 import { getCachedSearch, setCachedSearch } from "@/lib/posokanei/search-cache";
 import { ProductPage } from "@/lib/posokanei/types";
+import fs from "fs/promises";
+import path from "path";
 
 export const securitySuite = defineSuite({
   id: "security-suite",
@@ -134,6 +136,43 @@ export const securitySuite = defineSuite({
         const cached = getCachedSearch(dummyKey);
         assertEquals(cached?.total, 1, "Πρέπει να επιστρέφει το αποθηκευμένο αποτέλεσμα");
         assertEquals(cached?.products[0].id, "test-prod-1", "Πρέπει να περιέχει το σωστό product id");
+      },
+    }),
+
+    defineTest({
+      id: "security-form-fields-autofill-and-length-control",
+      title: "Ασφάλεια & Προσβασιμότητα Φορμών: Έλεγχος Autofill (id, name) & Όριο 255 Χαρακτήρων",
+      category: "security",
+      description: "Επαληθεύει ότι το πεδίο email διαθέτει μοναδικά attributes (id, name, autoComplete) για browser autofill και επιβάλλει όριο μήκους 255 χαρακτήρων σε client και server.",
+      documentation: "Ελέγχει ότι τα form inputs διαθέτουν id, name, autoComplete='email', maxLength={255} και ότι διευθύνσεις άνω των 255 χαρακτήρων απορρίπτονται άμεσα με 400 Bad Request.",
+      tags: ["security", "form-fields", "autofill", "input-validation", "minor-finding"],
+      severity: "high",
+      run: async ({ fetchApi, assertEquals, assert, assertContains }) => {
+        // 1. Επαλήθευση στατικού ορισμού των πεδίων της φόρμας στο NewsletterCard
+        const componentPath = path.join(process.cwd(), "src", "components", "newsletter", "newsletter-card.tsx");
+        const code = await fs.readFile(componentPath, "utf-8");
+
+        assertContains(code, 'id="newsletter-email-input"', "Το form field πρέπει να έχει μοναδικό id attribute");
+        assertContains(code, 'name="email"', "Το form field πρέπει να έχει name attribute για σωστό autofill");
+        assertContains(code, 'autoComplete="email"', "Το form field πρέπει να υποστηρίζει browser autofill");
+        assertContains(code, "maxLength={255}", "Το form field πρέπει να απαγορεύει άνω των 255 χαρακτήρων");
+
+        // 2. Επαλήθευση server-side επικύρωσης ορίου 255 χαρακτήρων
+        const oversizedEmail = "a".repeat(250) + "@validation-sub.gr";
+        assert(oversizedEmail.length > 255, "Το payload email πρέπει να υπερβαίνει τους 255 χαρακτήρες");
+
+        const testIp = `198.51.100.${Math.floor(Math.random() * 150) + 20}`;
+        const res = await fetchApi("/api/newsletter/subscribe", {
+          method: "POST",
+          headers: {
+            "x-forwarded-for": testIp,
+          },
+          body: JSON.stringify({ email: oversizedEmail }),
+        });
+
+        assertEquals(res.status, 400, "Αίτημα με email > 255 χαρακτήρες πρέπει να απορρίπτεται με 400 Bad Request");
+        const data = await res.json();
+        assertEquals(data.success, false, "Το API πρέπει να επιστρέφει success: false");
       },
     }),
   ],

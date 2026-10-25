@@ -11,7 +11,7 @@ interface StoreComparisonWidgetProps {
   unavailableCount?: number;
 }
 
-export function StoreComparisonWidget({
+export const StoreComparisonWidget = React.memo(function StoreComparisonWidget({
   comparisons,
   totalBulkSavings,
   unavailableCount = 0,
@@ -92,7 +92,7 @@ export function StoreComparisonWidget({
           return (
             <div
               key={comp.retailerId}
-              className={`p-3 rounded-xl border transition-all ${
+              className={`p-3 rounded-xl border transition-colors ${
                 comp.isCheapest
                   ? "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-500/40 shadow-xs ring-1 ring-emerald-500/30"
                   : "bg-card border-border hover:border-border/80"
@@ -143,4 +143,4 @@ export function StoreComparisonWidget({
       </div>
     </div>
   );
-}
+});

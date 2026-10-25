@@ -273,10 +273,17 @@ function NewsletterFormCompact() {
   return (
     <form onSubmit={handleSubscribe} className="space-y-2">
       <div className="flex items-center gap-2">
+        <label htmlFor="preferences-newsletter-email" className="sr-only">
+          Διεύθυνση Email
+        </label>
         <input
+          id="preferences-newsletter-email"
+          name="email"
           type="email"
+          autoComplete="email"
+          maxLength={255}
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value.slice(0, 255))}
           placeholder="Το email σας..."
           className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-input bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 font-medium"
         />

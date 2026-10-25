@@ -52,6 +52,11 @@ export function NewsletterCard({ source = "footer" }: NewsletterCardProps) {
       return;
     }
 
+    if (email.trim().length > 255) {
+      setError("Το email δεν μπορεί να υπερβαίνει τους 255 χαρακτήρες.");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setMessage(null);
@@ -167,12 +172,20 @@ export function NewsletterCard({ source = "footer" }: NewsletterCardProps) {
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
             <div className="relative flex-1">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <label htmlFor="newsletter-email-input" className="sr-only">
+                Διεύθυνση Email
+              </label>
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" aria-hidden="true" />
               <input
+                id="newsletter-email-input"
+                name="email"
                 type="email"
+                autoComplete="email"
+                maxLength={255}
                 value={email}
                 onChange={(e) => {
-                  setEmail(e.target.value);
+                  const val = e.target.value.slice(0, 255);
+                  setEmail(val);
                   if (error) setError(null);
                 }}
                 placeholder="π.χ. maria.papadopoulou@example.gr"

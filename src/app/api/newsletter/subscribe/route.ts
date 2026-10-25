@@ -54,9 +54,9 @@ export async function POST(req: NextRequest) {
 
     const rawEmail = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
 
-    if (!rawEmail || rawEmail.length > 254 || !EMAIL_REGEX.test(rawEmail)) {
+    if (!rawEmail || rawEmail.length > 255 || !EMAIL_REGEX.test(rawEmail)) {
       return NextResponse.json(
-        { success: false, error: "Παρακαλούμε εισάγετε μια έγκυρη διεύθυνση email (μέγιστο 254 χαρακτήρες)." },
+        { success: false, error: "Παρακαλούμε εισάγετε μια έγκυρη διεύθυνση email (μέγιστο 255 χαρακτήρες)." },
         { status: 400 }
       );
     }
