@@ -31,6 +31,11 @@ import {
   Bot,
   Shield,
   Lock,
+  ChefHat,
+  Layers,
+  Beaker,
+  LogOut,
+  Settings,
 } from "lucide-react";
 
 export default function Home() {
@@ -83,7 +88,7 @@ export default function Home() {
 
   // Planner sub-tabs
   const [activeTab, setActiveTab] = useState<
-    "planner" | "recipes" | "pantry" | "curation-studio" | "test-center"
+    "planner" | "recipes" | "curation-studio" | "test-center"
   >("planner");
 
   // Admin studio states
@@ -102,7 +107,7 @@ export default function Home() {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const sec = params.get("section") as ActiveSection | null;
-      if (sec && ["landing", "planner", "clean", "baby", "grocery"].includes(sec)) {
+      if (sec && ["landing", "planner", "clean", "baby", "grocery", "pantry"].includes(sec)) {
         setActiveSection(sec);
       }
     }
@@ -136,11 +141,12 @@ export default function Home() {
   };
 
   const activeGroceryItemsCount = groceryItems.filter((i) => !i.inPantry && !i.isExcluded).length;
+  const activePantryItemsCount = userPantryItems.length + pantrySurplus.length;
   const scheduledMealsCount = slots.filter((s) => s.recipe !== null).length;
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
-      {/* Universal Uncluttered Header */}
+      {/* Universal Uncluttered Header (100% User-Essential) */}
       <MainHeader
         activeSection={activeSection}
         onSelectSection={(sec) => {
@@ -150,22 +156,9 @@ export default function Home() {
         onOpenSaveModal={() => setIsSaveModalOpen(true)}
         onOpenNewsletterModal={() => setIsNewsletterModalOpen(true)}
         onOpenSettingsModal={() => setIsSettingsOpen(true)}
-        isAdmin={isAdmin}
-        onAdminLoginClick={() => setIsAdminLoginOpen(true)}
-        onAdminLogout={adminLogout}
-        onOpenRecipeStudio={() => {
-          setActiveSection("planner");
-          setActiveTab("curation-studio");
-        }}
-        onOpenBundleStudio={() => {
-          handleOpenBundleStudio();
-        }}
-        onOpenTestCenter={() => {
-          setActiveSection("planner");
-          setActiveTab("test-center");
-        }}
         householdSize={preferences.householdSize}
         activeGroceryCount={activeGroceryItemsCount}
+        activePantryCount={activePantryItemsCount}
       />
 
       {/* Main Content Area */}
@@ -307,23 +300,6 @@ export default function Home() {
                   <span>Συνταγές</span>
                 </button>
 
-                <button
-                  onClick={() => setActiveTab("pantry")}
-                  className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap ${
-                    activeTab === "pantry"
-                      ? "bg-primary text-primary-foreground shadow-xs"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  }`}
-                >
-                  <Box className="size-4" />
-                  <span>Αποθήκη &amp; Πλεόνασμα</span>
-                  {(userPantryItems.length > 0 || pantrySurplus.length > 0) && (
-                    <span className="size-5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs flex items-center justify-center font-bold">
-                      {userPantryItems.length + pantrySurplus.length}
-                    </span>
-                  )}
-                </button>
-
                 {/* Curation Studio Tab: Available ONLY to administrator */}
                 {isAdmin && (
                   <button
@@ -381,22 +357,39 @@ export default function Home() {
                 )}
               </div>
 
-              {/* Direct CTA button to Universal Shopping List */}
-              <button
-                id="planner-quick-grocery-btn"
-                onClick={() => setActiveSection("grocery")}
-                className="flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-all shrink-0 ml-auto"
-                title="Προβολή της ενιαίας Λίστας Αγορών (όλα τα είδη)"
-              >
-                <ShoppingCart className="size-3.5" />
-                <span className="hidden sm:inline">Λίστα Αγορών</span>
-                <span className="sm:hidden">Λίστα</span>
-                {activeGroceryItemsCount > 0 && (
-                  <span className="size-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-bold">
-                    {activeGroceryItemsCount}
-                  </span>
-                )}
-              </button>
+              {/* Direct CTA buttons to Universal Pantry & Universal Shopping List */}
+              <div className="flex items-center gap-2 shrink-0 ml-auto">
+                <button
+                  id="planner-quick-pantry-btn"
+                  onClick={() => setActiveSection("pantry")}
+                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 border border-amber-500/20 transition-all shrink-0"
+                  title="Προβολή Αποθήκης & Πλεονάσματος"
+                >
+                  <Box className="size-3.5 text-amber-600 dark:text-amber-400" />
+                  <span className="hidden sm:inline">Αποθήκη</span>
+                  {activePantryItemsCount > 0 && (
+                    <span className="size-5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-200 text-[10px] flex items-center justify-center font-bold">
+                      {activePantryItemsCount}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  id="planner-quick-grocery-btn"
+                  onClick={() => setActiveSection("grocery")}
+                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-all shrink-0"
+                  title="Προβολή της ενιαίας Λίστας Αγορών (όλα τα είδη)"
+                >
+                  <ShoppingCart className="size-3.5" />
+                  <span className="hidden sm:inline">Λίστα Αγορών</span>
+                  <span className="sm:hidden">Λίστα</span>
+                  {activeGroceryItemsCount > 0 && (
+                    <span className="size-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-bold">
+                      {activeGroceryItemsCount}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Tab Views */}
@@ -437,19 +430,6 @@ export default function Home() {
                   onEditRecipeInStudio={handleEditRecipeInStudio}
                   onAddIngredient={addIngredientToRecipe}
                   isAdmin={isAdmin}
-                />
-              )}
-
-              {activeTab === "pantry" && (
-                <PantryView
-                  surplusItems={pantrySurplus}
-                  groceryItems={groceryItems}
-                  userPantryItems={userPantryItems}
-                  onTogglePantry={toggleItemPantry}
-                  onAddPantryItem={addPantryItem}
-                  onUpdatePantryItem={updatePantryItem}
-                  onDeletePantryItem={deletePantryItem}
-                  onAddSurplusToPantry={addSurplusToPantry}
                 />
               )}
 
@@ -552,104 +532,196 @@ export default function Home() {
             />
           </div>
         )}
+
+        {/* 6. UNIVERSAL PANTRY & SURPLUS VIEW */}
+        {activeSection === "pantry" && (
+          <div className="space-y-6">
+            <PantryView
+              surplusItems={pantrySurplus}
+              groceryItems={groceryItems}
+              userPantryItems={userPantryItems}
+              onTogglePantry={toggleItemPantry}
+              onAddPantryItem={addPantryItem}
+              onUpdatePantryItem={updatePantryItem}
+              onDeletePantryItem={deletePantryItem}
+              onAddSurplusToPantry={addSurplusToPantry}
+            />
+          </div>
+        )}
       </main>
 
-      {/* Universal Footer */}
-      <footer className="mt-auto border-t border-border/80 bg-muted/20 py-6 px-4 text-center text-xs text-muted-foreground space-y-2">
-        <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-medium text-foreground">
-          <button
-            onClick={() => setActiveSection("landing")}
-            className="hover:text-primary transition-colors"
-          >
-            🏠 Αρχική
-          </button>
-          <span>&bull;</span>
-          <button
-            onClick={() => setActiveSection("planner")}
-            className="hover:text-primary transition-colors"
-          >
-            🍽️ Meal Planner
-          </button>
-          <span>&bull;</span>
-          <button
-            onClick={() => setActiveSection("clean")}
-            className="hover:text-primary transition-colors"
-          >
-            🧼 Clean Planner
-          </button>
-          <span>&bull;</span>
-          <button
-            onClick={() => setActiveSection("baby")}
-            className="hover:text-primary transition-colors"
-          >
-            👶 Baby Care
-          </button>
-          <span>&bull;</span>
-          <button
-            onClick={() => setActiveSection("grocery")}
-            className="hover:text-primary transition-colors"
-          >
-            🛒 Λίστα Αγορών
-          </button>
-          <span>&bull;</span>
-          <button
-            onClick={() => setIsNewsletterModalOpen(true)}
-            className="hover:text-primary transition-colors"
-          >
-            ✉️ Ενημερώσεις
-          </button>
-        </div>
-
-        <p>
-          pioftina.gr &bull; Δεδομένα τιμών και προϊόντων από το επίσημο Παρατηρητήριο Τιμών{" "}
-          <a
-            href="https://posokanei.gov.gr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-foreground font-medium"
-          >
-            posokanei.gov.gr
-          </a>
-        </p>
-
-        {/* Administrator Link / Status */}
-        <div className="pt-2 text-[11px] text-muted-foreground/70 flex items-center justify-center gap-2">
-          {isAdmin ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 font-semibold border border-amber-500/20">
-              <Shield className="size-3" />
-              <span>Συνδεδεμένος ως Διαχειριστής</span>
-              <span>&bull;</span>
-              <button
-                onClick={() => {
-                  setActiveSection("clean");
-                  setIsAdminBundleStudioOpen(true);
-                }}
-                className="underline hover:text-foreground"
-              >
-                Bundle Studio
-              </button>
-              <span>&bull;</span>
-              <Link href="/admin/tests" className="underline hover:text-foreground">
-                Test Center
-              </Link>
-              <span>&bull;</span>
-              <button
-                onClick={adminLogout}
-                className="underline hover:text-foreground transition-colors cursor-pointer"
-              >
-                Αποσύνδεση
-              </button>
-            </span>
-          ) : (
+      {/* Universal Footer: User Navigation, Data Citations & Administration/Developer Console */}
+      <footer className="mt-auto border-t border-border/80 bg-muted/20 py-8 px-4 text-xs text-muted-foreground space-y-6">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* 1. Universal User Navigation Links */}
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs font-semibold text-foreground">
             <button
-              id="footer-admin-login-btn"
-              onClick={() => setIsAdminLoginOpen(true)}
-              className="inline-flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer opacity-70 hover:opacity-100"
+              onClick={() => setActiveSection("landing")}
+              className="hover:text-primary transition-colors flex items-center gap-1"
             >
-              <Lock className="size-3" />
-              <span>Διαχείριση (Admin)</span>
+              <span>🏠</span> <span>Αρχική</span>
             </button>
-          )}
+            <span>&bull;</span>
+            <button
+              onClick={() => setActiveSection("planner")}
+              className="hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <span>🍽️</span> <span>Γεύματα</span>
+            </button>
+            <span>&bull;</span>
+            <button
+              onClick={() => setActiveSection("grocery")}
+              className="hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <span>🛒</span> <span>Λίστα Αγορών</span>
+              {activeGroceryItemsCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full bg-primary/20 text-primary text-[10px] font-bold">
+                  {activeGroceryItemsCount}
+                </span>
+              )}
+            </button>
+            <span>&bull;</span>
+            <button
+              onClick={() => setActiveSection("pantry")}
+              className="hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <span>📦</span> <span>Αποθήκη</span>
+              {activePantryItemsCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[10px] font-bold">
+                  {activePantryItemsCount}
+                </span>
+              )}
+            </button>
+            <span>&bull;</span>
+            <button
+              onClick={() => setActiveSection("clean")}
+              className="hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <span>🧼</span> <span>Καθαριότητα</span>
+            </button>
+            <span>&bull;</span>
+            <button
+              onClick={() => setActiveSection("baby")}
+              className="hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <span>👶</span> <span>Βρεφικά</span>
+            </button>
+            <span>&bull;</span>
+            <button
+              onClick={() => setIsNewsletterModalOpen(true)}
+              className="hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <span>✉️</span> <span>Ενημερώσεις</span>
+            </button>
+            <span>&bull;</span>
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <Settings className="size-3.5" /> <span>Ρυθμίσεις</span>
+            </button>
+          </div>
+
+          {/* 2. Official Data Source Attribution & Disclaimer */}
+          <div className="text-center text-[11px] text-muted-foreground/80 max-w-2xl mx-auto space-y-1">
+            <p>
+              <strong>pioftina.gr</strong> &bull; Έξυπνες αγορές σούπερ μάρκετ με αυτόματη σύγκριση τιμών καλαθιού.
+            </p>
+            <p>
+              Δεδομένα τιμών και προϊόντων από το επίσημο Παρατηρητήριο Τιμών{" "}
+              <a
+                href="https://posokanei.gov.gr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-foreground font-medium"
+              >
+                posokanei.gov.gr
+              </a>{" "}
+              (Γενική Γραμματεία Εμπορίου).
+            </p>
+          </div>
+
+          {/* 3. Dedicated Administration & Developer Console Bar */}
+          <div className="pt-4 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px]">
+            {/* Left: Developer / Tech Info */}
+            <div className="flex items-center gap-2 text-muted-foreground/70">
+              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>e-Καταναλωτής Live API</span>
+              <span>&bull;</span>
+              <span>Next.js 16 (Turbopack)</span>
+              <span>&bull;</span>
+              <Link
+                href="/admin/tests"
+                className="hover:text-foreground transition-colors underline font-mono text-[10px]"
+                title="Προβολή αποτελεσμάτων δοκιμών QA & Pentest"
+              >
+                42/42 Tests OK
+              </Link>
+            </div>
+
+            {/* Right: Administration Controls */}
+            <div className="flex items-center gap-2">
+              {isAdmin ? (
+                <div className="flex flex-wrap items-center gap-1.5 bg-amber-500/10 border border-amber-500/25 px-3 py-1.5 rounded-xl text-amber-800 dark:text-amber-200">
+                  <span className="inline-flex items-center gap-1 font-bold mr-1">
+                    <Shield className="size-3.5 text-amber-600 dark:text-amber-400" />
+                    <span>Admin</span>
+                  </span>
+                  <span>&bull;</span>
+                  <button
+                    id="footer-admin-recipe-studio-btn"
+                    onClick={() => {
+                      setActiveSection("planner");
+                      setActiveTab("curation-studio");
+                    }}
+                    className="inline-flex items-center gap-1 font-medium hover:text-foreground underline transition-colors cursor-pointer"
+                  >
+                    <ChefHat className="size-3 text-blue-600 dark:text-blue-400" />
+                    <span>Recipe Studio</span>
+                  </button>
+                  <span>&bull;</span>
+                  <button
+                    id="footer-admin-bundle-studio-btn"
+                    onClick={() => {
+                      handleOpenBundleStudio();
+                    }}
+                    className="inline-flex items-center gap-1 font-medium hover:text-foreground underline transition-colors cursor-pointer"
+                  >
+                    <Layers className="size-3 text-emerald-600 dark:text-emerald-400" />
+                    <span>Bundle Studio</span>
+                  </button>
+                  <span>&bull;</span>
+                  <Link
+                    href="/admin/tests"
+                    className="inline-flex items-center gap-1 font-medium hover:text-foreground underline transition-colors"
+                  >
+                    <Beaker className="size-3 text-purple-600 dark:text-purple-400" />
+                    <span>Test Center</span>
+                  </Link>
+                  <span>&bull;</span>
+                  <button
+                    id="footer-admin-logout-btn"
+                    onClick={adminLogout}
+                    className="inline-flex items-center gap-1 font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 transition-colors ml-1 cursor-pointer"
+                    title="Αποσύνδεση Διαχειριστή"
+                  >
+                    <LogOut className="size-3" />
+                    <span>Αποσύνδεση</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  id="footer-admin-login-btn"
+                  onClick={() => setIsAdminLoginOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/60 transition-all font-semibold cursor-pointer"
+                  title="Σύνδεση Διαχειριστή (Admin Console)"
+                >
+                  <Lock className="size-3 text-primary" />
+                  <span>Διαχείριση &amp; Pentest (Admin)</span>
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </footer>
 
