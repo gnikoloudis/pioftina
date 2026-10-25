@@ -2,9 +2,9 @@
 
 > Αυτό το έγγραφο παράγεται αυτόματα και περιλαμβάνει αναλυτικά όλα τα tests του `pioftina.gr`, τις κατηγορίες τους, τι επαληθεύει το καθένα και πώς να προσθέσετε νέα tests.
 
-- **Σύνολο Σουιτών**: 7
-- **Σύνολο Καταχωρημένων Tests**: 28
-- **Τελευταία Ενημέρωση**: 24/10/2026, 6:07:02 μ.μ.
+- **Σύνολο Σουιτών**: 8
+- **Σύνολο Καταχωρημένων Tests**: 36
+- **Τελευταία Ενημέρωση**: 24/10/2026, 7:19:23 μ.μ.
 
 ---
 
@@ -174,6 +174,8 @@ defineTest({
 | 3 | **Προστασία DELETE /api/recipes από μη εξουσιοδοτημένους χρήστες** | `api-recipes-delete-unauthorized-rejection` | 🟠 High | `security, api` | Επιβεβαιώνει ότι διαγραφή συνταγής απαιτεί αυστηρά δικαιώματα διαχειριστή. |
 | 4 | **Εγγραφή στο Newsletter με έγκυρο email** | `api-newsletter-subscribe-valid-email` | 🟠 High | `newsletter, api` | Επαληθεύει ότι αποστέλλοντας έγκυρο email στο /api/newsletter/subscribe λαμβάνουμε 200 OK. |
 | 5 | **Απόρριψη άκυρης διεύθυνσης email στο Newsletter** | `api-newsletter-subscribe-invalid-email-rejection` | 🟡 Medium | `newsletter, validation` | Ελέγχει ότι μορφές όπως 'invalid-email', 'user@', '@domain.com' απορρίπτονται με 400 Bad Request. |
+| 6 | **Δημόσια αναζήτηση προϊόντων με GET /api/posokanei/search?q=...** | `api-posokanei-search-get-query` | 🔴 Critical | `posokanei, search, api` | Επαληθεύει ότι το GET endpoint αναζήτησης προϊόντων ανταποκρίνεται με 200 OK και επιστρέφει JSON αποτελέσματα. |
+| 7 | **Απόρριψη κενής παραμέτρου αναζήτησης στο GET /api/posokanei/search** | `api-posokanei-search-get-empty-rejection` | 🟡 Medium | `posokanei, validation, api` | Ελέγχει ότι κλήση GET χωρίς query string 'q' ή 'title' απορρίπτεται με 400 Bad Request. |
 
 #### Αναλυτικές Λεπτομέρειες Ελέγχων Σουίτας:
 - **`api-recipes-get-public` - Δημόσια πρόσβαση στο GET /api/recipes**:
@@ -196,6 +198,14 @@ defineTest({
   - *Σκοπός*: Ελέγχει ότι μορφές όπως 'invalid-email', 'user@', '@domain.com' απορρίπτονται με 400 Bad Request.
   - *Τεκμηρίωση*: Στέλνει POST με άκυρο email string και επιβεβαιώνει ότι δεν αποθηκεύεται τίποτα.
   - *Tags*: `newsletter`, `validation`
+- **`api-posokanei-search-get-query` - Δημόσια αναζήτηση προϊόντων με GET /api/posokanei/search?q=...**:
+  - *Σκοπός*: Επαληθεύει ότι το GET endpoint αναζήτησης προϊόντων ανταποκρίνεται με 200 OK και επιστρέφει JSON αποτελέσματα.
+  - *Τεκμηρίωση*: Εκτελεί GET /api/posokanei/search?q=Ariel και ελέγχει status 200 και ύπαρξη πίνακα προϊόντων.
+  - *Tags*: `posokanei`, `search`, `api`
+- **`api-posokanei-search-get-empty-rejection` - Απόρριψη κενής παραμέτρου αναζήτησης στο GET /api/posokanei/search**:
+  - *Σκοπός*: Ελέγχει ότι κλήση GET χωρίς query string 'q' ή 'title' απορρίπτεται με 400 Bad Request.
+  - *Τεκμηρίωση*: Στέλνει GET /api/posokanei/search χωρίς παραμέτρους και επαληθεύει status 400.
+  - *Tags*: `posokanei`, `validation`, `api`
 
 ---
 
@@ -246,6 +256,46 @@ defineTest({
   - *Σκοπός*: Επαληθεύει ότι τα δεδομένα πλάνου και ρυθμίσεων μπορούν να σειριοποιηθούν σε JSON χωρίς circular references.
   - *Τεκμηρίωση*: Το JSON backup επιτρέπει την τοπική αποθήκευση του πλήρους configuration του χρήστη.
   - *Tags*: `export`, `json`, `backup`
+
+---
+
+### 📁 Clean Planner & Baby Care Bundles (`api`)
+*Ελέγχει τα πακέτα καθαριότητας και βρεφικών ειδών, τον υπολογισμό τιμών ανά σούπερ μάρκετ και την προστασία διαχείρισης διαχειριστή.*
+
+| # | Τίτλος Ελέγχου | ID | Βαρύτητα | Tags | Περιγραφή |
+|---|---|---|---|---|---|
+| 1 | **Δημόσια ανάκτηση πακέτων (Clean Planner & Baby Care)** | `bundles-get-public` | 🔴 Critical | `smoke, bundles, api` | Επιβεβαιώνει ότι οποιοσδήποτε επισκέπτης μπορεί να διαβάσει τα δημοσιευμένα bundles. |
+| 2 | **Φιλτράρισμα πακέτων Clean Planner (category=cleaning)** | `bundles-filter-cleaning` | 🟠 High | `bundles, cleaning` | Επιβεβαιώνει ότι το φιλτράρισμα ?category=cleaning επιστρέφει αυστηρά πακέτα καθαριότητας. |
+| 3 | **Φιλτράρισμα πακέτων Baby Care (category=baby)** | `bundles-filter-baby` | 🟠 High | `bundles, baby` | Επιβεβαιώνει ότι το φιλτράρισμα ?category=baby επιστρέφει αυστηρά βρεφικά πακέτα. |
+| 4 | **Υπολογισμός τιμών ανά Σούπερ Μάρκετ & εύρεση φθηνότερου καταστήματος** | `bundles-pricing-matrix` | 🟠 High | `optimizer, bundles, posokanei` | Επιβεβαιώνει ότι κάθε πακέτο διαθέτει υπολογισμένο πίνακα τιμών και έγκυρο bestStoreId. |
+| 5 | **Προστασία POST /api/bundles από μη εξουσιοδοτημένους χρήστες** | `bundles-post-unauthorized-rejection` | 🔴 Critical | `security, admin, bundles` | Επιβεβαιώνει ότι δημιουργία ή τροποποίηση πακέτου απαιτεί αυστηρά δικαιώματα διαχειριστή. |
+| 6 | **Προστασία DELETE /api/bundles από μη εξουσιοδοτημένους χρήστες** | `bundles-delete-unauthorized-rejection` | 🔴 Critical | `security, admin, bundles` | Επιβεβαιώνει ότι διαγραφή πακέτου απαιτεί αυστηρά δικαιώματα διαχειριστή. |
+
+#### Αναλυτικές Λεπτομέρειες Ελέγχων Σουίτας:
+- **`bundles-get-public` - Δημόσια ανάκτηση πακέτων (Clean Planner & Baby Care)**:
+  - *Σκοπός*: Επιβεβαιώνει ότι οποιοσδήποτε επισκέπτης μπορεί να διαβάσει τα δημοσιευμένα bundles.
+  - *Τεκμηρίωση*: Εκτελεί GET /api/bundles και ελέγχει ότι επιστρέφει status 200 και τουλάχιστον 6 έτοιμα πακέτα.
+  - *Tags*: `smoke`, `bundles`, `api`
+- **`bundles-filter-cleaning` - Φιλτράρισμα πακέτων Clean Planner (category=cleaning)**:
+  - *Σκοπός*: Επιβεβαιώνει ότι το φιλτράρισμα ?category=cleaning επιστρέφει αυστηρά πακέτα καθαριότητας.
+  - *Τεκμηρίωση*: Εκτελεί GET /api/bundles?category=cleaning και ελέγχει ότι όλα τα επιστρεφόμενα πακέτα έχουν category 'cleaning'.
+  - *Tags*: `bundles`, `cleaning`
+- **`bundles-filter-baby` - Φιλτράρισμα πακέτων Baby Care (category=baby)**:
+  - *Σκοπός*: Επιβεβαιώνει ότι το φιλτράρισμα ?category=baby επιστρέφει αυστηρά βρεφικά πακέτα.
+  - *Τεκμηρίωση*: Εκτελεί GET /api/bundles?category=baby και ελέγχει ότι όλα τα επιστρεφόμενα πακέτα έχουν category 'baby'.
+  - *Tags*: `bundles`, `baby`
+- **`bundles-pricing-matrix` - Υπολογισμός τιμών ανά Σούπερ Μάρκετ & εύρεση φθηνότερου καταστήματος**:
+  - *Σκοπός*: Επιβεβαιώνει ότι κάθε πακέτο διαθέτει υπολογισμένο πίνακα τιμών και έγκυρο bestStoreId.
+  - *Τεκμηρίωση*: Ελέγχει ότι το storePrices περιλαμβάνει τα 5 παρακολουθούμενα σούπερ μάρκετ και το estimatedTotalEur αντιστοιχεί στο φθηνότερο διαθέσιμο.
+  - *Tags*: `optimizer`, `bundles`, `posokanei`
+- **`bundles-post-unauthorized-rejection` - Προστασία POST /api/bundles από μη εξουσιοδοτημένους χρήστες**:
+  - *Σκοπός*: Επιβεβαιώνει ότι δημιουργία ή τροποποίηση πακέτου απαιτεί αυστηρά δικαιώματα διαχειριστή.
+  - *Τεκμηρίωση*: Στέλνει POST /api/bundles χωρίς admin credentials και επιβεβαιώνει status 401 Unauthorized.
+  - *Tags*: `security`, `admin`, `bundles`
+- **`bundles-delete-unauthorized-rejection` - Προστασία DELETE /api/bundles από μη εξουσιοδοτημένους χρήστες**:
+  - *Σκοπός*: Επιβεβαιώνει ότι διαγραφή πακέτου απαιτεί αυστηρά δικαιώματα διαχειριστή.
+  - *Τεκμηρίωση*: Στέλνει DELETE /api/bundles?id=bundle-clean-monthly-family χωρίς admin credentials και επιβεβαιώνει status 401.
+  - *Tags*: `security`, `admin`, `bundles`
 
 ---
 

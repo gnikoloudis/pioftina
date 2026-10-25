@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   OptimizedGroceryItem,
   BasketComparison,
@@ -31,6 +31,9 @@ import {
   EyeOff,
   RotateCcw,
   Download,
+  X,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -45,10 +48,14 @@ interface GroceryListViewProps {
   onToggleChecked: (ingredientId: string) => void;
   onTogglePantry: (ingredientId: string) => void;
   onToggleExcluded?: (ingredientId: string) => void;
+  onExcludeMultiple?: (ingredientIds: string[]) => void;
+  onRestoreExcludedItems?: (ingredientIds: string[]) => void;
   onRestoreAllExcluded?: () => void;
+  onClearExcludedPermanently?: () => void;
   onUpdateItemOption: (ingredientId: string, option: PackOption) => void;
   onCurateProduct?: (ingredientId: string, product: Product) => void;
   onOpenSaveModal?: () => void;
+  onClearGroceryList?: (options?: { clearSlots?: boolean }) => void;
 }
 
 export function GroceryListView({
@@ -62,17 +69,37 @@ export function GroceryListView({
   onToggleChecked,
   onTogglePantry,
   onToggleExcluded,
+  onExcludeMultiple,
+  onRestoreExcludedItems,
   onRestoreAllExcluded,
+  onClearExcludedPermanently,
   onUpdateItemOption,
   onCurateProduct,
   onOpenSaveModal,
+  onClearGroceryList,
 }: GroceryListViewProps) {
   const [selectedItemForModal, setSelectedItemForModal] =
     useState<OptimizedGroceryItem | null>(null);
   const [curatingItem, setCuratingItem] = useState<OptimizedGroceryItem | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [hideChecked, setHideChecked] = useState(false);
   const [collapsedAisles, setCollapsedAisles] = useState<string[]>([]);
+  const [isBulkMode, setIsBulkMode] = useState(false);
+  const [selectedBulkIds, setSelectedBulkIds] = useState<string[]>([]);
+  const [undoToast, setUndoToast] = useState<{
+    ids: string[];
+    message: string;
+  } | null>(null);
+
+  // Auto-dismiss undo toast after 6 seconds
+  useEffect(() => {
+    if (!undoToast) return;
+    const timer = setTimeout(() => {
+      setUndoToast(null);
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [undoToast]);
 
   // Calculate progress & active items (excluding pantry and deleted/excluded items)
   const activeItems = items.filter((i) => !i.inPantry && !i.isExcluded);
@@ -97,6 +124,97 @@ export function GroceryListView({
         ? prev.filter((k) => k !== categoryKey)
         : [...prev, categoryKey]
     );
+  };
+
+  // Single-item removal with instant Undo toast
+  const handleRemoveSingleItem = (item: OptimizedGroceryItem) => {
+    if (onToggleExcluded) {
+      onToggleExcluded(item.ingredientId);
+      setSelectedBulkIds((prev) => prev.filter((id) => id !== item.ingredientId));
+      setUndoToast({
+        ids: [item.ingredientId],
+        message: `Το είδος «${item.ingredientName}» αφαιρέθηκε από τη λίστα`,
+      });
+    }
+  };
+
+  // Bulk removal helper
+  const handleRemoveMultiple = (ids: string[], label: string) => {
+    if (ids.length === 0) return;
+    if (onExcludeMultiple) {
+      onExcludeMultiple(ids);
+    } else if (onToggleExcluded) {
+      ids.forEach((id) => onToggleExcluded(id));
+    }
+    setSelectedBulkIds([]);
+    setUndoToast({
+      ids,
+      message: label,
+    });
+  };
+
+  // Quick action: Remove all purchased/checked items
+  const handleRemoveCheckedItems = () => {
+    const checkedIds = activeItems.filter((i) => i.isChecked).map((i) => i.ingredientId);
+    if (checkedIds.length === 0) return;
+    handleRemoveMultiple(
+      checkedIds,
+      `${checkedIds.length} ${checkedIds.length === 1 ? "αγορασμένο είδος αφαιρέθηκε" : "αγορασμένα είδη αφαιρέθηκαν"}`
+    );
+  };
+
+  // Bulk select toggles
+  const toggleSelectBulkItem = (id: string) => {
+    setSelectedBulkIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAllCategory = (catItems: OptimizedGroceryItem[]) => {
+    const catIds = catItems.map((i) => i.ingredientId);
+    const allSelected = catIds.every((id) => selectedBulkIds.includes(id));
+    if (allSelected) {
+      setSelectedBulkIds((prev) => prev.filter((id) => !catIds.includes(id)));
+    } else {
+      setSelectedBulkIds((prev) => Array.from(new Set([...prev, ...catIds])));
+    }
+  };
+
+  const handleSelectAll = () => {
+    if (selectedBulkIds.length === activeItems.length) {
+      setSelectedBulkIds([]);
+    } else {
+      setSelectedBulkIds(activeItems.map((i) => i.ingredientId));
+    }
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedBulkIds.length === 0) return;
+    const count = selectedBulkIds.length;
+    handleRemoveMultiple(
+      selectedBulkIds,
+      `${count} ${count === 1 ? "επιλεγμένο είδος αφαιρέθηκε" : "επιλεγμένα είδη αφαιρέθηκαν"}`
+    );
+    setIsBulkMode(false);
+  };
+
+  const handleRemoveCategory = (catKey: AisleCategory, catItems: OptimizedGroceryItem[]) => {
+    const catIds = catItems.map((i) => i.ingredientId);
+    const aisleName = AISLE_CATEGORIES[catKey]?.nameEl || "κατηγορία";
+    handleRemoveMultiple(
+      catIds,
+      `Όλα τα είδη (${catIds.length}) από «${aisleName}» αφαιρέθηκαν`
+    );
+  };
+
+  const handleUndo = () => {
+    if (!undoToast) return;
+    if (onRestoreExcludedItems) {
+      onRestoreExcludedItems(undoToast.ids);
+    } else if (onToggleExcluded) {
+      undoToast.ids.forEach((id) => onToggleExcluded(id));
+    }
+    setUndoToast(null);
   };
 
   // Group items by category
@@ -143,6 +261,39 @@ export function GroceryListView({
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+          {checkedCount > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              id="btn-remove-checked-items"
+              onClick={handleRemoveCheckedItems}
+              className="text-xs gap-1.5 border-rose-500/40 hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold animate-in fade-in"
+              title="Διαγραφή όλων των αγορασμένων ειδών από τη λίστα"
+            >
+              <Trash2 className="size-3.5" />
+              <span>Διαγραφή Αγορασμένων ({checkedCount})</span>
+            </Button>
+          )}
+
+          <Button
+            variant={isBulkMode ? "default" : "outline"}
+            size="sm"
+            id="btn-toggle-bulk-mode"
+            onClick={() => {
+              setIsBulkMode(!isBulkMode);
+              if (isBulkMode) setSelectedBulkIds([]);
+            }}
+            className={`text-xs gap-1.5 ${
+              isBulkMode
+                ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                : "text-foreground hover:bg-muted font-medium"
+            }`}
+            title="Ενεργοποίηση λειτουργίας μαζικής επιλογής και διαγραφής"
+          >
+            <CheckSquare className="size-3.5" />
+            <span>{isBulkMode ? "Ακύρωση Επιλογής" : "Μαζική Επιλογή"}</span>
+          </Button>
+
           <Button
             variant="outline"
             size="sm"
@@ -175,6 +326,20 @@ export function GroceryListView({
             <Share2 className="size-3.5" />
             Κοινοποίηση
           </Button>
+
+          {onClearGroceryList && (
+            <Button
+              variant="outline"
+              size="sm"
+              id="btn-clear-grocery-list"
+              onClick={() => setIsResetModalOpen(true)}
+              className="text-xs gap-1.5 border-rose-500/30 hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold"
+              title="Επαναφορά και καθαρισμός της λίστας αγορών"
+            >
+              <Trash2 className="size-3.5" />
+              <span>Καθαρισμός Λίστας</span>
+            </Button>
+          )}
         </div>
       </div>
 
@@ -247,13 +412,55 @@ export function GroceryListView({
                     </span>
                   </div>
 
-                  <button className="text-muted-foreground">
-                    {isCollapsed ? (
-                      <ChevronDown className="size-4" />
-                    ) : (
-                      <ChevronUp className="size-4" />
+                  <div className="flex items-center gap-2">
+                    {isBulkMode && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleSelectAllCategory(catItems);
+                        }}
+                        className="px-2 py-1 rounded-lg text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors flex items-center gap-1"
+                        title={
+                          catItems.every((i) => selectedBulkIds.includes(i.ingredientId))
+                            ? "Αποεπιλογή όλων στην κατηγορία"
+                            : "Επιλογή όλων στην κατηγορία"
+                        }
+                      >
+                        {catItems.every((i) => selectedBulkIds.includes(i.ingredientId)) ? (
+                          <>
+                            <CheckSquare className="size-3" />
+                            <span>Αποεπιλογή ({catItems.length})</span>
+                          </>
+                        ) : (
+                          <>
+                            <Square className="size-3" />
+                            <span>Επιλογή ({catItems.length})</span>
+                          </>
+                        )}
+                      </button>
                     )}
-                  </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveCategory(catKey, catItems);
+                      }}
+                      className="p-1.5 rounded-lg text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 transition-colors"
+                      title={`Αφαίρεση όλων των ειδών της κατηγορίας «${aisle.nameEl}»`}
+                    >
+                      <Trash2 className="size-3.5" />
+                    </button>
+
+                    <span className="text-muted-foreground pl-1">
+                      {isCollapsed ? (
+                        <ChevronDown className="size-4" />
+                      ) : (
+                        <ChevronUp className="size-4" />
+                      )}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Items List */}
@@ -268,29 +475,54 @@ export function GroceryListView({
                         (opt?.totalPrice || 0) <= 0;
                       const hasBulk = !isUnavailable && (opt?.isBulk || (opt?.savingsVsSmallestPercent || 0) > 0);
 
+                      const isSelectedInBulk = selectedBulkIds.includes(item.ingredientId);
+
                       return (
                         <div
                           key={item.ingredientId}
+                          onClick={isBulkMode ? () => toggleSelectBulkItem(item.ingredientId) : undefined}
                           className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors ${
-                            item.isChecked
+                            isBulkMode && isSelectedInBulk
+                              ? "bg-primary/10 border-l-4 border-l-primary"
+                              : item.isChecked
                               ? "bg-muted/30 opacity-60"
                               : isUnavailable
                               ? "bg-amber-500/[0.02] hover:bg-amber-500/[0.05]"
                               : "hover:bg-muted/10"
-                          }`}
+                          } ${isBulkMode ? "cursor-pointer select-none" : ""}`}
                         >
                           {/* Left: Checkbox & Name */}
                           <div className="flex items-start gap-3 flex-1 min-w-0">
-                            <button
-                              onClick={() => onToggleChecked(item.ingredientId)}
-                              className={`mt-0.5 size-5 rounded-md border flex items-center justify-center transition-all ${
-                                item.isChecked
-                                  ? "bg-primary border-primary text-primary-foreground shadow-2xs"
-                                  : "border-muted-foreground/40 hover:border-primary"
-                              }`}
-                            >
-                              {item.isChecked && <Check className="size-3.5" />}
-                            </button>
+                            {isBulkMode ? (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleSelectBulkItem(item.ingredientId);
+                                }}
+                                className={`mt-0.5 size-5 rounded-md border flex items-center justify-center transition-all ${
+                                  isSelectedInBulk
+                                    ? "bg-primary border-primary text-primary-foreground shadow-2xs"
+                                    : "border-muted-foreground/40 hover:border-primary bg-background"
+                                }`}
+                                title={isSelectedInBulk ? "Αποεπιλογή" : "Επιλογή"}
+                              >
+                                {isSelectedInBulk && <Check className="size-3.5" />}
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => onToggleChecked(item.ingredientId)}
+                                className={`mt-0.5 size-5 rounded-md border flex items-center justify-center transition-all ${
+                                  item.isChecked
+                                    ? "bg-primary border-primary text-primary-foreground shadow-2xs"
+                                    : "border-muted-foreground/40 hover:border-primary"
+                                }`}
+                                title={item.isChecked ? "Σημειώθηκε ως αγορασμένο" : "Σημείωση ως αγορασμένο"}
+                              >
+                                {item.isChecked && <Check className="size-3.5" />}
+                              </button>
+                            )}
 
                             <div className="space-y-1 min-w-0 flex-1">
                               <div className="flex items-center gap-2 flex-wrap">
@@ -437,9 +669,14 @@ export function GroceryListView({
                               {/* Delete / Exclude button */}
                               {onToggleExcluded && (
                                 <button
-                                  onClick={() => onToggleExcluded(item.ingredientId)}
-                                  className="p-1.5 text-muted-foreground hover:text-rose-500 rounded-md transition-colors"
-                                  title="Διαγραφή / Εξαίρεση από τη λίστα αγορών"
+                                  type="button"
+                                  id={`btn-remove-item-${item.ingredientId}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRemoveSingleItem(item);
+                                  }}
+                                  className="p-1.5 text-muted-foreground/60 hover:text-rose-600 hover:bg-rose-500/10 rounded-md transition-colors"
+                                  title="Αφαίρεση από τη λίστα αγορών"
                                 >
                                   <Trash2 className="size-3.5" />
                                 </button>
@@ -467,16 +704,29 @@ export function GroceryListView({
                 Εξαιρεμένα είδη ({excludedItems.length})
               </span>
             </div>
-            {onRestoreAllExcluded && (
-              <Button
-                variant="ghost"
-                size="xs"
-                onClick={onRestoreAllExcluded}
-                className="text-xs text-primary hover:underline h-7"
-              >
-                Επαναφορά όλων
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {onClearExcludedPermanently && (
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  onClick={onClearExcludedPermanently}
+                  className="text-xs text-rose-600 hover:bg-rose-500/10 h-7"
+                  title="Οριστική διαγραφή όλων των εξαιρεμένων ειδών"
+                >
+                  Οριστικός Καθαρισμός
+                </Button>
+              )}
+              {onRestoreAllExcluded && (
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  onClick={onRestoreAllExcluded}
+                  className="text-xs text-primary hover:underline h-7"
+                >
+                  Επαναφορά όλων
+                </Button>
+              )}
+            </div>
           </div>
           <div className="mt-2.5 divide-y divide-border/40">
             {excludedItems.map((item) => (
@@ -546,6 +796,167 @@ export function GroceryListView({
           items={items}
           totalCost={totalCost}
         />
+      )}
+
+      {/* Reset & Clean Confirmation Modal */}
+      {isResetModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
+          <div className="relative w-full max-w-md rounded-2xl bg-card border border-border shadow-2xl p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="size-8 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                  <Trash2 className="size-4" />
+                </div>
+                <h3 className="text-base font-bold text-foreground">
+                  Καθαρισμός &amp; Επαναφορά Λίστας
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsResetModalOpen(false)}
+                className="size-7 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Επιλέξτε τον τρόπο με τον οποίο επιθυμείτε να επαναφέρετε τη λίστα αγορών σας:
+            </p>
+
+            <div className="space-y-2.5">
+              {/* Option 1: Clean bundles & uncheck items, keep meal plan slots */}
+              <button
+                type="button"
+                id="btn-confirm-clear-bundles"
+                onClick={() => {
+                  if (onClearGroceryList) onClearGroceryList({ clearSlots: false });
+                  setIsResetModalOpen(false);
+                }}
+                className="w-full text-left p-3.5 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all space-y-1 group cursor-pointer"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-foreground group-hover:text-primary">
+                    1. Καθαρισμός Πακέτων &amp; Επαναφορά Τικ
+                  </span>
+                  <RotateCcw className="size-3.5 text-muted-foreground group-hover:text-primary" />
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Αφαιρεί τα πρόσθετα πακέτα καθαριότητας &amp; βρεφικών, ξε-τικάρει όλα τα αγορασμένα είδη και διατηρεί τα εβδομαδιαία γεύματά σας.
+                </p>
+              </button>
+
+              {/* Option 2: Full reset everything */}
+              <button
+                type="button"
+                id="btn-confirm-reset-all"
+                onClick={() => {
+                  if (onClearGroceryList) onClearGroceryList({ clearSlots: true });
+                  setIsResetModalOpen(false);
+                }}
+                className="w-full text-left p-3.5 rounded-xl border border-rose-500/30 hover:border-rose-500 hover:bg-rose-500/5 transition-all space-y-1 group cursor-pointer"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-rose-600 dark:text-rose-400">
+                    2. Πλήρης Επαναφορά Όλων (Γεύματα &amp; Λίστα)
+                  </span>
+                  <Trash2 className="size-3.5 text-rose-500" />
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Καθαρίζει ολόκληρο το εβδομαδιαίο πλάνο γευμάτων και αδειάζει πλήρως τη λίστα αγορών για νέο ξεκίνημα.
+                </p>
+              </button>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsResetModalOpen(false)}
+                className="text-xs rounded-xl"
+              >
+                Ακύρωση
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Floating Bulk Action Bar */}
+      {isBulkMode && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-xl bg-card/95 backdrop-blur-md border border-border shadow-2xl rounded-2xl p-3.5 flex items-center justify-between gap-3 animate-in slide-in-from-bottom-4 duration-200">
+          <div className="flex items-center gap-2">
+            <span className="size-2.5 rounded-full bg-primary animate-pulse" />
+            <span className="text-xs font-bold text-foreground">
+              {selectedBulkIds.length} από {activeItems.length} επιλεγμένα
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="xs"
+              onClick={handleSelectAll}
+              className="text-xs text-muted-foreground hover:text-foreground h-8"
+            >
+              {selectedBulkIds.length === activeItems.length && activeItems.length > 0
+                ? "Αποεπιλογή"
+                : "Επιλογή Όλων"}
+            </Button>
+            <Button
+              variant="default"
+              size="xs"
+              disabled={selectedBulkIds.length === 0}
+              onClick={handleDeleteSelected}
+              className="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs h-8 gap-1.5 shadow-xs disabled:opacity-50"
+            >
+              <Trash2 className="size-3.5" />
+              <span>Διαγραφή ({selectedBulkIds.length})</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => {
+                setIsBulkMode(false);
+                setSelectedBulkIds([]);
+              }}
+              className="text-xs h-8"
+              title="Κλείσιμο λειτουργίας μαζικής επιλογής"
+            >
+              <X className="size-3.5" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Undo Toast */}
+      {undoToast && (
+        <div className="fixed bottom-6 right-6 z-50 max-w-md bg-card text-card-foreground border border-border/80 shadow-2xl rounded-2xl p-3.5 flex items-center justify-between gap-3 animate-in slide-in-from-bottom-2 fade-in duration-200">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="size-7 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+              <Trash2 className="size-3.5" />
+            </div>
+            <p className="text-xs font-medium truncate text-foreground">
+              {undoToast.message}
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              id="btn-undo-toast"
+              onClick={handleUndo}
+              className="px-2.5 py-1 rounded-lg bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-colors flex items-center gap-1 cursor-pointer shadow-xs"
+            >
+              <RotateCcw className="size-3" />
+              <span>Αναίρεση</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setUndoToast(null)}
+              className="p-1 rounded-lg hover:bg-muted text-muted-foreground transition-colors"
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

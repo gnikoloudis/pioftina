@@ -68,8 +68,12 @@ export const apiRoutesSuite = defineSuite({
       severity: "high",
       run: async ({ fetchApi, assertEquals, assert }) => {
         const uniqueEmail = `test-user-${Date.now()}@example.com`;
+        const testIp = `198.51.100.${Math.floor(Math.random() * 100) + 10}`;
         const res = await fetchApi("/api/newsletter/subscribe", {
           method: "POST",
+          headers: {
+            "x-forwarded-for": testIp,
+          },
           body: JSON.stringify({
             email: uniqueEmail,
             topics: ["deals", "recipes"],
@@ -92,14 +96,47 @@ export const apiRoutesSuite = defineSuite({
       tags: ["newsletter", "validation"],
       severity: "medium",
       run: async ({ fetchApi, assertEquals }) => {
+        const testIp = `198.51.100.${Math.floor(Math.random() * 100) + 120}`;
         const res = await fetchApi("/api/newsletter/subscribe", {
           method: "POST",
           headers: {
-            "x-forwarded-for": "198.51.100.99",
+            "x-forwarded-for": testIp,
           },
           body: JSON.stringify({ email: "invalid-email-format" }),
         });
         assertEquals(res.status, 400, "Άκυρο email πρέπει να απορρίπτεται με 400 Bad Request");
+      },
+    }),
+
+    defineTest({
+      id: "api-posokanei-search-get-query",
+      title: "Δημόσια αναζήτηση προϊόντων με GET /api/posokanei/search?q=...",
+      category: "api",
+      description: "Επαληθεύει ότι το GET endpoint αναζήτησης προϊόντων ανταποκρίνεται με 200 OK και επιστρέφει JSON αποτελέσματα.",
+      documentation: "Εκτελεί GET /api/posokanei/search?q=Ariel και ελέγχει status 200 και ύπαρξη πίνακα προϊόντων.",
+      tags: ["posokanei", "search", "api"],
+      severity: "critical",
+      run: async ({ fetchApi, assert, assertEquals }) => {
+        const res = await fetchApi("/api/posokanei/search?q=Ariel");
+        assertEquals(res.status, 200, "Το GET /api/posokanei/search?q=Ariel πρέπει να επιστρέφει 200 OK");
+
+        const data = await res.json();
+        assert(Array.isArray(data.products), "Πρέπει να επιστρέφει πίνακα products");
+        assert(data.products.length > 0, "Πρέπει να επιστρέφει τουλάχιστον ένα αποτέλεσμα για 'Ariel'");
+      },
+    }),
+
+    defineTest({
+      id: "api-posokanei-search-get-empty-rejection",
+      title: "Απόρριψη κενής παραμέτρου αναζήτησης στο GET /api/posokanei/search",
+      category: "api",
+      description: "Ελέγχει ότι κλήση GET χωρίς query string 'q' ή 'title' απορρίπτεται με 400 Bad Request.",
+      documentation: "Στέλνει GET /api/posokanei/search χωρίς παραμέτρους και επαληθεύει status 400.",
+      tags: ["posokanei", "validation", "api"],
+      severity: "medium",
+      run: async ({ fetchApi, assertEquals }) => {
+        const res = await fetchApi("/api/posokanei/search");
+        assertEquals(res.status, 400, "Κλήση χωρίς q ή title πρέπει να επιστρέφει 400 Bad Request");
       },
     }),
   ],

@@ -321,5 +321,564 @@
     "source": "footer",
     "status": "active",
     "userAgent": "node"
+  },
+  {
+    "id": "sub-mvml3xvk-veav",
+    "email": "test-user-1792857574174@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T15:59:34.208Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvml43rn-m1bl",
+    "email": "test-1792857581827@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T15:59:41.843Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmlaioj-k7h8",
+    "email": "test-user-1792857880702@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T16:04:41.107Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmlakfp-95e8",
+    "email": "test-1792857883308@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T16:04:43.381Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmlamh3-d486",
+    "email": "test-1792857885994@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T16:04:46.023Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmlatn6-xu2t",
+    "email": "test-user-1792857895264@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T16:04:55.314Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmlb0mn-tyxl",
+    "email": "test-1792857904322@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T16:05:04.367Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmli26y-b2d7",
+    "email": "test-user-1792858232676@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T16:10:32.986Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmltk0s-9u45",
+    "email": "test-user-1792858769290@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T16:19:29.308Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmltp67-kmgn",
+    "email": "test-1792858775965@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T16:19:35.983Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmlv8ae-dm35",
+    "email": "test-user-1792858847388@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T16:20:47.414Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmm4lvb-05v3",
+    "email": "test-user-1792859284897@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T16:28:04.919Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmm503b-34ba",
+    "email": "test-1792859303329@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T16:28:23.351Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmm5s9l-w1oj",
+    "email": "test-1792859339839@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T16:28:59.864Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmmc7nb-k2ug",
+    "email": "test-user-1792859639717@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T16:33:59.735Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmmccy2-iz4i",
+    "email": "test-1792859646584@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T16:34:06.602Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmmcw4o-m3j5",
+    "email": "test-1792859671412@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T16:34:31.464Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmmf1wn-gwti",
+    "email": "test-user-1792859772010@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T16:36:12.263Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmmf32o-g52u",
+    "email": "test-1792859773732@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T16:36:13.776Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmmk9hx-zalg",
+    "email": "test-user-1792860015132@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T16:40:15.381Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmmkakc-hyy2",
+    "email": "test-1792860016708@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T16:40:16.764Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmmkc3w-ckxx",
+    "email": "test-1792860018738@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T16:40:18.764Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmmrjk7-dd16",
+    "email": "test-user-1792860354977@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T16:45:55.015Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmmrpx7-3e9j",
+    "email": "test-1792860363238@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T16:46:03.259Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmn8u4e-jx0i",
+    "email": "test-user-1792861161832@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T16:59:21.854Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmn90x5-tbhc",
+    "email": "test-1792861170639@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T16:59:30.665Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmna94w-erk0",
+    "email": "test-1792861227945@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T17:00:27.968Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmnk011-n3fx",
+    "email": "test-user-1792861682696@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T17:08:02.725Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmo1h83-sixe",
+    "email": "test-user-1792862498142@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T17:21:38.163Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmo3jln-4h74",
+    "email": "test-user-1792862594534@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T17:23:14.555Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmo3uo8-706n",
+    "email": "test-1792862608889@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T17:23:28.904Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmof2pu-96b3",
+    "email": "test-user-1792863132530@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T17:32:12.546Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmofakm-w252",
+    "email": "test-user-1792863142709@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T17:32:22.726Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmoffnm-j3ab",
+    "email": "test-user-1792863149298@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T17:32:29.314Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmokcr5-0wda",
+    "email": "test-user-1792863378817@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T17:36:18.833Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmokh67-bfhn",
+    "email": "test-user-1792863384543@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T17:36:24.559Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmon2bo-vynq",
+    "email": "test-user-1792863505263@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T17:38:25.284Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmonb3j-wsu9",
+    "email": "test-user-1792863516637@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T17:38:36.655Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmongsk-ynn1",
+    "email": "test-1792863524017@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T17:38:44.036Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmoohpx-tfke",
+    "email": "test-user-1792863571650@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T17:39:31.893Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmooild-g18n",
+    "email": "test-user-1792863572978@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-24T17:39:33.025Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmooiqc-8scp",
+    "email": "test-1792863573153@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T17:39:33.204Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvmooka5-ez5m",
+    "email": "test2-1792863575187@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-10-24T17:39:35.213Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvne7vlp-bx6s",
+    "email": "test-user-1792906466715@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T05:34:26.749Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvnedyyb-sum9",
+    "email": "test-user-1792906751004@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-10-25T05:39:11.027Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
   }
 ]

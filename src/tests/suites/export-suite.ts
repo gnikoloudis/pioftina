@@ -4,7 +4,7 @@ import {
   generatePlanAndShoppingListHtml,
   PlanExportData,
 } from "@/lib/export/plan-exporter";
-import { INITIAL_MEAL_SLOTS, DEFAULT_PREFERENCES } from "@/lib/storage/store";
+import { INITIAL_MEAL_SLOTS, DEFAULT_PREFERENCES } from "@/lib/storage/initial-data";
 import { SEED_RECIPES } from "@/lib/recipes/seed-recipes";
 import { OptimizedGroceryItem } from "@/types/meal-planner";
 
@@ -212,6 +212,97 @@ export const exportSuite: TestSuite = {
         const parsed = JSON.parse(jsonStr);
         assert(parsed.version === "1.0", "Η έκδοση backup πρέπει να είναι 1.0");
         assert(Array.isArray(parsed.slots) && parsed.slots.length > 0, "Πρέπει να περιέχει τη λίστα slots");
+      },
+    },
+
+    {
+      id: "TEST-EXP-05",
+      title: "Επαλήθευση εξαγωγής πακέτων καθαριότητας & βρεφικών (Household & Baby Care Bundles)",
+      category: "export",
+      severity: "high",
+      tags: ["export", "bundles", "cleaning", "baby"],
+      description:
+        "Επαληθεύει ότι προϊόντα από πακέτα καθαριότητας (household) και βρεφικής φροντίδας (baby) εξάγονται κανονικά στο αρχείο .txt και στο εκτυπώσιμο HTML κάτω από τους αντίστοιχους διαδρόμους.",
+      documentation:
+        "Η συνάρτηση generatePlanAndShoppingListText και generatePlanAndShoppingListHtml πρέπει να αναγνωρίζει τις κατηγορίες household και baby.",
+      run: ({ assertContains }) => {
+        const bundleGroceryItems: OptimizedGroceryItem[] = [
+          ...SAMPLE_GROCERY_ITEMS,
+          {
+            ingredientId: "bundle-cleaning-1-ariel",
+            ingredientName: "Ariel All-in-1 Pods (Ariel)",
+            category: "household",
+            rawRequiredAmount: 1,
+            rawUnit: "τεμ",
+            normalizedRequiredAmount: 1,
+            normalizedUnit: "τεμ",
+            alternativeOptions: [],
+            surplusAmount: 0,
+            surplusUnit: "τεμ",
+            isChecked: false,
+            inPantry: false,
+            isExcluded: false,
+            selectedOption: {
+              product: {} as any,
+              packCount: 1,
+              packSize: 70,
+              packUnit: "μεζούρες",
+              totalQuantity: 1,
+              totalPrice: 18.9,
+              unitPrice: 18.9,
+              retailer: "sklavenitis",
+              retailerName: "Σκλαβενίτης",
+              isBulk: false,
+            },
+          },
+          {
+            ingredientId: "bundle-baby-1-pampers",
+            ingredientName: "Pampers Premium Care No4 (Pampers)",
+            category: "baby",
+            rawRequiredAmount: 2,
+            rawUnit: "τεμ",
+            normalizedRequiredAmount: 2,
+            normalizedUnit: "τεμ",
+            alternativeOptions: [],
+            surplusAmount: 0,
+            surplusUnit: "τεμ",
+            isChecked: false,
+            inPantry: false,
+            isExcluded: false,
+            selectedOption: {
+              product: {} as any,
+              packCount: 2,
+              packSize: 104,
+              packUnit: "πάνες",
+              totalQuantity: 2,
+              totalPrice: 38.5,
+              unitPrice: 19.25,
+              retailer: "ab_vasilopoulos",
+              retailerName: "ΑΒ Βασιλόπουλος",
+              isBulk: true,
+            },
+          },
+        ];
+
+        const testData: PlanExportData = {
+          slots: INITIAL_MEAL_SLOTS,
+          groceryItems: bundleGroceryItems,
+          preferences: DEFAULT_PREFERENCES,
+          totalCost: 64.3,
+          remainingCost: 59.5,
+          purchasedCost: 4.8,
+          totalSavings: 5.2,
+        };
+
+        const textOutput = generatePlanAndShoppingListText(testData);
+        assertContains(textOutput, "Ariel All-in-1 Pods", "Το κείμενο πρέπει να περιλαμβάνει το προϊόν καθαριότητας");
+        assertContains(textOutput, "Pampers Premium Care", "Το κείμενο πρέπει να περιλαμβάνει το βρεφικό προϊόν");
+        assertContains(textOutput, "ΕΙΔΗ ΣΠΙΤΙΟΥ", "Πρέπει να υπάρχει επικεφαλίδα για τα είδη σπιτιού");
+        assertContains(textOutput, "ΒΡΕΦΙΚΑ ΕΙΔΗ", "Πρέπει να υπάρχει επικεφαλίδα για τα βρεφικά είδη");
+
+        const htmlOutput = generatePlanAndShoppingListHtml(testData);
+        assertContains(htmlOutput, "Ariel All-in-1 Pods", "Το HTML πρέπει να περιλαμβάνει το προϊόν καθαριότητας");
+        assertContains(htmlOutput, "Pampers Premium Care", "Το HTML πρέπει να περιλαμβάνει το βρεφικό προϊόν");
       },
     },
   ],

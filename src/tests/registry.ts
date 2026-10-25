@@ -6,14 +6,18 @@ import { apiRoutesSuite } from "./suites/api-routes-suite";
 import { posokaneiSuite } from "./suites/posokanei-suite";
 import { customUserSuite } from "./suites/custom-user-tests";
 import { exportSuite } from "./suites/export-suite";
+import { bundlesSuite } from "./suites/bundles-suite";
+import { groceryRemovalSuite } from "./suites/grocery-removal-suite";
 
 const REGISTERED_SUITES: TestSuite[] = [
   recipesSuite,
   optimizerSuite,
+  groceryRemovalSuite,
   securitySuite,
   apiRoutesSuite,
   posokaneiSuite,
   exportSuite,
+  bundlesSuite,
   customUserSuite,
 ];
 

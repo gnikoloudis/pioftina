@@ -20,10 +20,11 @@ export const injectionSecurityRules: SecurityRule[] = [
         "user space@domain.com",
       ];
 
-      for (const email of invalidEmails) {
+      for (let i = 0; i < invalidEmails.length; i++) {
+        const email = invalidEmails[i];
         const res = await fetchApi("/api/newsletter/subscribe", {
           method: "POST",
-          headers: { "Content-Type": "application/json", "x-forwarded-for": `198.51.100.${Math.floor(Math.random() * 200)}` },
+          headers: { "Content-Type": "application/json", "x-forwarded-for": `198.51.100.${100 + i + Math.floor(Math.random() * 50)}` },
           body: JSON.stringify({ email }),
         });
         assertEquals(res.status, 400, `Το άκυρο email '${email}' πρέπει να απορρίπτεται με 400`);

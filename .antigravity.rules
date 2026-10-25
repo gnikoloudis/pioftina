@@ -1,0 +1,15 @@
+# Code Navigation & Dense Analysis Rules
+
+## 1. Code Navigation Strategy
+* **Graph Priority:** Do NOT perform full file reads or open sequential directory trees to trace dependencies. Always use the `code-graph` MCP tool to locate callers and definitions first.
+* **Chokepoint Guardrails:** Before making any modifications to a high-centrality chokepoint (`executeSearchLogic`, `checkRateLimit`, or `searchProducts`), you must check its blast radius by querying the graph for all incoming and outgoing edges.
+
+## 2. Reading Order & Context Tour Optimization
+When analyzing a new feature or debugging an issue, follow the established architectural hierarchy to preserve context window space:
+1. **Foundational Context:** `src/types` -> `src/lib/posokanei` -> Security (`rate-limiter.ts`, `admin-auth.ts`)
+2. **Core Engines:** `src/lib/recipes` -> `src/lib/optimizer` -> `src/lib/storage`
+3. **Feature Modules & Orchestration:** `src/components/meal-planner` -> `src/app/page.tsx`
+
+## 3. Token & Cost Efficiency
+* Never read an entire file if you only need a single block. Use targeted line-range reads for active logic (e.g., extracting only `applyInstantPriceRecalculation` from `store.ts`).
+* When spawning sub-agents, do not pass raw code text. Only pass the specific subgraph definitions and Centrality Scores relevant to the sub-agent's micro-task.

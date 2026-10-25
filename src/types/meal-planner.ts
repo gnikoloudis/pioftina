@@ -7,7 +7,8 @@ export type AisleCategory =
   | "pantry"
   | "bakery"
   | "beverages"
-  | "household";
+  | "household"
+  | "baby";
 
 export interface AisleCategoryMeta {
   key: AisleCategory;
@@ -66,6 +67,13 @@ export const AISLE_CATEGORIES: Record<AisleCategory, AisleCategoryMeta> = {
     nameEn: "Household",
     icon: "🧼",
     badgeColor: "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300",
+  },
+  baby: {
+    key: "baby",
+    nameEl: "Βρεφικά Είδη & Φροντίδα",
+    nameEn: "Baby Care",
+    icon: "👶",
+    badgeColor: "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300",
   },
 };
 

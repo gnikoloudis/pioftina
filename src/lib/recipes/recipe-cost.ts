@@ -35,6 +35,7 @@ const CATEGORY_FALLBACK_UNIT_PRICES: Record<AisleCategory, number> = {
   bakery: 2.8,    // ~2.80 €/kg
   beverages: 1.5, // ~1.50 €/L
   household: 2.5, // ~2.50 €/τεμ
+  baby: 4.5,      // ~4.50 €/τεμ
 };
 
 /**

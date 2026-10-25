@@ -15,6 +15,7 @@ import {
   PackOption,
   UserPantryItem,
 } from "@/types/meal-planner";
+import { ProductBundle } from "@/types/bundles";
 import { Product } from "@/lib/posokanei/types";
 import { SEED_RECIPES } from "@/lib/recipes/seed-recipes";
 import { getCuratedDefaultProduct } from "@/lib/recipes/curated-products";
@@ -24,169 +25,12 @@ import {
   computeCartTotals,
 } from "@/lib/optimizer/packaging";
 
-export const DEFAULT_PREFERENCES: UserPreferences = {
-  householdSize: 4,
-  preferredSupermarkets: ["sklavenitis", "ab_vasilopoulos", "lidl"],
-  prioritizeBulk: true,
-  showSurplusWarning: true,
-};
-
-export const INITIAL_MEAL_SLOTS: MealSlot[] = [
-  // Δευτέρα (Day 0)
-  {
-    id: "slot-0-breakfast",
-    day: 0,
-    mealType: "breakfast",
-    recipe: SEED_RECIPES.find((r) => r.id === "recipe-arabic-pita-wrap") || SEED_RECIPES[8],
-    courseType: "breakfast",
-    servings: 2,
-  },
-  {
-    id: "slot-0-lunch-main",
-    day: 0,
-    mealType: "lunch",
-    recipe: SEED_RECIPES.find((r) => r.id === "moussaka") || SEED_RECIPES[0], // Μουσακάς
-    courseType: "main",
-    servings: 4,
-  },
-  {
-    id: "slot-0-lunch-salad",
-    day: 0,
-    mealType: "lunch",
-    recipe: SEED_RECIPES.find((r) => r.id === "greek-salad-dakos") || SEED_RECIPES[6], // Χωριάτικη Σαλάτα & Ντάκος
-    courseType: "salad",
-    servings: 4,
-  },
-  {
-    id: "slot-0-dinner",
-    day: 0,
-    mealType: "dinner",
-    recipe: SEED_RECIPES.find((r) => r.id === "spanakorizo") || SEED_RECIPES[5], // Σπανακόρυζο
-    courseType: "main",
-    servings: 4,
-  },
-
-  // Τρίτη (Day 1)
-  {
-    id: "slot-1-lunch",
-    day: 1,
-    mealType: "lunch",
-    recipe: SEED_RECIPES.find((r) => r.id === "fasolakia-ladera") || SEED_RECIPES[4], // Φασολάκια Λαδερά
-    courseType: "main",
-    servings: 4,
-  },
-  {
-    id: "slot-1-dinner",
-    day: 1,
-    mealType: "dinner",
-    recipe: SEED_RECIPES.find((r) => r.id === "fakes-soup") || SEED_RECIPES[7], // Φακές
-    courseType: "main",
-    servings: 4,
-  },
-
-  // Τετάρτη (Day 2)
-  {
-    id: "slot-2-lunch",
-    day: 2,
-    mealType: "lunch",
-    recipe: SEED_RECIPES.find((r) => r.id === "spaghetti-kimas") || SEED_RECIPES[3], // Μακαρόνια με Κιμά
-    courseType: "main",
-    servings: 4,
-  },
-  {
-    id: "slot-2-dinner",
-    day: 2,
-    mealType: "dinner",
-    recipe: SEED_RECIPES.find((r) => r.id === "gemista") || SEED_RECIPES[1], // Γεμιστά
-    courseType: "main",
-    servings: 4,
-  },
-
-  // Παρασκευή (Day 4)
-  {
-    id: "slot-4-lunch-main",
-    day: 4,
-    mealType: "lunch",
-    recipe: SEED_RECIPES.find((r) => r.id === "roast-chicken-potatoes") || SEED_RECIPES[2], // Κοτόπουλο στο Φούρνο
-    courseType: "main",
-    servings: 4,
-  },
-  {
-    id: "slot-4-lunch-salad",
-    day: 4,
-    mealType: "lunch",
-    recipe: SEED_RECIPES.find((r) => r.id === "greek-salad-dakos") || SEED_RECIPES[6], // Σαλάτα Ντάκος
-    courseType: "salad",
-    servings: 4,
-  },
-  {
-    id: "slot-4-dinner",
-    day: 4,
-    mealType: "dinner",
-    recipe: SEED_RECIPES.find((r) => r.id === "fasolakia-ladera") || SEED_RECIPES[4],
-    courseType: "main",
-    servings: 4,
-  },
-
-  // Κυριακή (Day 6)
-  {
-    id: "slot-6-breakfast",
-    day: 6,
-    mealType: "breakfast",
-    recipe: SEED_RECIPES.find((r) => r.id === "recipe-arabic-pita-wrap") || SEED_RECIPES[8],
-    courseType: "breakfast",
-    servings: 2,
-  },
-  {
-    id: "slot-6-lunch-main",
-    day: 6,
-    mealType: "lunch",
-    recipe: SEED_RECIPES.find((r) => r.id === "moussaka") || SEED_RECIPES[0], // Μουσακάς
-    courseType: "main",
-    servings: 4,
-  },
-  {
-    id: "slot-6-lunch-salad",
-    day: 6,
-    mealType: "lunch",
-    recipe: SEED_RECIPES.find((r) => r.id === "greek-salad-dakos") || SEED_RECIPES[6], // Σαλάτα Ντάκος
-    courseType: "salad",
-    servings: 4,
-  },
-];
-
-export const DEFAULT_PANTRY_ITEMS: UserPantryItem[] = [
-  {
-    id: "pantry-olive-oil",
-    name: "Εξαιρετικό Παρθένο Ελαιόλαδο",
-    amount: 1,
-    unit: "L",
-    category: "pantry",
-    notes: "Βασικό ντουλάπι μαγειρικής",
-    createdAt: "2026-10-01T00:00:00.000Z",
-    updatedAt: "2026-10-01T00:00:00.000Z",
-  },
-  {
-    id: "pantry-sea-salt",
-    name: "Αλάτι Ψιλό Θαλασσινό",
-    amount: 1,
-    unit: "kg",
-    category: "pantry",
-    notes: "Ντουλάπι μπαχαρικών",
-    createdAt: "2026-10-01T00:00:00.000Z",
-    updatedAt: "2026-10-01T00:00:00.000Z",
-  },
-  {
-    id: "pantry-oregano",
-    name: "Ρίγανη Ελληνική",
-    amount: 50,
-    unit: "g",
-    category: "pantry",
-    notes: "Μπαχαρικά & βότανα",
-    createdAt: "2026-10-01T00:00:00.000Z",
-    updatedAt: "2026-10-01T00:00:00.000Z",
-  },
-];
+import {
+  DEFAULT_PREFERENCES,
+  INITIAL_MEAL_SLOTS,
+  DEFAULT_PANTRY_ITEMS,
+} from "./initial-data";
+export { DEFAULT_PREFERENCES, INITIAL_MEAL_SLOTS, DEFAULT_PANTRY_ITEMS };
 
 const STORAGE_PREFIX = "pioftina_v2_";
 const STORAGE_KEYS = {
@@ -201,6 +45,7 @@ const STORAGE_KEYS = {
   CURATIONS: `${STORAGE_PREFIX}recipe_curations`,
   RECIPE_CATEGORIES: `${STORAGE_PREFIX}recipe_categories`,
   RECIPE_REFERENCE_URLS: `${STORAGE_PREFIX}recipe_reference_urls`,
+  BUNDLE_ITEMS: `${STORAGE_PREFIX}bundle_items`,
 };
 
 export function useMealPlannerStore() {
@@ -215,6 +60,7 @@ export function useMealPlannerStore() {
   const [userPantryItems, setUserPantryItems] = useState<UserPantryItem[]>(DEFAULT_PANTRY_ITEMS);
   const [excludedItemIds, setExcludedItemIds] = useState<string[]>([]);
   const [customOptions, setCustomOptions] = useState<Record<string, PackOption>>({});
+  const [addedBundleItems, setAddedBundleItems] = useState<OptimizedGroceryItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Computed grocery list state
@@ -445,6 +291,16 @@ export function useMealPlannerStore() {
           setCustomOptions(sanitized);
         } catch (_) {}
       }
+
+      const storedBundleItems = localStorage.getItem(STORAGE_KEYS.BUNDLE_ITEMS);
+      if (storedBundleItems) {
+        try {
+          const parsedBundleItems = JSON.parse(storedBundleItems);
+          if (Array.isArray(parsedBundleItems)) {
+            setAddedBundleItems(parsedBundleItems);
+          }
+        } catch (_) {}
+      }
     } catch (e) {
       console.warn("Error reading from localStorage:", e);
     } finally {
@@ -558,13 +414,15 @@ export function useMealPlannerStore() {
   useEffect(() => {
     if (!isLoaded) return;
 
-    // Cache key to avoid redundant API triggers and prevent maximum update depth loop
     const slotsKey = slots
       .map((s) => `${s.id}:${s.recipe?.id}:${s.servings}:${s.recipe?.ingredients?.length || 0}`)
       .join(";");
     const prefsKey = `${preferences.householdSize}:${preferences.prioritizeBulk}:${preferences.preferredSupermarkets.join(",")}`;
     const customOptsKey = Object.keys(customOptions).sort().join(",");
-    const runKey = `${slotsKey}|${prefsKey}|${customOptsKey}`;
+    const bundleKey = addedBundleItems
+      .map((i) => `${i.ingredientId}:${i.selectedOption?.totalPrice}`)
+      .join(";");
+    const runKey = `${slotsKey}|${prefsKey}|${customOptsKey}|${bundleKey}`;
 
     if (runKey === lastRunKeyRef.current) {
       return;
@@ -598,13 +456,22 @@ export function useMealPlannerStore() {
           };
         });
 
-        const totals = computeCartTotals(updatedItems);
+        // Combine with added bundle products (cleaning & baby care)
+        const mappedBundleItems = addedBundleItems.map((item) => ({
+          ...item,
+          isChecked: checkedItemIds.includes(item.ingredientId),
+          inPantry: pantryItemIds.includes(item.ingredientId),
+          isExcluded: excludedItemIds.includes(item.ingredientId),
+        }));
+        const combinedItems = [...updatedItems, ...mappedBundleItems];
+
+        const totals = computeCartTotals(combinedItems);
         const comparisons = computeBasketComparisons(
-          updatedItems,
+          combinedItems,
           preferences.preferredSupermarkets
         );
 
-        setGroceryItems(updatedItems);
+        setGroceryItems(combinedItems);
         setBasketComparisons(comparisons);
         setPantrySurplus(res.pantrySurplus);
         setTotalCost(totals.totalCost);
@@ -619,7 +486,7 @@ export function useMealPlannerStore() {
     return () => {
       isCancelled = true;
     };
-  }, [slots, preferences, isLoaded, customOptions]);
+  }, [slots, preferences, isLoaded, customOptions, addedBundleItems]);
 
   // Synchronously re-evaluate prices and comparisons whenever checked, pantry, or excluded status changes
   const applyInstantPriceRecalculation = (
@@ -785,9 +652,36 @@ export function useMealPlannerStore() {
   };
 
   const toggleItemExcluded = (ingredientId: string) => {
-    const nextExcluded = excludedItemIds.includes(ingredientId)
+    const isCurrentlyExcluded = excludedItemIds.includes(ingredientId);
+    const nextExcluded = isCurrentlyExcluded
       ? excludedItemIds.filter((id) => id !== ingredientId)
       : [...excludedItemIds, ingredientId];
+
+    // If excluding, also ensure it's removed from checked items
+    const nextChecked = !isCurrentlyExcluded
+      ? checkedItemIds.filter((id) => id !== ingredientId)
+      : checkedItemIds;
+
+    setExcludedItemIds(nextExcluded);
+    setCheckedItemIds(nextChecked);
+    applyInstantPriceRecalculation(nextChecked, pantryItemIds, nextExcluded);
+  };
+
+  const excludeMultipleItems = (ingredientIds: string[]) => {
+    if (ingredientIds.length === 0) return;
+    const idsSet = new Set(ingredientIds);
+    const nextExcluded = Array.from(new Set([...excludedItemIds, ...ingredientIds]));
+    const nextChecked = checkedItemIds.filter((id) => !idsSet.has(id));
+
+    setExcludedItemIds(nextExcluded);
+    setCheckedItemIds(nextChecked);
+    applyInstantPriceRecalculation(nextChecked, pantryItemIds, nextExcluded);
+  };
+
+  const restoreExcludedItems = (ingredientIds: string[]) => {
+    if (ingredientIds.length === 0) return;
+    const idsSet = new Set(ingredientIds);
+    const nextExcluded = excludedItemIds.filter((id) => !idsSet.has(id));
 
     setExcludedItemIds(nextExcluded);
     applyInstantPriceRecalculation(checkedItemIds, pantryItemIds, nextExcluded);
@@ -795,6 +689,25 @@ export function useMealPlannerStore() {
 
   const restoreAllExcludedItems = () => {
     setExcludedItemIds([]);
+    applyInstantPriceRecalculation(checkedItemIds, pantryItemIds, []);
+  };
+
+  const clearExcludedItemsPermanently = () => {
+    // If any excluded items were added bundle items, remove them permanently from addedBundleItems
+    if (excludedItemIds.length > 0) {
+      const excludedSet = new Set(excludedItemIds);
+      setAddedBundleItems((prev) => {
+        const next = prev.filter((item) => !excludedSet.has(item.ingredientId));
+        try {
+          localStorage.setItem(STORAGE_KEYS.BUNDLE_ITEMS, JSON.stringify(next));
+        } catch (_) {}
+        return next;
+      });
+    }
+    setExcludedItemIds([]);
+    try {
+      localStorage.removeItem(STORAGE_KEYS.EXCLUDED_ITEMS);
+    } catch (_) {}
     applyInstantPriceRecalculation(checkedItemIds, pantryItemIds, []);
   };
 
@@ -1214,6 +1127,164 @@ export function useMealPlannerStore() {
     );
   };
 
+  const addBundleToGroceryList = (bundle: ProductBundle) => {
+    const newItems: OptimizedGroceryItem[] = bundle.items.map((item) => {
+      const itemPrice = item.curatedProduct?.price_stats?.min_price || item.referencePriceEur || 3.0;
+      const storeId = bundle.bestStoreId || "sklavenitis";
+      const storeName = bundle.bestStoreName || "Σκλαβενίτης";
+      const lineTotal = Math.round(itemPrice * item.quantity * 100) / 100;
+
+      return {
+        ingredientId: `bundle-${bundle.id}-${item.id}`,
+        ingredientName: `${item.name} (${item.brand})`,
+        category: (bundle.category === "cleaning" ? "household" : "baby") as any,
+        rawRequiredAmount: item.quantity,
+        rawUnit: item.unitLabel,
+        normalizedRequiredAmount: item.quantity,
+        normalizedUnit: "τεμ",
+        selectedOption: {
+          product: item.curatedProduct || {
+            id: item.productId || item.id,
+            name: item.name,
+            brand: item.brand,
+            category: bundle.category,
+            category_ids: [],
+            unit: "τεμ",
+            unit_quantity: 1,
+            has_image: false,
+            image_url: null,
+            private_label: false,
+            price_drop: false,
+            available_countries: ["GR"],
+            is_international: false,
+            retailers: [storeId],
+            price_stats: {
+              min_price: itemPrice,
+              max_price: itemPrice,
+              avg_price: itemPrice,
+              min_unit_price: itemPrice,
+              retailer_count: 1,
+            },
+            retailer_prices: [
+              {
+                retailer: storeId,
+                retailer_display_name: storeName,
+                retailer_name: item.name,
+                price: itemPrice,
+                price_normalized: itemPrice,
+                is_discount: false,
+                discount_percentage: null,
+                last_updated: "2026-10-20",
+                country: "GR",
+              },
+            ],
+          },
+          packSize: 1,
+          packUnit: item.unitLabel,
+          packCount: item.quantity,
+          totalQuantity: item.quantity,
+          totalPrice: lineTotal,
+          unitPrice: itemPrice,
+          retailer: storeId,
+          retailerName: storeName,
+          isBulk: item.quantity > 1,
+          isSynthetic: false,
+          isAvailable: true,
+        },
+        alternativeOptions: [],
+        surplusAmount: 0,
+        surplusUnit: "τεμ",
+        isChecked: false,
+        inPantry: false,
+        isExcluded: false,
+        curatedProduct: item.curatedProduct,
+        isCurated: true,
+        isUnmatched: false,
+        isAvailable: true,
+      };
+    });
+
+    setAddedBundleItems((prev) => {
+      const existingIds = new Set(newItems.map((i) => i.ingredientId));
+      const filtered = prev.filter((i) => !existingIds.has(i.ingredientId));
+      const next = [...filtered, ...newItems];
+      try {
+        localStorage.setItem(STORAGE_KEYS.BUNDLE_ITEMS, JSON.stringify(next));
+      } catch (_) {}
+      return next;
+    });
+
+    // Synchronously ensure groceryItems reflects the added bundle immediately
+    setGroceryItems((prev) => {
+      const existingIds = new Set(newItems.map((i) => i.ingredientId));
+      const filtered = prev.filter((i) => !existingIds.has(i.ingredientId));
+      const combined = [...filtered, ...newItems];
+      const totals = computeCartTotals(combined);
+      const comparisons = computeBasketComparisons(combined, preferences.preferredSupermarkets);
+      setBasketComparisons(comparisons);
+      setTotalCost(totals.totalCost);
+      setRemainingCost(totals.remainingCost);
+      setPurchasedCost(totals.purchasedCost);
+      setTotalSavings(totals.totalBulkSavings);
+      return combined;
+    });
+  };
+
+  const clearBundleGroceryItems = () => {
+    setAddedBundleItems([]);
+    try {
+      localStorage.removeItem(STORAGE_KEYS.BUNDLE_ITEMS);
+    } catch (_) {}
+    setGroceryItems((prev) => {
+      const withoutBundles = prev.filter((i) => !i.ingredientId.startsWith("bundle-"));
+      const totals = computeCartTotals(withoutBundles);
+      const comparisons = computeBasketComparisons(withoutBundles, preferences.preferredSupermarkets);
+      setBasketComparisons(comparisons);
+      setTotalCost(totals.totalCost);
+      setRemainingCost(totals.remainingCost);
+      setPurchasedCost(totals.purchasedCost);
+      setTotalSavings(totals.totalBulkSavings);
+      return withoutBundles;
+    });
+  };
+
+  const clearGroceryList = (options?: { clearSlots?: boolean }) => {
+    setAddedBundleItems([]);
+    setCheckedItemIds([]);
+    setExcludedItemIds([]);
+    setCustomOptions({});
+    try {
+      localStorage.removeItem(STORAGE_KEYS.BUNDLE_ITEMS);
+      localStorage.removeItem(STORAGE_KEYS.CHECKED_ITEMS);
+      localStorage.removeItem(STORAGE_KEYS.EXCLUDED_ITEMS);
+      localStorage.removeItem(STORAGE_KEYS.CUSTOM_OPTIONS);
+    } catch (_) {}
+
+    if (options?.clearSlots) {
+      clearAllSlots();
+      setGroceryItems([]);
+      setBasketComparisons([]);
+      setTotalCost(0);
+      setRemainingCost(0);
+      setPurchasedCost(0);
+      setTotalSavings(0);
+    } else {
+      setGroceryItems((prev) => {
+        const withoutBundles = prev
+          .filter((i) => !i.ingredientId.startsWith("bundle-"))
+          .map((i) => ({ ...i, isChecked: false, isExcluded: false }));
+        const totals = computeCartTotals(withoutBundles);
+        const comparisons = computeBasketComparisons(withoutBundles, preferences.preferredSupermarkets);
+        setBasketComparisons(comparisons);
+        setTotalCost(totals.totalCost);
+        setRemainingCost(totals.remainingCost);
+        setPurchasedCost(totals.purchasedCost);
+        setTotalSavings(totals.totalBulkSavings);
+        return withoutBundles;
+      });
+    }
+  };
+
   return {
     slots,
     preferences,
@@ -1224,6 +1295,10 @@ export function useMealPlannerStore() {
     basketComparisons,
     pantrySurplus,
     userPantryItems,
+    addedBundleItems,
+    addBundleToGroceryList,
+    clearBundleGroceryItems,
+    clearGroceryList,
     addPantryItem,
     updatePantryItem,
     deletePantryItem,
@@ -1243,7 +1318,10 @@ export function useMealPlannerStore() {
     toggleItemChecked,
     toggleItemPantry,
     toggleItemExcluded,
+    excludeMultipleItems,
+    restoreExcludedItems,
     restoreAllExcludedItems,
+    clearExcludedItemsPermanently,
     excludedItemIds,
     updateItemPackOption,
     curateIngredientProduct,

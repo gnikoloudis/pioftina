@@ -20,13 +20,14 @@ export const ssrfSecurityRules: SecurityRule[] = [
         "http://[::1]:80/status",
       ];
 
-      for (const url of loopbackUrls) {
+      for (let i = 0; i < loopbackUrls.length; i++) {
+        const url = loopbackUrls[i];
         const res = await fetchApi("/api/recipes/import", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Cookie: `pioftina_admin_session=${adminToken}`,
-            "x-forwarded-for": `198.51.100.${Math.floor(Math.random() * 200) + 1}`,
+            "x-forwarded-for": `198.51.101.${10 + i * 15 + Math.floor(Math.random() * 5)}`,
           },
           body: JSON.stringify({ url }),
         });
@@ -99,7 +100,7 @@ export const ssrfSecurityRules: SecurityRule[] = [
         headers: {
           "Content-Type": "application/json",
           Cookie: `pioftina_admin_session=${adminToken}`,
-          "x-forwarded-for": "198.51.100.13",
+          "x-forwarded-for": `198.51.100.${Math.floor(Math.random() * 200) + 50}`,
         },
         body: JSON.stringify({ url: metadataUrl }),
       });
@@ -133,13 +134,14 @@ export const ssrfSecurityRules: SecurityRule[] = [
         "javascript:alert(1)",
       ];
 
-      for (const url of unsafeProtocols) {
+      for (let i = 0; i < unsafeProtocols.length; i++) {
+        const url = unsafeProtocols[i];
         const res = await fetchApi("/api/recipes/import", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Cookie: `pioftina_admin_session=${adminToken}`,
-            "x-forwarded-for": `198.51.100.${Math.floor(Math.random() * 200) + 1}`,
+            "x-forwarded-for": `198.51.103.${10 + i * 15 + Math.floor(Math.random() * 5)}`,
           },
           body: JSON.stringify({ url }),
         });
