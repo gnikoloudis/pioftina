@@ -27,7 +27,7 @@ graph TD
     end
 
     subgraph CoreEngines ["Tier 2: Core Domain & Optimization Engines"]
-        Opt["Combinatorial Packaging Solver\nsrc/lib/optimizer/packaging.ts"]
+        Optimizer["Combinatorial Packaging Solver\nsrc/lib/optimizer/packaging.ts"]
         Cost["Recipe & Ingredient Cost Engine\nsrc/lib/recipes/recipe-cost.ts"]
         Bundles["Bundle Pricing & Store Matrix\nsrc/lib/bundles/bundle-service.ts"]
         Agent["Recipe Parser & Quantity Auditor\nsrc/lib/agent/recipe-collector.ts"]
@@ -50,9 +50,9 @@ graph TD
 
     %% Dependencies
     UI --> Store
-    Store --> Opt
-    Opt --> Cost
-    Opt --> Poso
+    Store --> Optimizer
+    Optimizer --> Cost
+    Optimizer --> Poso
     Cost --> Poso
     Bundles --> Poso
     UI --> ServerAPIs
@@ -108,25 +108,25 @@ sequenceDiagram
     actor User as User
     participant UI as Meal Planner / Pantry UI
     participant Store as useMealPlannerStore
-    participant Opt as Packaging Optimizer
+    participant Optimizer as Packaging Optimizer
     participant Cache as Posokanei Search Cache
     participant Ext as posokane.gov.gr API
 
     User->>UI: Selects recipe for Monday Lunch
     UI->>Store: addMealToSlot("mon", "lunch", recipeId)
-    Store->>Opt: aggregateIngredients(selectedMeals)
+    Store->>Optimizer: aggregateIngredients(selectedMeals)
     Store->>Store: Subtract items marked in Pantry (home stock)
-    Store->>Opt: generateOptimizedGroceryList(remainingRequirements)
-    Opt->>Cache: Fetch current SKU prices (Sklavenitis, AB, etc.)
+    Store->>Optimizer: generateOptimizedGroceryList(remainingRequirements)
+    Optimizer->>Cache: Fetch current SKU prices (Sklavenitis, AB, etc.)
     alt Cache Miss
         Cache->>Ext: HTTP GET /api/v1/products/search?q=...
         Ext-->>Cache: Supermarket price points
-        Cache-->>Opt: Normalized daily prices
+        Cache-->>Optimizer: Normalized daily prices
     else Cache Hit
-        Cache-->>Opt: In-memory cached product page (10m TTL)
+        Cache-->>Optimizer: In-memory cached product page (10m TTL)
     end
-    Opt->>Opt: Compute lowest cost retailer & multi-pack options
-    Opt-->>Store: Return OptimizedGroceryList & BasketComparisons
+    Optimizer->>Optimizer: Compute lowest cost retailer & multi-pack options
+    Optimizer-->>Store: Return OptimizedGroceryList & BasketComparisons
     Store->>UI: Reactive state update (queueMicrotask)
     UI-->>User: Instant update of Grocery List & Store Comparison Matrix
 ```

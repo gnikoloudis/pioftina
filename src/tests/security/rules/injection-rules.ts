@@ -54,10 +54,11 @@ export const injectionSecurityRules: SecurityRule[] = [
         '<svg onload=alert(1)>',
       ];
 
-      for (const payload of xssPayloads) {
+      for (let i = 0; i < xssPayloads.length; i++) {
+        const payload = xssPayloads[i];
         const res = await fetchApi("/api/newsletter/subscribe", {
           method: "POST",
-          headers: { "Content-Type": "application/json", "x-forwarded-for": `198.51.100.${Math.floor(Math.random() * 200)}` },
+          headers: { "Content-Type": "application/json", "x-forwarded-for": `198.51.${100 + i}.${Math.floor(Math.random() * 250) + 1}` },
           body: JSON.stringify({ email: payload }),
         });
         assertEquals(res.status, 400, `Το XSS payload '${payload}' πρέπει να απορρίπτεται με 400`);
