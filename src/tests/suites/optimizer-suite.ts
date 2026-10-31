@@ -3,8 +3,11 @@ import {
   aggregateIngredients,
   computeBasketComparisons,
   computeCartTotals,
+  normalizePackSize,
+  evaluatePackOptions,
 } from "@/lib/optimizer/packaging";
 import { MealSlot, OptimizedGroceryItem } from "@/types/meal-planner";
+import { Product } from "@/lib/posokanei/types";
 import { SEED_RECIPES } from "@/lib/recipes/seed-recipes";
 
 export const optimizerSuite = defineSuite({
@@ -207,6 +210,94 @@ export const optimizerSuite = defineSuite({
         assertEquals(totals.totalCost, 2.20, "Συνολικό κόστος 2.20€");
         assertEquals(totals.purchasedCost, 1.20, "Αγορασμένα 1.20€");
         assertEquals(totals.remainingCost, 1.00, "Απομένουν 1.00€");
+      },
+    }),
+
+    defineTest({
+      id: "optimizer-pack-size-normalization",
+      title: "Κανονικοποίηση μεγέθους συσκευασίας (normalizePackSize)",
+      category: "optimizer",
+      description: "Επαληθεύει ότι συσκευασίες γραμμαρίων (π.χ. 350g, 500g) μετατρέπονται σωστά σε kg χωρίς να επηρεάζονται τα τεμάχια (π.χ. αυγά, κάψουλες).",
+      documentation: "Ελέγχει ότι 500g -> 0.5kg, 350g -> 0.35kg, 1kg -> 1kg, 750ml -> 0.75L, και 10 τεμάχια -> 10 τεμάχια.",
+      tags: ["optimizer", "math", "units"],
+      severity: "critical",
+      run: ({ assertEquals, assertApproxEquals }) => {
+        const dummyProdGrams = {
+          id: "prod-500g",
+          unit: "g",
+          unit_quantity: 500,
+        } as Product;
+        const normGrams = normalizePackSize(dummyProdGrams, "kg");
+        assertApproxEquals(normGrams.packSize, 0.5, 0.001, "500g πρέπει να γίνει 0.5kg");
+        assertEquals(normGrams.packUnit, "kg", "Η μονάδα πρέπει να γίνει kg");
+
+        const dummyAnthotyro = {
+          id: "anthotyro-350g",
+          unit: "g",
+          unit_quantity: 350,
+        } as Product;
+        const normAnthotyro = normalizePackSize(dummyAnthotyro, "kg");
+        assertApproxEquals(normAnthotyro.packSize, 0.35, 0.001, "350g πρέπει να γίνει 0.35kg");
+
+        const dummyEggs = {
+          id: "eggs-10",
+          unit: "τεμ",
+          unit_quantity: 10,
+        } as Product;
+        const normEggs = normalizePackSize(dummyEggs, "τεμ");
+        assertEquals(normEggs.packSize, 10, "10 τεμ πρέπει να παραμείνουν 10");
+        assertEquals(normEggs.packUnit, "τεμ", "Η μονάδα πρέπει να παραμείνει τεμ");
+      },
+    }),
+
+    defineTest({
+      id: "optimizer-realistic-surplus-calculation",
+      title: "Αποφυγή πλασματικών πλεονασμάτων (Realistic Surplus)",
+      category: "optimizer",
+      description: "Επαληθεύει ότι οι συσκευασίες ψωμιού και ανθότυρου υπολογίζουν ρεαλιστικό πλεόνασμα (~0.49kg και ~0.28kg) αντί για +499kg ή +349kg.",
+      documentation: "Εκτελεί evaluatePackOptions με απαιτούμενες ποσότητες 0.51kg (ψωμί/κουλούρι) και 0.42kg (ανθότυρο) και ελέγχει ότι το πλεόνασμα παραμένει < 1kg.",
+      tags: ["optimizer", "surplus", "regression"],
+      severity: "critical",
+      run: ({ assert, assertApproxEquals }) => {
+        // Ψωμί / Κουλούρι: 500g συσκευασία (1.35€), απαιτούμενο 0.51kg
+        const breadProduct = {
+          id: "bread-500g",
+          name: "Ψωμί Προζυμένιο 500g",
+          unit: "g",
+          unit_quantity: 500,
+          retailer_prices: [
+            { retailer: "sklavenitis", price: 1.35, price_normalized: 2.70 },
+          ],
+        } as unknown as Product;
+
+        const breadOptions = evaluatePackOptions(breadProduct, 0.51, ["sklavenitis"], "kg");
+        assert(breadOptions.length > 0, "Πρέπει να παραχθούν επιλογές συσκευασίας για ψωμί");
+        const breadBest = breadOptions[0];
+        assertApproxEquals(breadBest.packSize, 0.5, 0.001, "Το μέγεθος πακέτου πρέπει να είναι 0.5kg");
+        assertApproxEquals(breadBest.totalQuantity, 1.0, 0.001, "2 πακέτα των 0.5kg = 1.0kg");
+        const breadSurplus = breadBest.totalQuantity - 0.51;
+        assertApproxEquals(breadSurplus, 0.49, 0.01, "Το πλεόνασμα πρέπει να είναι 0.49kg (και ΟΧΙ +499.49kg!)");
+        assert(breadSurplus < 1.0, "Το πλεόνασμα δεν επιτρέπεται να υπερβαίνει το μέγεθος της συσκευασίας");
+
+        // Ανθότυρο: 350g συσκευασία (2.40€), απαιτούμενο 0.42kg
+        const anthotyroProduct = {
+          id: "anthotyro-350g",
+          name: "Ανθότυρο Νωπό 350g",
+          unit: "g",
+          unit_quantity: 350,
+          retailer_prices: [
+            { retailer: "sklavenitis", price: 2.40, price_normalized: 6.85 },
+          ],
+        } as unknown as Product;
+
+        const anthoOptions = evaluatePackOptions(anthotyroProduct, 0.42, ["sklavenitis"], "kg");
+        assert(anthoOptions.length > 0, "Πρέπει να παραχθούν επιλογές συσκευασίας για ανθότυρο");
+        const anthoBest = anthoOptions[0];
+        assertApproxEquals(anthoBest.packSize, 0.35, 0.001, "Το μέγεθος πακέτου πρέπει να είναι 0.35kg");
+        assertApproxEquals(anthoBest.totalQuantity, 0.70, 0.001, "2 πακέτα των 0.35kg = 0.70kg");
+        const anthoSurplus = anthoBest.totalQuantity - 0.42;
+        assertApproxEquals(anthoSurplus, 0.28, 0.01, "Το πλεόνασμα πρέπει να είναι 0.28kg (και ΟΧΙ +349.58kg!)");
+        assert(anthoSurplus < 1.0, "Το πλεόνασμα δεν επιτρέπεται να υπερβαίνει το μέγεθος της συσκευασίας");
       },
     }),
   ],

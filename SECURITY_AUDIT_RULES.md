@@ -2,9 +2,9 @@
 
 > Αυτό το έγγραφο παράγεται αυτόματα και περιλαμβάνει αναλυτικά όλους τους κανόνες ασφαλείας του `pioftina.gr`, τις κατηγορίες OWASP Top 10, το μοντέλο απειλών (Threat Impact) και οδηγίες επίλυσης (Remediation).
 
-- **Σύνολο Κανόνων Ασφαλείας**: 32
+- **Σύνολο Κανόνων Ασφαλείας**: 34
 - **Πρότυπα Συμμόρφωσης**: OWASP Top 10 (2021/2025), OWASP ASVS v4.0, CWE Standards
-- **Τελευταία Ενημέρωση**: 25/10/2026, 2:12:33 μ.μ.
+- **Τελευταία Ενημέρωση**: 31/10/2026, 8:20:31 π.μ.
 
 ---
 
@@ -215,6 +215,22 @@ defineSecurityRule({
 - **Μοντέλο Απειλής (Threat Impact)**: Αν το import ήταν δημόσιο, θα μπορούσε να χρησιμοποιηθεί καταχρηστικά ως proxy για DoS σε τρίτα sites ή για εξάντληση των πόρων του server.
 - **Οδηγίες Επίλυσης (Remediation)**: Προστατεύστε το endpoint εισαγωγής με verifyAdminRequest().
 - **Tags**: `acl`, `authorization`, `owasp-a01`
+
+#### `SEC-ACL-ADMIN-TESTS-UNAUTH` — Προστασία Test Runner Endpoint (GET /api/admin/tests 401)
+- **Σοβαρότητα**: 🔴 **CRITICAL**
+- **Πρότυπο CWE**: [CWE-285](https://cwe.mitre.org/data/definitions/285.html)
+- **Περιγραφή Ελέγχου**: Επαληθεύει ότι το endpoint εκτέλεσης δοκιμών QA απαιτεί έγκυρο session διαχειριστή και απορρίπτει ανώνυμα αιτήματα με 401 Unauthorized.
+- **Μοντέλο Απειλής (Threat Impact)**: Ανεξέλεγκτη πρόσβαση στο test runner επιτρέπει σε τρίτους να προκαλούν άσκοπη υπερφόρτωση του server (Resource Exhaustion) και να διαβάζουν εσωτερικά αποτελέσματα QA.
+- **Οδηγίες Επίλυσης (Remediation)**: Ελέγχετε πάντα το session token μέσω verifyAdminRequest() πριν από την έναρξη του test runner.
+- **Tags**: `acl`, `admin`, `tests`, `owasp-a01`
+
+#### `SEC-ACL-ADMIN-SECURITY-UNAUTH` — Προστασία Pentest Audit Endpoint (GET /api/admin/security 401)
+- **Σοβαρότητα**: 🔴 **CRITICAL**
+- **Πρότυπο CWE**: [CWE-200](https://cwe.mitre.org/data/definitions/200.html)
+- **Περιγραφή Ελέγχου**: Επιβεβαιώνει ότι το endpoint αναφοράς ευπαθειών ασφαλείας είναι κλειδωμένο και απορρίπτει ανώνυμα αιτήματα με 401 Unauthorized.
+- **Μοντέλο Απειλής (Threat Impact)**: Διαρροή αναφορών pentest σε μη εξουσιοδοτημένους χρήστες αποκαλύπτει εσωτερικές αδυναμίες και διανύσματα επίθεσης της εφαρμογής.
+- **Οδηγίες Επίλυσης (Remediation)**: Απαιτείτε αυστηρά διαπιστευτήρια διαχειριστή μέσω verifyAdminRequest() στο /api/admin/security.
+- **Tags**: `acl`, `admin`, `security`, `data-leakage`, `owasp-a01`
 
 #### `SEC-LEAK-CLIENT-SECRETS` — Αποτροπή Διαρροής Μυστικών στα Δημόσια Endpoints
 - **Σοβαρότητα**: 🔴 **CRITICAL**

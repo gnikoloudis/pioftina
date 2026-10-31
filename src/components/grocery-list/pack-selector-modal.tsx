@@ -158,9 +158,9 @@ export function PackSelectorModal({
   });
 
   const handleSelectProduct = (product: Product) => {
-    // Generate optimal pack options for the new product matching the needed quantity
     const requiredAmount = item.normalizedRequiredAmount || item.rawRequiredAmount || 1;
-    const options = evaluatePackOptions(product, requiredAmount, preferredSupermarkets);
+    const targetUnit = item.normalizedUnit || item.rawUnit;
+    const options = evaluatePackOptions(product, requiredAmount, preferredSupermarkets, targetUnit);
     const bestOption = options[0];
 
     if (onSelectNewProduct) {

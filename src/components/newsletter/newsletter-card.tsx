@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Mail, Sparkles, CheckCircle2, Loader2, ArrowRight, ShieldCheck, Tag, Utensils, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NewsletterTopic } from "@/types/newsletter";
+import Link from "next/link";
 
 const LOCAL_STORAGE_KEY = "pioftina_newsletter_subscribed";
 const LOCAL_STORAGE_EMAIL = "pioftina_newsletter_email";
@@ -236,7 +237,10 @@ export function NewsletterCard({ source = "footer" }: NewsletterCardProps) {
           <div className="flex items-center gap-2 text-[11px] text-muted-foreground pt-1">
             <ShieldCheck className="size-3.5 text-primary shrink-0" />
             <span>
-              Σεβόμαστε το απόρρητό σας. Κανένα spam, δυνατότητα διαγραφής ανά πάσα στιγμή με ένα κλικ.
+              Σεβόμαστε το απόρρητό σας. Κανένα spam, 1-click διαγραφή.{" "}
+              <Link href="/privacy" className="underline hover:text-primary transition-colors font-medium">
+                Πολιτική Απορρήτου (GDPR)
+              </Link>
             </span>
           </div>
         </form>

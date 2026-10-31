@@ -381,6 +381,22 @@ export function PantryView({
               }`}
             >
               {/* 1. Items from Weekly Plan (Have at home / inPantry) */}
+              {activeSection === "from-plan" && filteredPlanItems.length === 0 && (
+                <div className="p-8 text-center bg-card border border-border rounded-2xl space-y-3 mb-4">
+                  <div className="mx-auto size-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                    <Home className="size-5" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-bold text-xs text-foreground">
+                      Δεν έχετε σημειώσει υλικά από το πρόγραμμα ως &quot;Έχω ήδη στο σπίτι&quot;
+                    </p>
+                    <p className="text-[11px] text-muted-foreground max-w-sm mx-auto">
+                      Στη λίστα αγορών, πατήστε το εικονίδιο 🏠 δίπλα σε οποιοδήποτε υλικό έχετε ήδη στο σπίτι. Θα εμφανιστεί εδώ και θα εξαιρεθεί αυτόματα από το κόστος αγορών!
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {(activeSection === "all" || activeSection === "from-plan") &&
                 filteredPlanItems.length > 0 && (
                   <div className="space-y-3">
@@ -652,6 +668,16 @@ export function PantryView({
                           </div>
                           <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-xs shrink-0 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                             +{item.amount} {item.unit}
+                            {item.unit === "kg" && item.amount < 1 && (
+                              <span className="text-[10px] font-normal opacity-80 ml-1">
+                                ({Math.round(item.amount * 1000)}g)
+                              </span>
+                            )}
+                            {item.unit === "L" && item.amount < 1 && (
+                              <span className="text-[10px] font-normal opacity-80 ml-1">
+                                ({Math.round(item.amount * 1000)}ml)
+                              </span>
+                            )}
                           </span>
                         </div>
 

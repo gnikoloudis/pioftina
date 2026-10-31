@@ -2,8 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAllSuites } from "@/tests/registry";
 import { runTestEngine, RunOptions } from "@/tests/core/runner";
 import { TestCategory } from "@/tests/core/types";
+import { verifyAdminRequest } from "@/lib/security/admin-auth";
 
 export async function GET(req: NextRequest) {
+  const isAdmin = await verifyAdminRequest(req);
+  if (!isAdmin) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Μη εξουσιοδοτημένη πρόσβαση. Απαιτούνται δικαιώματα διαχειριστή.",
+      },
+      { status: 401 }
+    );
+  }
+
   try {
     const url = new URL(req.url);
     const category = (url.searchParams.get("category") || undefined) as TestCategory | undefined;
@@ -38,6 +50,17 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const isAdmin = await verifyAdminRequest(req);
+  if (!isAdmin) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Μη εξουσιοδοτημένη πρόσβαση. Απαιτούνται δικαιώματα διαχειριστή.",
+      },
+      { status: 401 }
+    );
+  }
+
   try {
     const body = await req.json().catch(() => ({}));
     const url = new URL(req.url);

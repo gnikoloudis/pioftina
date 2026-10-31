@@ -139,5 +139,72 @@ export const apiRoutesSuite = defineSuite({
         assertEquals(res.status, 400, "Κλήση χωρίς q ή title πρέπει να επιστρέφει 400 Bad Request");
       },
     }),
+
+    defineTest({
+      id: "api-admin-tests-unauthorized-rejection",
+      title: "Απόρριψη ανώνυμης κλήσης στο GET /api/admin/tests με 401",
+      category: "api",
+      description: "Επιβεβαιώνει ότι κλήση στο /api/admin/tests χωρίς διαπιστευτήρια διαχειριστή επιστρέφει 401 Unauthorized.",
+      documentation: "Στέλνει GET /api/admin/tests χωρίς admin cookie/token και ελέγχει status 401.",
+      tags: ["security", "api", "admin"],
+      severity: "critical",
+      run: async ({ fetchApi, assertEquals }) => {
+        const res = await fetchApi("/api/admin/tests");
+        assertEquals(res.status, 401, "Πρέπει να επιστρέφει 401 Unauthorized για μη εξουσιοδοτημένο χρήστη");
+      },
+    }),
+
+    defineTest({
+      id: "api-admin-security-unauthorized-rejection",
+      title: "Απόρριψη ανώνυμης κλήσης στο GET /api/admin/security με 401",
+      category: "api",
+      description: "Επιβεβαιώνει ότι κλήση στο /api/admin/security χωρίς διαπιστευτήρια διαχειριστή επιστρέφει 401 Unauthorized.",
+      documentation: "Στέλνει GET /api/admin/security χωρίς admin cookie/token και ελέγχει status 401.",
+      tags: ["security", "api", "admin"],
+      severity: "critical",
+      run: async ({ fetchApi, assertEquals }) => {
+        const res = await fetchApi("/api/admin/security");
+        assertEquals(res.status, 401, "Πρέπει να επιστρέφει 401 Unauthorized για μη εξουσιοδοτημένο χρήστη");
+      },
+    }),
+
+    defineTest({
+      id: "api-admin-tests-authorized-success",
+      title: "Επιτυχής εκτέλεση GET /api/admin/tests με έγκυρο Admin Session",
+      category: "api",
+      description: "Επιβεβαιώνει ότι εξουσιοδοτημένος διαχειριστής με pioftina_admin_session λαμβάνει 200 OK και αναφορά δοκιμών.",
+      documentation: "Στέλνει GET /api/admin/tests με Cookie pioftina_admin_session και ελέγχει status 200 και success: true.",
+      tags: ["security", "api", "admin"],
+      severity: "high",
+      run: async ({ fetchApi, adminToken, assertEquals, assert }) => {
+        const res = await fetchApi("/api/admin/tests?category=supermarket", {
+          headers: {
+            Cookie: `pioftina_admin_session=${adminToken}`,
+          },
+        });
+        assertEquals(res.status, 200, "Εξουσιοδοτημένο αίτημα πρέπει να επιστρέφει 200 OK");
+        const data = await res.json();
+        assertEquals(data.success, true, "Απάντηση με success: true");
+        assert(!!data.report, "Πρέπει να επιστρέφει αντικείμενο report");
+      },
+    }),
+
+    defineTest({
+      id: "api-privacy-page-accessible",
+      title: "Δημόσια πρόσβαση και εγκυρότητα της σελίδας Πολιτικής Απορρήτου (/privacy)",
+      category: "api",
+      description: "Επιβεβαιώνει ότι η διαδρομή /privacy είναι δημόσια προσβάσιμη (200 OK) και περιλαμβάνει αναφορές σε GDPR, e-Καταναλωτή και Newsletter.",
+      documentation: "Στέλνει GET /privacy και ελέγχει status 200 και την ύπαρξη των βασικών όρων προστασίας δεδομένων.",
+      tags: ["privacy", "gdpr", "api"],
+      severity: "high",
+      run: async ({ fetchApi, assertEquals, assert }) => {
+        const res = await fetchApi("/privacy");
+        assertEquals(res.status, 200, "Η σελίδα /privacy πρέπει να επιστρέφει HTTP 200 OK");
+        const html = await res.text();
+        assert(html.includes("GDPR") || html.includes("2016/679"), "Πρέπει να περιλαμβάνει αναφορά στον GDPR");
+        assert(html.includes("Privacy by Design") || html.includes("localStorage") || html.includes("τοπική αποθήκευση"), "Πρέπει να περιλαμβάνει αναφορά στο Privacy by Design / localStorage");
+        assert(html.includes("newsletter") || html.includes("Ενημερωτικό Δελτίο") || html.includes("ενημερωτικό δελτίο"), "Πρέπει να περιλαμβάνει αναφορά στο Newsletter");
+      },
+    }),
   ],
 });

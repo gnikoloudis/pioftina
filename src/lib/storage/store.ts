@@ -150,19 +150,36 @@ export function useMealPlannerStore() {
               const mapped = prevSlots.map((slot) => {
                 if (!slot || !slot.recipe) return slot;
                 const updated = recipeMap.get(slot.recipe.id);
-                if (updated && (updated.title !== slot.recipe.title || updated.ingredients?.length !== slot.recipe.ingredients?.length)) {
-                  changed = true;
-                  return {
-                    ...slot,
-                    recipe: {
-                      ...updated,
-                      servings: slot.recipe.servings || updated.servings,
-                    },
-                  };
+                if (updated) {
+                  const ingredientsChanged =
+                    JSON.stringify(
+                      updated.ingredients?.map((i) => ({ id: i.id, amount: i.amount, unit: i.unit }))
+                    ) !==
+                    JSON.stringify(
+                      slot.recipe.ingredients?.map((i) => ({ id: i.id, amount: i.amount, unit: i.unit }))
+                    );
+
+                  if (updated.title !== slot.recipe.title || ingredientsChanged) {
+                    changed = true;
+                    return {
+                      ...slot,
+                      recipe: {
+                        ...updated,
+                        servings: slot.recipe.servings || updated.servings,
+                      },
+                    };
+                  }
                 }
                 return slot;
               });
-              return changed ? mapped : prevSlots;
+              if (changed) {
+                try {
+                  localStorage.setItem(STORAGE_KEYS.SLOTS, JSON.stringify(mapped));
+                } catch (_) {}
+                lastRunKeyRef.current = "";
+                return mapped;
+              }
+              return prevSlots;
             });
           }
         })
@@ -416,7 +433,12 @@ export function useMealPlannerStore() {
     if (!isLoaded) return;
 
     const slotsKey = slots
-      .map((s) => `${s.id}:${s.recipe?.id}:${s.servings}:${s.recipe?.ingredients?.length || 0}`)
+      .map(
+        (s) =>
+          `${s.id}:${s.recipe?.id}:${s.servings}:${s.recipe?.ingredients
+            ?.map((ing) => `${ing.id || ing.name}_${ing.amount}_${ing.unit}`)
+            .join(",") || ""}`
+      )
       .join(";");
     const prefsKey = `${preferences.householdSize}:${preferences.prioritizeBulk}:${preferences.preferredSupermarkets.join(",")}`;
     const customOptsKey = Object.keys(customOptions).sort().join(",");
@@ -866,9 +888,19 @@ export function useMealPlannerStore() {
           const options = evaluatePackOptions(
             product,
             item.normalizedRequiredAmount || item.rawRequiredAmount,
-            preferences.preferredSupermarkets
+            preferences.preferredSupermarkets,
+            item.normalizedUnit || item.rawUnit
           );
           const bestOption = options[0] || item.selectedOption;
+          const newSurplus = bestOption
+            ? Number(
+                Math.max(
+                  0,
+                  bestOption.totalQuantity -
+                    (item.normalizedRequiredAmount || item.rawRequiredAmount)
+                ).toFixed(2)
+              )
+            : item.surplusAmount;
           return {
             ...item,
             ingredientName: product.name,
@@ -878,6 +910,7 @@ export function useMealPlannerStore() {
             isSynthetic: false,
             selectedOption: bestOption,
             alternativeOptions: options.slice(1),
+            surplusAmount: newSurplus,
           };
         }
         return item;
@@ -1147,10 +1180,17 @@ export function useMealPlannerStore() {
 
     persistCustomRecipeToServer(recipe);
 
-    // Also update any scheduled meal slots using this recipe
-    setSlots((prev) =>
-      prev.map((slot) => (slot.recipe?.id === recipe.id ? { ...slot, recipe } : slot))
-    );
+    // Also update any scheduled meal slots using this recipe and persist
+    setSlots((prev) => {
+      const next = prev.map((slot) => (slot.recipe?.id === recipe.id ? { ...slot, recipe } : slot));
+      try {
+        localStorage.setItem(STORAGE_KEYS.SLOTS, JSON.stringify(next));
+      } catch (_) {}
+      return next;
+    });
+
+    // Invalidate optimizer memoization so that changes are immediately reflected
+    lastRunKeyRef.current = "";
   };
 
   const addIngredientToRecipe = (recipeId: string, ingredient: Ingredient) => {
@@ -1167,9 +1207,9 @@ export function useMealPlannerStore() {
       return prev;
     });
 
-    // Also update any scheduled meal slots using this recipe
-    setSlots((prev) =>
-      prev.map((slot) => {
+    // Also update any scheduled meal slots using this recipe and persist
+    setSlots((prev) => {
+      const next = prev.map((slot) => {
         if (slot.recipe?.id === recipeId) {
           const updatedIngredients = [...(slot.recipe.ingredients || []), ingredient];
           return {
@@ -1181,8 +1221,14 @@ export function useMealPlannerStore() {
           };
         }
         return slot;
-      })
-    );
+      });
+      try {
+        localStorage.setItem(STORAGE_KEYS.SLOTS, JSON.stringify(next));
+      } catch (_) {}
+      return next;
+    });
+
+    lastRunKeyRef.current = "";
   };
 
   const deleteCustomRecipe = (recipeId: string) => {

@@ -618,12 +618,22 @@ export default function Home() {
             >
               <Settings className="size-3.5" /> <span>Ρυθμίσεις</span>
             </button>
+            <span>&bull;</span>
+            <Link
+              href="/privacy"
+              className="hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <span>🛡️</span> <span>Πολιτική Απορρήτου</span>
+            </Link>
           </div>
 
           {/* 2. Official Data Source Attribution & Disclaimer */}
           <div className="text-center text-[11px] text-muted-foreground/80 max-w-2xl mx-auto space-y-1">
             <p>
-              <strong>pioftina.gr</strong> &bull; Έξυπνες αγορές σούπερ μάρκετ με αυτόματη σύγκριση τιμών καλαθιού.
+              <strong>pioftina.gr</strong> &bull; Έξυπνες αγορές σούπερ μάρκετ με αυτόματη σύγκριση τιμών καλαθιού &bull;{" "}
+              <Link href="/privacy" className="underline hover:text-foreground font-medium">
+                Πολιτική Απορρήτου (GDPR)
+              </Link>
             </p>
             <p>
               Δεδομένα τιμών και προϊόντων από το επίσημο Παρατηρητήριο Τιμών{" "}
@@ -648,23 +658,38 @@ export default function Home() {
               <span>&bull;</span>
               <span>Next.js 16 (Turbopack)</span>
               <span>&bull;</span>
-              <Link
-                href="/admin/tests"
-                className="hover:text-foreground transition-colors underline font-mono text-[10px]"
-                title="Προβολή αποτελεσμάτων δοκιμών QA & Pentest"
-              >
-                42/42 Tests OK
-              </Link>
+              {isAdmin ? (
+                <Link
+                  href="/admin/tests"
+                  className="hover:text-foreground transition-colors underline font-mono text-[10px]"
+                  title="Προβολή αποτελεσμάτων δοκιμών QA & Pentest"
+                >
+                  42/42 Tests OK
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsAdminLoginOpen(true)}
+                  className="hover:text-foreground transition-colors underline font-mono text-[10px] cursor-pointer"
+                  title="Προβολή αποτελεσμάτων δοκιμών QA & Pentest (Απαιτείται σύνδεση διαχειριστή)"
+                >
+                  42/42 Tests OK
+                </button>
+              )}
             </div>
 
             {/* Right: Administration Controls */}
             <div className="flex items-center gap-2">
               {isAdmin ? (
                 <div className="flex flex-wrap items-center gap-1.5 bg-amber-500/10 border border-amber-500/25 px-3 py-1.5 rounded-xl text-amber-800 dark:text-amber-200">
-                  <span className="inline-flex items-center gap-1 font-bold mr-1">
+                  <Link
+                    href="/admin"
+                    className="inline-flex items-center gap-1 font-bold mr-1 hover:underline transition-colors"
+                    title="Μετάβαση στον Πίνακα Ελέγχου Διαχειριστή"
+                  >
                     <Shield className="size-3.5 text-amber-600 dark:text-amber-400" />
                     <span>Admin</span>
-                  </span>
+                  </Link>
                   <span>&bull;</span>
                   <button
                     id="footer-admin-recipe-studio-btn"

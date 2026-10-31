@@ -98,4 +98,48 @@ export const accessControlSecurityRules: SecurityRule[] = [
       };
     },
   }),
+
+  defineSecurityRule({
+    id: "SEC-ACL-ADMIN-TESTS-UNAUTH",
+    title: "Προστασία Test Runner Endpoint (GET /api/admin/tests 401)",
+    owaspCategory: "A01_BROKEN_ACCESS_CONTROL",
+    cwe: "CWE-285",
+    severity: "critical",
+    description: "Επαληθεύει ότι το endpoint εκτέλεσης δοκιμών QA απαιτεί έγκυρο session διαχειριστή και απορρίπτει ανώνυμα αιτήματα με 401 Unauthorized.",
+    threatImpact: "Ανεξέλεγκτη πρόσβαση στο test runner επιτρέπει σε τρίτους να προκαλούν άσκοπη υπερφόρτωση του server (Resource Exhaustion) και να διαβάζουν εσωτερικά αποτελέσματα QA.",
+    remediation: "Ελέγχετε πάντα το session token μέσω verifyAdminRequest() πριν από την έναρξη του test runner.",
+    tags: ["acl", "admin", "tests", "owasp-a01"],
+    execute: async ({ fetchApi, assertEquals }) => {
+      const res = await fetchApi("/api/admin/tests", {
+        headers: { "x-forwarded-for": "192.0.2.10" },
+      });
+      assertEquals(res.status, 401, "Μη εξουσιοδοτημένη κλήση στο /api/admin/tests πρέπει να επιστρέφει 401 Unauthorized");
+      return {
+        evidence: `GET /api/admin/tests status: ${res.status} (Unauthorized)`,
+        details: "Το test runner endpoint προστατεύεται πλήρως από μη εξουσιοδοτημένη εκτέλεση.",
+      };
+    },
+  }),
+
+  defineSecurityRule({
+    id: "SEC-ACL-ADMIN-SECURITY-UNAUTH",
+    title: "Προστασία Pentest Audit Endpoint (GET /api/admin/security 401)",
+    owaspCategory: "A01_BROKEN_ACCESS_CONTROL",
+    cwe: "CWE-200",
+    severity: "critical",
+    description: "Επιβεβαιώνει ότι το endpoint αναφοράς ευπαθειών ασφαλείας είναι κλειδωμένο και απορρίπτει ανώνυμα αιτήματα με 401 Unauthorized.",
+    threatImpact: "Διαρροή αναφορών pentest σε μη εξουσιοδοτημένους χρήστες αποκαλύπτει εσωτερικές αδυναμίες και διανύσματα επίθεσης της εφαρμογής.",
+    remediation: "Απαιτείτε αυστηρά διαπιστευτήρια διαχειριστή μέσω verifyAdminRequest() στο /api/admin/security.",
+    tags: ["acl", "admin", "security", "data-leakage", "owasp-a01"],
+    execute: async ({ fetchApi, assertEquals }) => {
+      const res = await fetchApi("/api/admin/security", {
+        headers: { "x-forwarded-for": "192.0.2.11" },
+      });
+      assertEquals(res.status, 401, "Μη εξουσιοδοτημένη κλήση στο /api/admin/security πρέπει να επιστρέφει 401 Unauthorized");
+      return {
+        evidence: `GET /api/admin/security status: ${res.status} (Unauthorized)`,
+        details: "Η αναφορά ασφαλείας και pentest είναι προσβάσιμη αποκλειστικά από τον διαχειριστή.",
+      };
+    },
+  }),
 ];

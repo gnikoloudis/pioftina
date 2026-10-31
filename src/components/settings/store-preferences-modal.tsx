@@ -7,6 +7,7 @@ import { Retailer } from "@/lib/posokanei/types";
 import { SupermarketBadge } from "@/components/supermarket-badge";
 import { X, Check, Settings2, Users, ShoppingCart, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface StorePreferencesModalProps {
   isOpen: boolean;
@@ -200,7 +201,7 @@ export function StorePreferencesModal({
             <p className="text-xs text-muted-foreground leading-relaxed">
               Λάβετε εβδομαδιαία οικονομικά μενού, προσφορές από τα επιλεγμένα σούπερ μάρκετ σας και συμβουλές εξοικονόμησης.
             </p>
-            <NewsletterFormCompact />
+            <NewsletterFormCompact onClose={onClose} />
           </div>
         </div>
 
@@ -222,7 +223,7 @@ export function StorePreferencesModal({
   );
 }
 
-function NewsletterFormCompact() {
+function NewsletterFormCompact({ onClose }: { onClose?: () => void }) {
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -301,6 +302,16 @@ function NewsletterFormCompact() {
           {msg}
         </p>
       )}
+      <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-0.5">
+        <span>Κανένα spam, 1-click διαγραφή.</span>
+        <Link
+          href="/privacy"
+          onClick={() => onClose?.()}
+          className="underline hover:text-foreground font-medium transition-colors"
+        >
+          Πολιτική Απορρήτου (GDPR)
+        </Link>
+      </div>
     </form>
   );
 }

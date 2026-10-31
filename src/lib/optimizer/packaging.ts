@@ -100,16 +100,100 @@ export function aggregateIngredients(
 }
 
 /**
+ * Normalizes a product pack size and unit against a target unit (e.g. converting 500g -> 0.5kg when target is kg).
+ */
+export function normalizePackSize(
+  product: Product,
+  targetUnit: string = "kg"
+): { packSize: number; packUnit: string } {
+  const rawSize =
+    product.unit_quantity && product.unit_quantity > 0 ? product.unit_quantity : 1.0;
+  const prodUnit = (product.unit || "").trim().toLowerCase();
+  const tgtUnit = (targetUnit || "kg").trim().toLowerCase();
+
+  const isPieces =
+    prodUnit === "τεμ" ||
+    prodUnit === "τεμ." ||
+    prodUnit === "τεμάχιο" ||
+    prodUnit === "τεμάχια" ||
+    prodUnit === "pcs" ||
+    prodUnit === "pc" ||
+    prodUnit === "item" ||
+    prodUnit === "items" ||
+    prodUnit === "αυγά" ||
+    prodUnit === "αυγα" ||
+    prodUnit === "κάψουλες" ||
+    prodUnit === "καψουλες" ||
+    tgtUnit === "τεμ" ||
+    tgtUnit === "pcs";
+
+  if (isPieces) {
+    return { packSize: rawSize, packUnit: product.unit || tgtUnit };
+  }
+
+  // If target is kg
+  if (tgtUnit === "kg") {
+    // If product is in grams (g, gr, γρ) OR rawSize >= 20
+    if (
+      prodUnit === "g" ||
+      prodUnit === "gr" ||
+      prodUnit === "γρ" ||
+      prodUnit === "gram" ||
+      prodUnit === "grams" ||
+      rawSize >= 20
+    ) {
+      return { packSize: Number((rawSize / 1000).toFixed(4)), packUnit: "kg" };
+    }
+    return { packSize: rawSize, packUnit: "kg" };
+  }
+
+  // If target is g or gr
+  if (tgtUnit === "g" || tgtUnit === "gr" || tgtUnit === "γρ") {
+    if (prodUnit === "kg" || rawSize <= 10) {
+      return { packSize: Number((rawSize * 1000).toFixed(2)), packUnit: "g" };
+    }
+    return { packSize: rawSize, packUnit: "g" };
+  }
+
+  // If target is L / l
+  if (tgtUnit === "l" || tgtUnit === "lt" || tgtUnit === "λίτρο" || tgtUnit === "λιτρο") {
+    if (
+      prodUnit === "ml" ||
+      prodUnit === "μλ" ||
+      prodUnit === "mil" ||
+      rawSize >= 50
+    ) {
+      return { packSize: Number((rawSize / 1000).toFixed(4)), packUnit: "L" };
+    }
+    return { packSize: rawSize, packUnit: "L" };
+  }
+
+  // If target is ml
+  if (tgtUnit === "ml" || tgtUnit === "μλ") {
+    if (prodUnit === "l" || prodUnit === "lt" || rawSize <= 10) {
+      return { packSize: Number((rawSize * 1000).toFixed(2)), packUnit: "ml" };
+    }
+    return { packSize: rawSize, packUnit: "ml" };
+  }
+
+  // Fallback
+  return { packSize: rawSize, packUnit: product.unit || tgtUnit };
+}
+
+/**
  * Evaluates packaging options from posokanei products for a given required amount
  */
 export function evaluatePackOptions(
   product: Product,
   requiredAmount: number,
-  preferredSupermarkets: string[]
+  preferredSupermarkets: string[],
+  targetUnit?: string
 ): PackOption[] {
   const options: PackOption[] = [];
-  const packSize = product.unit_quantity || 1.0;
-  const packUnit = product.unit || "kg";
+  const { packSize, packUnit } = normalizePackSize(
+    product,
+    targetUnit || product.unit || "kg"
+  );
 
   // Filter retailer prices to preferred stores if specified
   const eligiblePrices = (product.retailer_prices || []).filter((rp) => {
@@ -122,8 +206,8 @@ export function evaluatePackOptions(
 
   if (pricesToEvaluate.length > 0) {
     for (const rp of pricesToEvaluate) {
-      const packCount = Math.max(1, Math.ceil(requiredAmount / packSize));
-      const totalQuantity = packCount * packSize;
+      const packCount = Math.max(1, Math.ceil(requiredAmount / Math.max(0.0001, packSize)));
+      const totalQuantity = Number((packCount * packSize).toFixed(3));
       const totalPrice = Number((packCount * rp.price).toFixed(2));
       const unitPrice = Number(
         (rp.price_normalized || (packSize > 0 ? rp.price / packSize : rp.price)).toFixed(2)
@@ -152,8 +236,8 @@ export function evaluatePackOptions(
   } else if (product.price_stats && product.price_stats.min_price > 0) {
     // If retailer_prices is empty but price_stats exists
     const fallbackRetailer = preferredSupermarkets[0] || "sklavenitis";
-    const packCount = Math.max(1, Math.ceil(requiredAmount / packSize));
-    const totalQuantity = packCount * packSize;
+    const packCount = Math.max(1, Math.ceil(requiredAmount / Math.max(0.0001, packSize)));
+    const totalQuantity = Number((packCount * packSize).toFixed(3));
     const price = product.price_stats.min_price;
     const totalPrice = Number((packCount * price).toFixed(2));
     const unitPrice = Number(
@@ -308,7 +392,8 @@ export async function generateOptimizedGroceryList(
       const curatedOptions = evaluatePackOptions(
         agg.curatedProduct,
         agg.normalizedAmount,
-        preferences.preferredSupermarkets
+        preferences.preferredSupermarkets,
+        agg.normalizedUnit
       );
       allOptions.push(...curatedOptions);
 
@@ -337,7 +422,8 @@ export async function generateOptimizedGroceryList(
         const variantOptions = evaluatePackOptions(
           v,
           agg.normalizedAmount,
-          preferences.preferredSupermarkets
+          preferences.preferredSupermarkets,
+          agg.normalizedUnit
         );
         allOptions.push(...variantOptions);
       }
@@ -377,7 +463,8 @@ export async function generateOptimizedGroceryList(
         const options = evaluatePackOptions(
           prod,
           agg.normalizedAmount,
-          preferences.preferredSupermarkets
+          preferences.preferredSupermarkets,
+          agg.normalizedUnit
         );
         allOptions.push(...options);
       }

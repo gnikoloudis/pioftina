@@ -3,8 +3,8 @@
 > Αυτό το έγγραφο παράγεται αυτόματα και περιλαμβάνει αναλυτικά όλα τα tests του `pioftina.gr`, τις κατηγορίες τους, τι επαληθεύει το καθένα και πώς να προσθέσετε νέα tests.
 
 - **Σύνολο Σουιτών**: 9
-- **Σύνολο Καταχωρημένων Tests**: 46
-- **Τελευταία Ενημέρωση**: 25/10/2026, 2:12:32 μ.μ.
+- **Σύνολο Καταχωρημένων Tests**: 49
+- **Τελευταία Ενημέρωση**: 31/10/2026, 8:20:27 π.μ.
 
 ---
 
@@ -226,6 +226,9 @@ defineTest({
 | 5 | **Απόρριψη άκυρης διεύθυνσης email στο Newsletter** | `api-newsletter-subscribe-invalid-email-rejection` | 🟡 Medium | `newsletter, validation` | Ελέγχει ότι μορφές όπως 'invalid-email', 'user@', '@domain.com' απορρίπτονται με 400 Bad Request. |
 | 6 | **Δημόσια αναζήτηση προϊόντων με GET /api/posokanei/search?q=...** | `api-posokanei-search-get-query` | 🔴 Critical | `posokanei, search, api` | Επαληθεύει ότι το GET endpoint αναζήτησης προϊόντων ανταποκρίνεται με 200 OK και επιστρέφει JSON αποτελέσματα. |
 | 7 | **Απόρριψη κενής παραμέτρου αναζήτησης στο GET /api/posokanei/search** | `api-posokanei-search-get-empty-rejection` | 🟡 Medium | `posokanei, validation, api` | Ελέγχει ότι κλήση GET χωρίς query string 'q' ή 'title' απορρίπτεται με 400 Bad Request. |
+| 8 | **Απόρριψη ανώνυμης κλήσης στο GET /api/admin/tests με 401** | `api-admin-tests-unauthorized-rejection` | 🔴 Critical | `security, api, admin` | Επιβεβαιώνει ότι κλήση στο /api/admin/tests χωρίς διαπιστευτήρια διαχειριστή επιστρέφει 401 Unauthorized. |
+| 9 | **Απόρριψη ανώνυμης κλήσης στο GET /api/admin/security με 401** | `api-admin-security-unauthorized-rejection` | 🔴 Critical | `security, api, admin` | Επιβεβαιώνει ότι κλήση στο /api/admin/security χωρίς διαπιστευτήρια διαχειριστή επιστρέφει 401 Unauthorized. |
+| 10 | **Επιτυχής εκτέλεση GET /api/admin/tests με έγκυρο Admin Session** | `api-admin-tests-authorized-success` | 🟠 High | `security, api, admin` | Επιβεβαιώνει ότι εξουσιοδοτημένος διαχειριστής με pioftina_admin_session λαμβάνει 200 OK και αναφορά δοκιμών. |
 
 #### Αναλυτικές Λεπτομέρειες Ελέγχων Σουίτας:
 - **`api-recipes-get-public` - Δημόσια πρόσβαση στο GET /api/recipes**:
@@ -256,6 +259,18 @@ defineTest({
   - *Σκοπός*: Ελέγχει ότι κλήση GET χωρίς query string 'q' ή 'title' απορρίπτεται με 400 Bad Request.
   - *Τεκμηρίωση*: Στέλνει GET /api/posokanei/search χωρίς παραμέτρους και επαληθεύει status 400.
   - *Tags*: `posokanei`, `validation`, `api`
+- **`api-admin-tests-unauthorized-rejection` - Απόρριψη ανώνυμης κλήσης στο GET /api/admin/tests με 401**:
+  - *Σκοπός*: Επιβεβαιώνει ότι κλήση στο /api/admin/tests χωρίς διαπιστευτήρια διαχειριστή επιστρέφει 401 Unauthorized.
+  - *Τεκμηρίωση*: Στέλνει GET /api/admin/tests χωρίς admin cookie/token και ελέγχει status 401.
+  - *Tags*: `security`, `api`, `admin`
+- **`api-admin-security-unauthorized-rejection` - Απόρριψη ανώνυμης κλήσης στο GET /api/admin/security με 401**:
+  - *Σκοπός*: Επιβεβαιώνει ότι κλήση στο /api/admin/security χωρίς διαπιστευτήρια διαχειριστή επιστρέφει 401 Unauthorized.
+  - *Τεκμηρίωση*: Στέλνει GET /api/admin/security χωρίς admin cookie/token και ελέγχει status 401.
+  - *Tags*: `security`, `api`, `admin`
+- **`api-admin-tests-authorized-success` - Επιτυχής εκτέλεση GET /api/admin/tests με έγκυρο Admin Session**:
+  - *Σκοπός*: Επιβεβαιώνει ότι εξουσιοδοτημένος διαχειριστής με pioftina_admin_session λαμβάνει 200 OK και αναφορά δοκιμών.
+  - *Τεκμηρίωση*: Στέλνει GET /api/admin/tests με Cookie pioftina_admin_session και ελέγχει status 200 και success: true.
+  - *Tags*: `security`, `api`, `admin`
 
 ---
 
