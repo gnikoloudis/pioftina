@@ -8,15 +8,18 @@
     Optional custom git commit message.
 .PARAMETER SkipTests
     Skip automated tests (NOT recommended).
+.PARAMETER CheckVercel
+    Run Vercel deployment & log diagnostics after pushing.
 .EXAMPLE
     .\scripts\push-to-github.ps1
 .EXAMPLE
-    .\scripts\push-to-github.ps1 -CommitMessage "feat: add new feature"
+    .\scripts\push-to-github.ps1 -CommitMessage "feat: add new feature" -CheckVercel
 #>
 [CmdletBinding()]
 param (
     [string]$CommitMessage = "chore: update documentation, architecture specifications, and CI pipeline",
-    [switch]$SkipTests
+    [switch]$SkipTests,
+    [switch]$CheckVercel
 )
 
 $ErrorActionPreference = "Stop"
@@ -98,6 +101,12 @@ git push -u origin main
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Git push failed. Verify your GitHub network connection or authentication credentials."
     exit 1
+}
+
+if ($CheckVercel) {
+    Write-Host ""
+    Write-Host "[Vercel] Running Vercel Deployment & Log Diagnostics..." -ForegroundColor Cyan
+    & npm run vercel:diagnose
 }
 
 Write-Host ""

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { ADMIN_COOKIE_NAME, verifyAdminToken } from "@/lib/security/admin-auth";
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
   robots: "noindex, nofollow",
 };
 
-export default async function AdminLayout({
+async function AdminAuthBoundary({
   children,
 }: {
   children: React.ReactNode;
@@ -28,5 +29,23 @@ export default async function AdminLayout({
       <AdminTopNav />
       <div className="flex-1">{children}</div>
     </div>
+  );
+}
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex items-center justify-center font-sans text-xs text-muted-foreground">
+          Έλεγχος συνεδρίας διαχειριστή...
+        </div>
+      }
+    >
+      <AdminAuthBoundary>{children}</AdminAuthBoundary>
+    </Suspense>
   );
 }

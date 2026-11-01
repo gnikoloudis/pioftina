@@ -13,6 +13,10 @@
     "pentest": "tsx src/tests/security/runner/cli.ts",
     "test:security": "tsx src/tests/security/runner/cli.ts",
     "pentest:docs": "tsx src/tests/security/generate-security-docs.ts",
+    "vercel:diagnose": "tsx src/tests/runner/vercel-diagnostics.ts",
+    "vercel:errors": "tsx src/tests/runner/vercel-diagnostics.ts --mode=errors",
+    "vercel:build-logs": "tsx src/tests/runner/vercel-diagnostics.ts --mode=build",
+    "vercel:logs": "powershell -ExecutionPolicy Bypass -File ./scripts/check-vercel-logs.ps1",
     "ship": "powershell -ExecutionPolicy Bypass -File ./scripts/push-to-github.ps1"
   },
   "dependencies": {
@@ -20,6 +24,7 @@
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
     "@tanstack/react-query": "^5.104.3",
+    "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cn": "^0.5.0",
