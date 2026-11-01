@@ -199,6 +199,14 @@ export async function searchProducts(
 
       const data: ProductPage = await res.json();
 
+      if (!data.products || data.products.length === 0) {
+        const fallback = getFallbackSearchResults(cleanTitle, params);
+        if (fallback.products.length > 0) {
+          setCached(cacheKey, fallback);
+          return fallback;
+        }
+      }
+
       // Ensure product image_url is absolute
       if (data.products) {
         data.products = data.products.map((p) => ({

@@ -1448,5 +1448,55 @@
     "source": "footer",
     "status": "active",
     "userAgent": "node"
+  },
+  {
+    "id": "sub-mvxkrqgq-nzm2",
+    "email": "test-user-1793522132641@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-11-01T08:35:32.666Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvxkruid-vb3w",
+    "email": "test-1793522137885@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-11-01T08:35:37.909Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvxksb9z-cl8k",
+    "email": "test-user-1793522159617@example.com",
+    "topics": [
+      "deals",
+      "recipes"
+    ],
+    "subscribedAt": "2026-11-01T08:35:59.639Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
+  },
+  {
+    "id": "sub-mvxksdr6-hnnp",
+    "email": "test-1793522162826@example.com",
+    "topics": [
+      "deals",
+      "recipes",
+      "budget_tips"
+    ],
+    "subscribedAt": "2026-11-01T08:36:02.850Z",
+    "source": "footer",
+    "status": "active",
+    "userAgent": "node"
   }
 ]

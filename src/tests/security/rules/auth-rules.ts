@@ -101,9 +101,10 @@ export const authSecurityRules: SecurityRule[] = [
     tags: ["auth", "cookies", "httponly", "csrf", "owasp-a05"],
     execute: async ({ fetchApi, assert }) => {
       const secret = getAdminSecretKey();
+      const testIp = `10.99.${Math.floor(Math.random() * 200) + 1}.${Math.floor(Math.random() * 200) + 1}`;
       const res = await fetchApi("/api/admin/auth", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-forwarded-for": "10.99.1.1" },
+        headers: { "Content-Type": "application/json", "x-forwarded-for": testIp },
         body: JSON.stringify({ password: secret }),
       });
 

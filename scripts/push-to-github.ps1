@@ -51,7 +51,7 @@ Write-Host "      [OK] TypeScript compilation passed (0 errors)." -ForegroundCol
 
 # 3. Quality Gate: Full Test Suite
 if (-not $SkipTests) {
-    Write-Host "[3/6] Running Full Test Suite (46 Tests across 9 Suites)..." -ForegroundColor Cyan
+    Write-Host "[3/6] Running Full Test Suite (52 Tests across 9 Suites)..." -ForegroundColor Cyan
     & npm test
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Test suite failed. Push aborted."
@@ -60,7 +60,7 @@ if (-not $SkipTests) {
     Write-Host "      [OK] All tests passed (100 percent)." -ForegroundColor Green
 
     # 4. Quality Gate: OWASP Penetration Testing
-    Write-Host "[4/6] Running OWASP ASVS Penetration Testing Audit (32 Rules)..." -ForegroundColor Cyan
+    Write-Host "[4/6] Running OWASP ASVS Penetration Testing Audit (34 Rules)..." -ForegroundColor Cyan
     & npm run pentest
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Security audit failed. Push aborted."

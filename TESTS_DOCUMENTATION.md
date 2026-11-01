@@ -3,8 +3,8 @@
 > Αυτό το έγγραφο παράγεται αυτόματα και περιλαμβάνει αναλυτικά όλα τα tests του `pioftina.gr`, τις κατηγορίες τους, τι επαληθεύει το καθένα και πώς να προσθέσετε νέα tests.
 
 - **Σύνολο Σουιτών**: 9
-- **Σύνολο Καταχωρημένων Tests**: 49
-- **Τελευταία Ενημέρωση**: 31/10/2026, 8:20:27 π.μ.
+- **Σύνολο Καταχωρημένων Tests**: 52
+- **Τελευταία Ενημέρωση**: 1/11/2026, 10:36:04 π.μ.
 
 ---
 
@@ -108,6 +108,8 @@ defineTest({
 | 2 | **Κανονικοποίηση μονάδων (g -> kg, ml -> L)** | `optimizer-unit-normalization-g-to-kg` | 🟠 High | `optimizer, math` | Επαληθεύει ότι ποσότητες σε γραμμάρια μετατρέπονται σωστά σε δεκαδικά κιλά για αναζήτηση συσκευασιών. |
 | 3 | **Σύγκριση συνολικού καλαθιού σούπερ μάρκετ** | `optimizer-supermarket-basket-comparison` | 🔴 Critical | `optimizer, retailers, pricing` | Ελέγχει ότι η συνάρτηση computeBasketComparisons επιστρέφει ορθές τιμές για όλες τις υποστηριζόμενες αλυσίδες. |
 | 4 | **Υπολογισμός συνολικού κόστους καλαθιού και κέρδους bulk** | `optimizer-cart-totals-and-savings` | 🟠 High | `optimizer, cart` | Επιβεβαιώνει ότι το computeCartTotals υπολογίζει σωστά το remainingCost και το totalSavings. |
+| 5 | **Κανονικοποίηση μεγέθους συσκευασίας (normalizePackSize)** | `optimizer-pack-size-normalization` | 🔴 Critical | `optimizer, math, units` | Επαληθεύει ότι συσκευασίες γραμμαρίων (π.χ. 350g, 500g) μετατρέπονται σωστά σε kg χωρίς να επηρεάζονται τα τεμάχια (π.χ. αυγά, κάψουλες). |
+| 6 | **Αποφυγή πλασματικών πλεονασμάτων (Realistic Surplus)** | `optimizer-realistic-surplus-calculation` | 🔴 Critical | `optimizer, surplus, regression` | Επαληθεύει ότι οι συσκευασίες ψωμιού και ανθότυρου υπολογίζουν ρεαλιστικό πλεόνασμα (~0.49kg και ~0.28kg) αντί για +499kg ή +349kg. |
 
 #### Αναλυτικές Λεπτομέρειες Ελέγχων Σουίτας:
 - **`optimizer-ingredient-aggregation` - Συνένωση κοινών υλικών από πολλαπλά γεύματα**:
@@ -126,6 +128,14 @@ defineTest({
   - *Σκοπός*: Επιβεβαιώνει ότι το computeCartTotals υπολογίζει σωστά το remainingCost και το totalSavings.
   - *Τεκμηρίωση*: Ελέγχει ότι purchased items αφαιρούνται σωστά από το remainingCost και προστίθενται στο purchasedCost.
   - *Tags*: `optimizer`, `cart`
+- **`optimizer-pack-size-normalization` - Κανονικοποίηση μεγέθους συσκευασίας (normalizePackSize)**:
+  - *Σκοπός*: Επαληθεύει ότι συσκευασίες γραμμαρίων (π.χ. 350g, 500g) μετατρέπονται σωστά σε kg χωρίς να επηρεάζονται τα τεμάχια (π.χ. αυγά, κάψουλες).
+  - *Τεκμηρίωση*: Ελέγχει ότι 500g -> 0.5kg, 350g -> 0.35kg, 1kg -> 1kg, 750ml -> 0.75L, και 10 τεμάχια -> 10 τεμάχια.
+  - *Tags*: `optimizer`, `math`, `units`
+- **`optimizer-realistic-surplus-calculation` - Αποφυγή πλασματικών πλεονασμάτων (Realistic Surplus)**:
+  - *Σκοπός*: Επαληθεύει ότι οι συσκευασίες ψωμιού και ανθότυρου υπολογίζουν ρεαλιστικό πλεόνασμα (~0.49kg και ~0.28kg) αντί για +499kg ή +349kg.
+  - *Τεκμηρίωση*: Εκτελεί evaluatePackOptions με απαιτούμενες ποσότητες 0.51kg (ψωμί/κουλούρι) και 0.42kg (ανθότυρο) και ελέγχει ότι το πλεόνασμα παραμένει < 1kg.
+  - *Tags*: `optimizer`, `surplus`, `regression`
 
 ---
 
@@ -229,6 +239,7 @@ defineTest({
 | 8 | **Απόρριψη ανώνυμης κλήσης στο GET /api/admin/tests με 401** | `api-admin-tests-unauthorized-rejection` | 🔴 Critical | `security, api, admin` | Επιβεβαιώνει ότι κλήση στο /api/admin/tests χωρίς διαπιστευτήρια διαχειριστή επιστρέφει 401 Unauthorized. |
 | 9 | **Απόρριψη ανώνυμης κλήσης στο GET /api/admin/security με 401** | `api-admin-security-unauthorized-rejection` | 🔴 Critical | `security, api, admin` | Επιβεβαιώνει ότι κλήση στο /api/admin/security χωρίς διαπιστευτήρια διαχειριστή επιστρέφει 401 Unauthorized. |
 | 10 | **Επιτυχής εκτέλεση GET /api/admin/tests με έγκυρο Admin Session** | `api-admin-tests-authorized-success` | 🟠 High | `security, api, admin` | Επιβεβαιώνει ότι εξουσιοδοτημένος διαχειριστής με pioftina_admin_session λαμβάνει 200 OK και αναφορά δοκιμών. |
+| 11 | **Δημόσια πρόσβαση και εγκυρότητα της σελίδας Πολιτικής Απορρήτου (/privacy)** | `api-privacy-page-accessible` | 🟠 High | `privacy, gdpr, api` | Επιβεβαιώνει ότι η διαδρομή /privacy είναι δημόσια προσβάσιμη (200 OK) και περιλαμβάνει αναφορές σε GDPR, e-Καταναλωτή και Newsletter. |
 
 #### Αναλυτικές Λεπτομέρειες Ελέγχων Σουίτας:
 - **`api-recipes-get-public` - Δημόσια πρόσβαση στο GET /api/recipes**:
@@ -271,6 +282,10 @@ defineTest({
   - *Σκοπός*: Επιβεβαιώνει ότι εξουσιοδοτημένος διαχειριστής με pioftina_admin_session λαμβάνει 200 OK και αναφορά δοκιμών.
   - *Τεκμηρίωση*: Στέλνει GET /api/admin/tests με Cookie pioftina_admin_session και ελέγχει status 200 και success: true.
   - *Tags*: `security`, `api`, `admin`
+- **`api-privacy-page-accessible` - Δημόσια πρόσβαση και εγκυρότητα της σελίδας Πολιτικής Απορρήτου (/privacy)**:
+  - *Σκοπός*: Επιβεβαιώνει ότι η διαδρομή /privacy είναι δημόσια προσβάσιμη (200 OK) και περιλαμβάνει αναφορές σε GDPR, e-Καταναλωτή και Newsletter.
+  - *Τεκμηρίωση*: Στέλνει GET /privacy και ελέγχει status 200 και την ύπαρξη των βασικών όρων προστασίας δεδομένων.
+  - *Tags*: `privacy`, `gdpr`, `api`
 
 ---
 

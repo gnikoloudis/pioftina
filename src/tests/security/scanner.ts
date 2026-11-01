@@ -9,6 +9,10 @@ import {
   SecurityCategoryStats,
 } from "./types";
 import { getAllSecurityRules } from "./registry";
+import {
+  dispatchInProcessRequest,
+  isLocalhostUrl,
+} from "../core/in-process-dispatcher";
 
 export interface ScanOptions {
   rules?: SecurityRule[];
@@ -30,7 +34,14 @@ export function createSecurityContext(baseUrl: string): SecurityContext {
       ? pathOrUrl
       : `${normalizedBase}${pathOrUrl.startsWith("/") ? "" : "/"}${pathOrUrl}`;
 
-    return fetch(targetUrl, init);
+    try {
+      return await fetch(targetUrl, init);
+    } catch (err) {
+      if (isLocalhostUrl(targetUrl)) {
+        return dispatchInProcessRequest(targetUrl, init);
+      }
+      throw err;
+    }
   };
 
   const assert = (condition: boolean, message: string) => {

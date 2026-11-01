@@ -7,6 +7,10 @@ import {
   assertContains,
 } from "./assertions";
 import { createAdminToken } from "@/lib/security/admin-auth";
+import {
+  dispatchInProcessRequest,
+  isLocalhostUrl,
+} from "./in-process-dispatcher";
 
 /**
  * Creates an execution context for running tests either locally or against a deployed server (Vercel)
@@ -28,10 +32,20 @@ export function createTestContext(baseUrlOverride?: string): TestContext {
       headers.set("Content-Type", "application/json");
     }
 
-    return fetch(url, {
-      ...init,
-      headers,
-    });
+    try {
+      return await fetch(url, {
+        ...init,
+        headers,
+      });
+    } catch (err) {
+      if (isLocalhostUrl(url)) {
+        return dispatchInProcessRequest(url, {
+          ...init,
+          headers,
+        });
+      }
+      throw err;
+    }
   };
 
   return {
