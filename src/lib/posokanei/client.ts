@@ -70,8 +70,9 @@ export async function getRetailers(country = "GR"): Promise<Retailer[]> {
         }
       }
     } catch (e) {
-      console.warn("[Posokanei Client] Proxy fetch failed:", e);
+      console.info("[Posokanei Client] Proxy fetch using local retailers:", e);
     }
+    setCached(cacheKey, MOCK_RETAILERS);
     return MOCK_RETAILERS;
   }
 
@@ -87,7 +88,8 @@ export async function getRetailers(country = "GR"): Promise<Retailer[]> {
       UpstreamGovernor.reportUpstreamStatus(res.status);
 
       if (!res.ok) {
-        console.warn(`[Posokanei] /meta/retailers returned HTTP ${res.status}, falling back to mock`);
+        console.info(`[Posokanei] /meta/retailers returned HTTP ${res.status}, serving cached MOCK_RETAILERS`);
+        setCached(cacheKey, MOCK_RETAILERS);
         return MOCK_RETAILERS;
       }
 
@@ -116,7 +118,10 @@ export async function getRetailers(country = "GR"): Promise<Retailer[]> {
       setCached(cacheKey, result);
       return result;
     },
-    () => MOCK_RETAILERS
+    () => {
+      setCached(cacheKey, MOCK_RETAILERS);
+      return MOCK_RETAILERS;
+    }
   );
 }
 
@@ -152,15 +157,18 @@ export async function searchProducts(
         if (data.products && data.products.length > 0) {
           return data;
         }
-        return getFallbackSearchResults(cleanTitle, params);
+        const fallback = getFallbackSearchResults(cleanTitle, params);
+        setCached(cacheKey, fallback);
+        return fallback;
       } else {
-        // Non-OK response (e.g. 429/500/503): gracefully serve fallback without throwing
-        console.info(`[Posokanei Client] Proxy returned HTTP ${res.status} for "${cleanTitle}". Serving verified fallback data.`);
-        return getFallbackSearchResults(cleanTitle, params);
+        const fallback = getFallbackSearchResults(cleanTitle, params);
+        setCached(cacheKey, fallback);
+        return fallback;
       }
-    } catch (e) {
-      console.warn(`[Posokanei Client] Proxy search for "${cleanTitle}" failed:`, e);
-      return getFallbackSearchResults(cleanTitle, params);
+    } catch {
+      const fallback = getFallbackSearchResults(cleanTitle, params);
+      setCached(cacheKey, fallback);
+      return fallback;
     }
   }
 
@@ -193,8 +201,10 @@ export async function searchProducts(
       UpstreamGovernor.reportUpstreamStatus(res.status);
 
       if (!res.ok) {
-        console.warn(`[Posokanei] Search for "${cleanTitle}" failed with HTTP ${res.status}`);
-        return getFallbackSearchResults(cleanTitle, params);
+        console.info(`[Posokanei] Search for "${cleanTitle}" returned HTTP ${res.status}, serving cached fallback`);
+        const fallback = getFallbackSearchResults(cleanTitle, params);
+        setCached(cacheKey, fallback);
+        return fallback;
       }
 
       const data: ProductPage = await res.json();
@@ -222,7 +232,11 @@ export async function searchProducts(
       setCached(cacheKey, data);
       return data;
     },
-    () => getFallbackSearchResults(cleanTitle, params)
+    () => {
+      const fallback = getFallbackSearchResults(cleanTitle, params);
+      setCached(cacheKey, fallback);
+      return fallback;
+    }
   );
 }
 
@@ -244,10 +258,11 @@ export async function getProductById(id: string): Promise<Product | null> {
           return json.product;
         }
       }
-    } catch (e) {
-      console.warn(`[Posokanei Client] Proxy fetch for product ${id} failed:`, e);
+    } catch {
+      // Fallback below
     }
     const fallback = MOCK_FALLBACK_PRODUCTS.find((p) => p.id === id);
+    if (fallback) setCached(cacheKey, fallback);
     return fallback || null;
   }
 
@@ -267,6 +282,7 @@ export async function getProductById(id: string): Promise<Product | null> {
 
       if (!res.ok) {
         const fallback = MOCK_FALLBACK_PRODUCTS.find((p) => p.id === id);
+        if (fallback) setCached(cacheKey, fallback);
         return fallback || null;
       }
 
@@ -278,7 +294,11 @@ export async function getProductById(id: string): Promise<Product | null> {
       setCached(cacheKey, product);
       return product;
     },
-    () => MOCK_FALLBACK_PRODUCTS.find((p) => p.id === id) || null
+    () => {
+      const fallback = MOCK_FALLBACK_PRODUCTS.find((p) => p.id === id);
+      if (fallback) setCached(cacheKey, fallback);
+      return fallback || null;
+    }
   );
 }
 

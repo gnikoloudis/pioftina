@@ -4,7 +4,7 @@
 
 - **Σύνολο Σουιτών**: 9
 - **Σύνολο Καταχωρημένων Tests**: 52
-- **Τελευταία Ενημέρωση**: 1/11/2026, 10:56:42 π.μ.
+- **Τελευταία Ενημέρωση**: 1/11/2026, 11:11:14 π.μ.
 
 ---
 
@@ -232,7 +232,7 @@ defineTest({
 | 1 | **Δημόσια πρόσβαση στο GET /api/recipes** | `api-recipes-get-public` | 🔴 Critical | `smoke, api` | Επιβεβαιώνει ότι οποιοσδήποτε επισκέπτης μπορεί να διαβάσει τις συνταγές χωρίς authentication. |
 | 2 | **Προστασία POST /api/recipes/import από μη εξουσιοδοτημένους χρήστες** | `api-recipes-import-unauthorized-rejection` | 🔴 Critical | `security, api, admin` | Επιβεβαιώνει ότι κλήση εισαγωγής συνταγής χωρίς admin cookie/token απορρίπτεται με 401 Unauthorized. |
 | 3 | **Προστασία DELETE /api/recipes από μη εξουσιοδοτημένους χρήστες** | `api-recipes-delete-unauthorized-rejection` | 🟠 High | `security, api` | Επιβεβαιώνει ότι διαγραφή συνταγής απαιτεί αυστηρά δικαιώματα διαχειριστή. |
-| 4 | **Εγγραφή στο Newsletter με έγκυρο email** | `api-newsletter-subscribe-valid-email` | 🟠 High | `newsletter, api` | Επαληθεύει ότι αποστέλλοντας έγκυρο email στο /api/newsletter/subscribe λαμβάνουμε 200 OK. |
+| 4 | **Εγγραφή στο Newsletter με έγκυρο email** | `api-newsletter-subscribe-valid-email` | 🟠 High | `newsletter, api` | Επαληθεύει ότι αποστέλλοντας έγκυρο email στο /api/newsletter/subscribe λαμβάνουμε 200 OK (και σε serverless read-only περιβάλλον). |
 | 5 | **Απόρριψη άκυρης διεύθυνσης email στο Newsletter** | `api-newsletter-subscribe-invalid-email-rejection` | 🟡 Medium | `newsletter, validation` | Ελέγχει ότι μορφές όπως 'invalid-email', 'user@', '@domain.com' απορρίπτονται με 400 Bad Request. |
 | 6 | **Δημόσια αναζήτηση προϊόντων με GET /api/posokanei/search?q=...** | `api-posokanei-search-get-query` | 🔴 Critical | `posokanei, search, api` | Επαληθεύει ότι το GET endpoint αναζήτησης προϊόντων ανταποκρίνεται με 200 OK και επιστρέφει JSON αποτελέσματα. |
 | 7 | **Απόρριψη κενής παραμέτρου αναζήτησης στο GET /api/posokanei/search** | `api-posokanei-search-get-empty-rejection` | 🟡 Medium | `posokanei, validation, api` | Ελέγχει ότι κλήση GET χωρίς query string 'q' ή 'title' απορρίπτεται με 400 Bad Request. |
@@ -255,8 +255,8 @@ defineTest({
   - *Τεκμηρίωση*: Στέλνει DELETE /api/recipes?id=moussaka χωρίς admin credentials και ελέγχει status 401.
   - *Tags*: `security`, `api`
 - **`api-newsletter-subscribe-valid-email` - Εγγραφή στο Newsletter με έγκυρο email**:
-  - *Σκοπός*: Επαληθεύει ότι αποστέλλοντας έγκυρο email στο /api/newsletter/subscribe λαμβάνουμε 200 OK.
-  - *Τεκμηρίωση*: Στέλνει POST αίτημα με μοναδικό email δοκιμής και θέματα ενδιαφέροντος.
+  - *Σκοπός*: Επαληθεύει ότι αποστέλλοντας έγκυρο email στο /api/newsletter/subscribe λαμβάνουμε 200 OK (και σε serverless read-only περιβάλλον).
+  - *Τεκμηρίωση*: Στέλνει POST αίτημα με μοναδικό email δοκιμής και επαληθεύει επίσης το serverless-safe JSON store.
   - *Tags*: `newsletter`, `api`
 - **`api-newsletter-subscribe-invalid-email-rejection` - Απόρριψη άκυρης διεύθυνσης email στο Newsletter**:
   - *Σκοπός*: Ελέγχει ότι μορφές όπως 'invalid-email', 'user@', '@domain.com' απορρίπτονται με 400 Bad Request.

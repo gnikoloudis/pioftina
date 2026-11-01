@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
 import { Recipe } from "@/types/meal-planner";
 import { SEED_RECIPES } from "@/lib/recipes/seed-recipes";
 import { verifyAdminRequest } from "@/lib/security/admin-auth";
 import { checkRateLimit, createRateLimitResponse } from "@/lib/security/rate-limiter";
+import { readJsonDataFile, writeJsonDataFile } from "@/lib/storage/json-store";
 
-const DATA_FILE = path.join(process.cwd(), "src", "data", "recipes.json");
-const LEGACY_CUSTOM_FILE = path.join(process.cwd(), "src", "data", "custom-recipes.json");
+const DATA_FILENAME = "recipes.json";
+const LEGACY_CUSTOM_FILENAME = "custom-recipes.json";
 
 export async function readAllRecipes(): Promise<Recipe[]> {
   const map = new Map<string, Recipe>();
@@ -18,45 +17,32 @@ export async function readAllRecipes(): Promise<Recipe[]> {
   }
 
   // 2. Overlay existing stored recipes (custom recipes or user modifications)
-  try {
-    const data = await fs.readFile(DATA_FILE, "utf-8");
-    const parsed: Recipe[] = JSON.parse(data);
-    if (Array.isArray(parsed)) {
-      for (const r of parsed) {
-        if (r && r.id) {
-          if (r.id.startsWith("custom-")) {
-            map.set(r.id, r);
-          }
+  const parsed = await readJsonDataFile<Recipe[]>(DATA_FILENAME, []);
+  if (Array.isArray(parsed)) {
+    for (const r of parsed) {
+      if (r && r.id) {
+        if (r.id.startsWith("custom-")) {
+          map.set(r.id, r);
         }
       }
     }
-  } catch (_) {}
+  }
 
   // 3. Overlay any legacy custom recipes if present
-  try {
-    const legacyData = await fs.readFile(LEGACY_CUSTOM_FILE, "utf-8");
-    const legacyParsed: Recipe[] = JSON.parse(legacyData);
-    if (Array.isArray(legacyParsed)) {
-      for (const custom of legacyParsed) {
-        if (custom && custom.id) {
-          map.set(custom.id, custom);
-        }
+  const legacyParsed = await readJsonDataFile<Recipe[]>(LEGACY_CUSTOM_FILENAME, []);
+  if (Array.isArray(legacyParsed)) {
+    for (const custom of legacyParsed) {
+      if (custom && custom.id) {
+        map.set(custom.id, custom);
       }
     }
-  } catch (_) {}
+  }
 
-  const merged = Array.from(map.values());
-  try {
-    await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
-    await fs.writeFile(DATA_FILE, JSON.stringify(merged, null, 2), "utf-8");
-  } catch (_) {}
-
-  return merged;
+  return Array.from(map.values());
 }
 
 export async function writeAllRecipes(recipes: Recipe[]): Promise<void> {
-  await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
-  await fs.writeFile(DATA_FILE, JSON.stringify(recipes, null, 2), "utf-8");
+  await writeJsonDataFile(DATA_FILENAME, recipes);
 }
 
 export async function GET() {
@@ -165,4 +151,3 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 }
-

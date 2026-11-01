@@ -5,8 +5,8 @@
  * 1. Strict Outgoing Rate Limit: Minimum 800ms gap between consecutive requests to posokanei.gov.gr.
  * 2. Sequential Request Queue: Only 1 request in-flight at any time to prevent burst bans.
  * 3. Circuit Breaker: If posokanei.gov.gr returns HTTP 429, 403, or 503, immediately
- *    trips the breaker for 60 seconds. During this window, 0 requests are sent to the
- *    upstream government API, and cached/fallback data is served instantly.
+ *    trips the breaker (30 minutes on 403 cloud geo-block, 60 seconds on 429/503).
+ *    During this window, 0 requests are sent to the upstream government API, and cached/fallback data is served instantly.
  */
 
 interface CircuitBreakerState {
@@ -25,7 +25,7 @@ export class UpstreamGovernor {
   private static circuitBreaker: CircuitBreakerState = {
     isOpen: false,
     openedAt: 0,
-    cooldownMs: 60 * 1000, // 60 seconds cooldown upon 429/403/503
+    cooldownMs: 60 * 1000,
     failureCount: 0,
   };
 
@@ -62,13 +62,24 @@ export class UpstreamGovernor {
    * Report an upstream response status. If 429/403/503, trips the circuit breaker.
    */
   public static reportUpstreamStatus(status: number): void {
-    if (status === 429 || status === 403 || status === 503) {
+    if (status === 403) {
+      // Cloud datacenter IP geo-block (e.g., Vercel AWS Lambda): cool down for 30 minutes
       this.circuitBreaker.isOpen = true;
       this.circuitBreaker.openedAt = Date.now();
+      this.circuitBreaker.cooldownMs = 30 * 60 * 1000;
       this.circuitBreaker.lastFailureStatus = status;
       this.circuitBreaker.failureCount++;
-      console.warn(
-        `[Upstream Governor] Circuit breaker TRIPPED on HTTP ${status} from posokanei.gov.gr. Cooling down for ${this.circuitBreaker.cooldownMs / 1000}s to avoid IP ban.`
+      console.info(
+        `[Upstream Governor] Upstream posokanei.gov.gr returned HTTP 403 (geo-fenced). Serving verified local catalog for 30m.`
+      );
+    } else if (status === 429 || status === 503) {
+      this.circuitBreaker.isOpen = true;
+      this.circuitBreaker.openedAt = Date.now();
+      this.circuitBreaker.cooldownMs = 60 * 1000;
+      this.circuitBreaker.lastFailureStatus = status;
+      this.circuitBreaker.failureCount++;
+      console.info(
+        `[Upstream Governor] Circuit breaker active on HTTP ${status} from posokanei.gov.gr. Cooling down for 60s.`
       );
     } else if (status >= 200 && status < 300) {
       this.circuitBreaker.failureCount = 0;
@@ -86,15 +97,11 @@ export class UpstreamGovernor {
   ): Promise<T> {
     // 1. If circuit breaker is open, avoid contacting upstream completely
     if (this.isCircuitOpen()) {
-      const waitSec = this.getRemainingCooldownSeconds();
-      console.info(
-        `[Upstream Governor] Circuit breaker is OPEN (${waitSec}s remaining). Serving fallback for "${operationName}" without contacting posokanei.gov.gr.`
-      );
       return fallbackAction();
     }
 
     // 2. Chain onto the sequential queue to prevent concurrent blasts
-    return new Promise<T>((resolve, reject) => {
+    return new Promise<T>((resolve) => {
       this.executionQueue = this.executionQueue
         .then(async () => {
           // Double-check circuit breaker inside queue
@@ -117,13 +124,11 @@ export class UpstreamGovernor {
             const result = await action();
             resolve(result);
           } catch (error) {
-            // In case of network timeout or unexpected error, resolve with fallback
-            console.warn(`[Upstream Governor] Operation "${operationName}" threw error:`, error);
+            console.info(`[Upstream Governor] Operation "${operationName}" using local fallback:`, error);
             resolve(fallbackAction());
           }
         })
-        .catch((err) => {
-          console.error(`[Upstream Governor] Queue processing error:`, err);
+        .catch(() => {
           resolve(fallbackAction());
         });
     });

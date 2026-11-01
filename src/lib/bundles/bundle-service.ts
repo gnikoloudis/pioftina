@@ -1,10 +1,9 @@
-import fs from "fs/promises";
-import path from "path";
 import { ProductBundle, BundleCategory, BundleStorePrice } from "@/types/bundles";
 import { SEED_BUNDLES } from "@/lib/bundles/seed-bundles";
-import { MOCK_FALLBACK_PRODUCTS, getRetailerName } from "@/lib/posokanei/mock-data";
+import { MOCK_FALLBACK_PRODUCTS } from "@/lib/posokanei/mock-data";
+import { readJsonDataFile, writeJsonDataFile } from "@/lib/storage/json-store";
 
-const DATA_FILE = path.join(process.cwd(), "src", "data", "bundles.json");
+const DATA_FILENAME = "bundles.json";
 
 const TRACKED_RETAILERS = [
   { id: "sklavenitis", name: "Σκλαβενίτης" },
@@ -88,7 +87,6 @@ export function calculateBundlePricing(bundle: ProductBundle): ProductBundle {
 
   // Calculate estimated total and savings vs highest or average store price
   const allTotals = storePrices.map((s) => s.totalPrice);
-  const maxPrice = Math.max(...allTotals);
   const avgPrice = allTotals.reduce((a, b) => a + b, 0) / (allTotals.length || 1);
   const savings = Math.max(0, Math.round((avgPrice - bestStore.totalPrice) * 100) / 100);
 
@@ -106,30 +104,19 @@ export function calculateBundlePricing(bundle: ProductBundle): ProductBundle {
  * Reads all bundles from JSON file, initializing with SEED_BUNDLES if needed.
  */
 export async function readAllBundles(): Promise<ProductBundle[]> {
-  try {
-    const raw = await fs.readFile(DATA_FILE, "utf-8");
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed.map(calculateBundlePricing);
-    }
-  } catch (_) {}
+  const parsed = await readJsonDataFile<ProductBundle[]>(DATA_FILENAME, []);
+  if (Array.isArray(parsed) && parsed.length > 0) {
+    return parsed.map(calculateBundlePricing);
+  }
 
-  // Fallback to seed bundles and persist them
-  const initial = SEED_BUNDLES.map(calculateBundlePricing);
-  try {
-    await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
-    await fs.writeFile(DATA_FILE, JSON.stringify(initial, null, 2), "utf-8");
-  } catch (_) {}
-
-  return initial;
+  return SEED_BUNDLES.map(calculateBundlePricing);
 }
 
 /**
- * Writes bundles to file.
+ * Writes bundles to file safely across local and serverless environments.
  */
 export async function writeAllBundles(bundles: ProductBundle[]): Promise<void> {
-  await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
-  await fs.writeFile(DATA_FILE, JSON.stringify(bundles, null, 2), "utf-8");
+  await writeJsonDataFile(DATA_FILENAME, bundles);
 }
 
 /**

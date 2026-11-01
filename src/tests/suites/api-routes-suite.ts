@@ -1,4 +1,5 @@
 import { defineSuite, defineTest } from "../core/runner";
+import { readJsonDataFile, writeJsonDataFile } from "@/lib/storage/json-store";
 
 export const apiRoutesSuite = defineSuite({
   id: "api-routes-suite",
@@ -62,8 +63,8 @@ export const apiRoutesSuite = defineSuite({
       id: "api-newsletter-subscribe-valid-email",
       title: "Εγγραφή στο Newsletter με έγκυρο email",
       category: "api",
-      description: "Επαληθεύει ότι αποστέλλοντας έγκυρο email στο /api/newsletter/subscribe λαμβάνουμε 200 OK.",
-      documentation: "Στέλνει POST αίτημα με μοναδικό email δοκιμής και θέματα ενδιαφέροντος.",
+      description: "Επαληθεύει ότι αποστέλλοντας έγκυρο email στο /api/newsletter/subscribe λαμβάνουμε 200 OK (και σε serverless read-only περιβάλλον).",
+      documentation: "Στέλνει POST αίτημα με μοναδικό email δοκιμής και επαληθεύει επίσης το serverless-safe JSON store.",
       tags: ["newsletter", "api"],
       severity: "high",
       run: async ({ fetchApi, assertEquals, assert }) => {
@@ -84,6 +85,21 @@ export const apiRoutesSuite = defineSuite({
         assertEquals(res.status, 200, "Έγκυρη εγγραφή πρέπει να επιστρέφει 200 OK");
         const data = await res.json();
         assertEquals(data.success, true, "Απάντηση με success: true");
+
+        // Verify serverless-safe JSON store (EROFS protection for Vercel /var/task)
+        const prevVercel = process.env.VERCEL;
+        try {
+          process.env.VERCEL = "1";
+          await writeJsonDataFile("test-serverless-store.json", [{ ok: true }]);
+          const stored = await readJsonDataFile<Array<{ ok: boolean }>>("test-serverless-store.json", []);
+          assert(Array.isArray(stored) && stored.length === 1 && stored[0].ok === true, "Serverless JSON store write/read must succeed");
+        } finally {
+          if (prevVercel === undefined) {
+            delete process.env.VERCEL;
+          } else {
+            process.env.VERCEL = prevVercel;
+          }
+        }
       },
     }),
 

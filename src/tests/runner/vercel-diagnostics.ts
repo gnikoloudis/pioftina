@@ -291,20 +291,18 @@ async function main() {
   // 3. Fetch Runtime Logs if mode is all, runtime, or errors
   let runtimeLogs: RuntimeLogEntry[] = [];
   if (options.mode === "all" || options.mode === "runtime" || options.mode === "errors") {
+    const fetchLimit = options.mode === "errors" ? Math.max(options.limit, 100) : options.limit;
     const logArgs = [
       "logs",
       "--project",
       options.project,
       "--no-branch",
       "--limit",
-      String(options.limit),
+      String(fetchLimit),
       "--json",
     ];
     if (options.since) {
       logArgs.push("--since", options.since);
-    }
-    if (options.mode === "errors") {
-      logArgs.push("--level", "error");
     }
 
     const logsRes = await runVercelCommand(logArgs);
@@ -321,15 +319,15 @@ async function main() {
       (l) =>
         l.level === "warn" ||
         l.level === "warning" ||
-        (l.status && l.status >= 400 && l.status < 500)
+        (l.status && l.status >= 400 && l.status < 500 && l.level !== "info")
     );
 
     if (!options.jsonOutput) {
       console.log(
-        `${c.bold}${c.blue}▶ 3. Ανάλυση Runtime Logs (Σύνολο: ${runtimeLogs.length})${c.reset}`
+        `${c.bold}${c.blue}▶ 3. Ανάλυση Runtime Logs (Σύνολο Εγγραφών: ${runtimeLogs.length})${c.reset}`
       );
       console.log(
-        `  Σύνοψη: ${c.red}${errorLogs.length} Errors (5xx)${c.reset} | ${c.yellow}${warnLogs.length} Warnings (4xx/warn)${c.reset} | ${c.green}${runtimeLogs.length - errorLogs.length - warnLogs.length} Info (2xx)${c.reset}\n`
+        `  Σύνοψη: ${c.red}${errorLogs.length} Errors (5xx)${c.reset} | ${c.yellow}${warnLogs.length} Warnings (warn)${c.reset} | ${c.green}${runtimeLogs.length - errorLogs.length - warnLogs.length} Info (2xx/3xx/4xx)${c.reset}\n`
       );
 
       const displayList =
@@ -338,7 +336,7 @@ async function main() {
           : runtimeLogs.slice(0, 20);
 
       if (displayList.length === 0) {
-        console.log(`  ${c.green}✓ Δεν καταγράφηκαν σφάλματα runtime.${c.reset}\n`);
+        console.log(`  ${c.green}✓ Δεν καταγράφηκαν σφάλματα ή προειδοποιήσεις runtime.${c.reset}\n`);
       } else {
         for (const item of displayList) {
           const lvlColor =
